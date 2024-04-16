@@ -65,6 +65,16 @@ struct Vector4D
         return *this;
     }
 
+    Vector4D createResized(float newLength) const
+    {
+        const float len = length();
+        if (len != 0)
+        {
+            return Vector4D(x * newLength / len, y * newLength / len, z * newLength / len, w * newLength / len);
+        }
+        return Vector4D();
+    }
+
     operator float*()
     {
         return &x;

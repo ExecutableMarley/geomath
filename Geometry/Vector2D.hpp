@@ -60,6 +60,26 @@ struct Vector2D
         return *this;
     }
 
+    Vector2D createResized(float newLength) const
+    {
+        const float len = length();
+        if (len != 0)
+        {
+            return Vector2D(x * newLength / len, y * newLength / len);
+        }
+        return Vector2D();
+    }
+
+    float dot(const Vector2D& other) const
+    {
+        return x * other.x + y * other.y;
+    }
+
+    float cross(const Vector2D& other) const
+    {
+        return x * other.y - y * other.x;
+    }
+
     operator float*()
     {
         return &x;

@@ -63,6 +63,29 @@ struct Vector3D
         return *this;
     }
 
+    Vector3D createResized(float newLength) const
+    {
+        const float len = length();
+        if (len != 0)
+        {
+            return Vector3D(x * newLength / len, y * newLength / len, z * newLength / len);
+        }
+        return Vector3D();
+    }
+
+    float dot(const Vector3D& other) const
+    {
+        return x * other.x + y * other.y + z * other.z;
+    }
+
+    Vector3D cross(const Vector3D& other) const
+    {
+        return Vector3D(
+            y * other.z - z * other.y,
+            z * other.x - x * other.z,
+            x * other.y - y * other.x);
+    }
+
     operator float*()
     {
         return &x;
