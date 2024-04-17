@@ -1,0 +1,55 @@
+#pragma once
+
+#include <math.h>
+
+#include "Vector2D.hpp"
+
+namespace Utility
+{
+
+namespace Math
+{
+
+struct Triangle
+{
+    Vector2D m_a;
+    Vector2D m_b;
+    Vector2D m_c;
+
+    Triangle() : m_a(), m_b(), m_c() {}
+
+    Triangle(const Vector2D &a, const Vector2D &b, const Vector2D &c) : m_a(a), m_b(b), m_c(c) {}
+
+    float area() const
+    {
+        return 0.5f * fabs((m_a.x - m_c.x) * (m_b.y - m_c.y) - (m_b.x - m_c.x) * (m_a.y - m_c.y));
+    }
+
+    float perimeter() const
+    {
+        return (m_a - m_b).length() + (m_b - m_c).length() + (m_c - m_a).length();
+    }
+
+    Vector2D centroid() const
+    {
+        return (m_a + m_b + m_c) / 3.0f;
+    }
+
+    bool contains(const Vector2D &point) const
+    {
+        const float areaABC = area();
+        const float areaPBC = 0.5f * fabs((m_b.x - point.x) * (m_c.y - point.y) - (m_c.x - point.x) * (m_b.y - point.y));
+        const float areaPCA = 0.5f * fabs((m_c.x - point.x) * (m_a.y - point.y) - (m_a.x - point.x) * (m_c.y - point.y));
+        const float areaPAB = 0.5f * fabs((m_a.x - point.x) * (m_b.y - point.y) - (m_b.x - point.x) * (m_a.y - point.y));
+        return areaABC == areaPBC + areaPCA + areaPAB;
+    }
+
+    bool contains(const Triangle &triangle) const
+    {
+        return contains(triangle.m_a) && contains(triangle.m_b) && contains(triangle.m_c);
+    }
+};
+
+} // namespace Math
+
+} // namespace Utility

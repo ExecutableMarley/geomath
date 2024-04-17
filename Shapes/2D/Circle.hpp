@@ -1,0 +1,60 @@
+#pragma once
+
+#include <math.h>
+
+#include "Vector2D.hpp"
+
+namespace Utility
+{
+
+namespace Math
+{
+
+struct Circle
+{
+    Vector2D m_center;
+    float m_radius;
+
+    Circle() : m_center(), m_radius(0) {}
+
+    Circle(const Vector2D &center, float radius) : m_center(center), m_radius(radius) {}
+
+    float area() const
+    {
+        return 3.14159265358979323846f * m_radius * m_radius;
+    }
+
+    float circumference() const
+    {
+        return 2.0f * 3.14159265358979323846f * m_radius;
+    }
+
+    float perimeter() const
+    {
+        return circumference();
+    }
+
+    Vector2D centroid() const
+    {
+        return m_center;
+    }
+
+    bool contains(const Vector2D &point) const
+    {
+        return (point - m_center).lengthSquared() <= m_radius * m_radius;
+    }
+
+    bool contains(const Circle &circle) const
+    {
+        return (m_center - circle.m_center).lengthSquared() + circle.m_radius * circle.m_radius <= m_radius * m_radius;
+    }
+
+    bool intersects(const Circle &circle) const
+    {
+        return (m_center - circle.m_center).lengthSquared() <= (m_radius + circle.m_radius) * (m_radius + circle.m_radius);
+    }
+};
+
+} // namespace Math
+
+} // namespace Utility
