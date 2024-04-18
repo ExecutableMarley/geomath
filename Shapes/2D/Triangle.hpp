@@ -2,6 +2,7 @@
 
 #include <math.h>
 
+#include "CommonMath.hpp"
 #include "Vector2D.hpp"
 
 namespace Utility
@@ -41,7 +42,7 @@ struct Triangle
         const float areaPBC = 0.5f * fabs((m_b.x - point.x) * (m_c.y - point.y) - (m_c.x - point.x) * (m_b.y - point.y));
         const float areaPCA = 0.5f * fabs((m_c.x - point.x) * (m_a.y - point.y) - (m_a.x - point.x) * (m_c.y - point.y));
         const float areaPAB = 0.5f * fabs((m_a.x - point.x) * (m_b.y - point.y) - (m_b.x - point.x) * (m_a.y - point.y));
-        return areaABC == areaPBC + areaPCA + areaPAB;
+        return approximatelyEqual(areaABC, areaPBC + areaPCA + areaPAB);
     }
 
     bool contains(const Triangle &triangle) const

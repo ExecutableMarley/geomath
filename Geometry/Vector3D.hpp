@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include "../CommonMath.hpp"
+
 namespace Utility
 {
 
@@ -150,12 +152,12 @@ struct Vector3D
 
     bool operator==(const Vector3D& other) const
     {
-        return x == other.x && y == other.y && z == other.z;
+        return approximatelyEqual(x, other.x) && approximatelyEqual(y, other.y) && approximatelyEqual(z, other.z);
     }
 
     bool operator!=(const Vector3D& other) const
     {
-        return x != other.x || y != other.y || z != other.z;
+        return !approximatelyEqual(x, other.x) || !approximatelyEqual(y, other.y) || !approximatelyEqual(z, other.z);
     }
 
     Vector3D operator-() const

@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include "../CommonMath.hpp"
+
 namespace Utility
 {
 
@@ -140,12 +142,12 @@ struct Vector2D
 
     bool operator==(const Vector2D& other) const
     {
-        return x == other.x && y == other.y;
+        return approximatelyEqual(x, other.x) && approximatelyEqual(y, other.y);
     }
 
     bool operator!=(const Vector2D& other) const
     {
-        return x != other.x || y != other.y;
+        return !approximatelyEqual(x, other.x) || !approximatelyEqual(y, other.y);
     }
 
     Vector2D operator-(const Vector2D& other) const
@@ -153,6 +155,16 @@ struct Vector2D
         return Vector2D(x - other.x, y - other.y);
     }
 };
+
+Vector2D operator *(float scalar, const Vector2D& vector)
+{
+    return vector * scalar;
+}
+
+Vector2D operator /(float scalar, const Vector2D& vector)
+{
+    return Vector2D(scalar / vector.x, scalar / vector.y);
+}
 
 } // namespace Math
 

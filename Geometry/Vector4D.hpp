@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include "../CommonMath.hpp"
+
 namespace Utility
 {
 
@@ -143,12 +145,12 @@ struct Vector4D
 
     bool operator==(const Vector4D &other) const
     {
-        return x == other.x && y == other.y && z == other.z && w == other.w;
+        return approximatelyEqual(x, other.x) && approximatelyEqual(y, other.y) && approximatelyEqual(z, other.z) && approximatelyEqual(w, other.w);
     }
 
     bool operator!=(const Vector4D &other) const
     {
-        return x != other.x || y != other.y || z != other.z || w != other.w;
+        return !approximatelyEqual(x, other.x) || !approximatelyEqual(y, other.y) || !approximatelyEqual(z, other.z) || !approximatelyEqual(w, other.w);
     }
 
     Vector4D operator-() const
