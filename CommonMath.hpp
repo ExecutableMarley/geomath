@@ -95,6 +95,17 @@ float tanDeg(float degrees)
     return tan(degToRad(degrees));
 }
 
+void sinCos(float radians, float &sine, float &cosine)
+{
+    sine = sin(radians);
+    cosine = cos(radians);
+}
+
+void sinCosDeg(float degrees, float &sine, float &cosine)
+{
+    sinCos(degToRad(degrees), sine, cosine);
+}
+
 
 } // namespace Math
 
