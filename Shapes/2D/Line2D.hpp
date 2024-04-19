@@ -22,14 +22,19 @@ public:
 
     Line2D(Vector2D startPoint, Vector2D direction, float length) : m_start(startPoint), m_end(startPoint + direction.createNormalized() * length) {}
 
-    float length()
+    float length() const
     {
         return (m_start - m_end).length();
     }
 
-    Vector2D direction()
+    Vector2D direction() const
     {
         return (m_end - m_start).normalize();
+    }
+
+    Vector2D deltaVector() const
+    {
+        return m_end - m_start;
     }
 };
 

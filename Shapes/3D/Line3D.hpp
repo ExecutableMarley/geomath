@@ -30,6 +30,11 @@ struct Line3D
     {
         return (m_end - m_start).normalize();
     }
+
+    Vector3D deltaVector() const
+    {
+        return m_end - m_start;
+    }
 };
 
 } // namespace Math
