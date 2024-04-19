@@ -36,6 +36,23 @@ struct Triangle
         return (m_a + m_b + m_c) / 3.0f;
     }
 
+    Triangle& translate(const Vector2D &translation)
+    {
+        m_a += translation;
+        m_b += translation;
+        m_c += translation;
+        return *this;
+    }
+
+    Triangle& rotate(float angle)
+    {
+        const Vector2D centroid = this->centroid();
+        m_a.rotateAround(angle, centroid);
+        m_b.rotateAround(angle, centroid);
+        m_c.rotateAround(angle, centroid);
+        return *this;
+    }
+
     bool contains(const Vector2D &point) const
     {
         const float areaABC = area();

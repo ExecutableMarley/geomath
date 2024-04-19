@@ -82,6 +82,23 @@ struct Vector2D
         return x * other.y - y * other.x;
     }
 
+    Vector2D& rotate(float degree)
+    {
+        float cosAngle, sinAngle;
+        sinCosDeg(degree, sinAngle, cosAngle);
+
+        const float tempX = x;
+        x = x * cosAngle - y * sinAngle;
+        y = tempX * sinAngle + y * cosAngle;
+
+        return *this;
+    }
+
+    Vector2D& rotateAround(float degree, const Vector2D& point)
+    {
+        return (*this -= point).rotate(degree) += point;
+    }
+
     operator float*()
     {
         return &x;

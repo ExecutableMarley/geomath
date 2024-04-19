@@ -44,6 +44,13 @@ struct BBox2D
         return (m_min + m_max) * 0.5f;
     }
 
+    BBox2D& translate(const Vector2D &translation)
+    {
+        m_min += translation;
+        m_max += translation;
+        return *this;
+    }
+
     bool contains(const Vector2D &point) const
     {
         return point.x >= m_min.x && point.x <= m_max.x && point.y >= m_min.y && point.y <= m_max.y;

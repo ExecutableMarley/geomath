@@ -39,6 +39,17 @@ struct Circle
         return m_center;
     }
 
+    Circle& translate(const Vector2D &translation)
+    {
+        m_center += translation;
+        return *this;
+    }
+
+    Circle& rotate(float angle)
+    {
+        return *this;
+    }
+
     bool contains(const Vector2D &point) const
     {
         return (point - m_center).lengthSquared() <= m_radius * m_radius;
