@@ -22,7 +22,7 @@ public:
 
     BBox3D(const Vector3D &center, float halfSize) : m_min(center - Vector3D(halfSize, halfSize, halfSize)), m_max(center + Vector3D(halfSize, halfSize, halfSize)) {}
 
-    BBox3D(const Vector3D &center, const Vector3D &halfSize) : m_min(center - halfSize), m_max(center + halfSize) {}
+    //BBox3D(const Vector3D &center, const Vector3D &halfSize) : m_min(center - halfSize), m_max(center + halfSize) {}
 
     Vector3D center() const
     {

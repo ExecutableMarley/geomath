@@ -2,7 +2,9 @@
 
 #include <math.h>
 
+#include "CommonMath.hpp"
 #include "Vector2D.hpp"
+#include "BBox2D.hpp"
 
 namespace Utility
 {
@@ -21,12 +23,12 @@ struct Circle
 
     float area() const
     {
-        return 3.14159265358979323846f * m_radius * m_radius;
+        return PI * m_radius * m_radius;
     }
 
     float circumference() const
     {
-        return 2.0f * 3.14159265358979323846f * m_radius;
+        return 2.0f * PI * m_radius;
     }
 
     float perimeter() const
@@ -63,6 +65,11 @@ struct Circle
     bool intersects(const Circle &circle) const
     {
         return (m_center - circle.m_center).lengthSquared() <= (m_radius + circle.m_radius) * (m_radius + circle.m_radius);
+    }
+
+    BBox2D boundingBox() const
+    {
+        return BBox2D(m_center - Vector2D(m_radius, m_radius), m_center + Vector2D(m_radius, m_radius));
     }
 };
 

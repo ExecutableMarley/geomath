@@ -4,6 +4,7 @@
 
 #include "CommonMath.hpp"
 #include "Vector2D.hpp"
+#include "BBox2D.hpp"
 
 namespace Utility
 {
@@ -65,6 +66,12 @@ struct Triangle
     bool contains(const Triangle &triangle) const
     {
         return contains(triangle.m_a) && contains(triangle.m_b) && contains(triangle.m_c);
+    }
+
+    BBox2D boundingBox() const
+    {
+        return BBox2D(Vector2D(fminf(fminf(m_a.x, m_b.x), m_c.x), fminf(fminf(m_a.y, m_b.y), m_c.y)),
+                      Vector2D(fmaxf(fmaxf(m_a.x, m_b.x), m_c.x), fmaxf(fmaxf(m_a.y, m_b.y), m_c.y)));
     }
 };
 

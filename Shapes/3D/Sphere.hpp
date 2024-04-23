@@ -4,6 +4,7 @@
 
 #include "CommonMath.hpp"
 #include "Vector3D.hpp"
+#include "BBox3D.hpp"
 
 namespace Utility
 {
@@ -39,6 +40,11 @@ public:
     bool intersects(const Sphere &sphere) const
     {
         return (m_center - sphere.m_center).lengthSquared() <= (m_radius + sphere.m_radius) * (m_radius + sphere.m_radius);
+    }
+
+    BBox3D boundingBox() const
+    {
+        return BBox3D(m_center - Vector3D(m_radius, m_radius, m_radius), m_center + Vector3D(m_radius, m_radius, m_radius));
     }
 };
 
