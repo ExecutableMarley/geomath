@@ -201,6 +201,24 @@ struct Vector3D
     {
         return Vector3D(-x, -y, -z);
     }
+
+    // Static functions
+
+    static Vector3D min(const Vector3D& a, const Vector3D& b)
+    {
+        return Vector3D(
+            a.x < b.x ? a.x : b.x,
+            a.y < b.y ? a.y : b.y,
+            a.z < b.z ? a.z : b.z);
+    }
+
+    static Vector3D max(const Vector3D& a, const Vector3D& b)
+    {
+        return Vector3D(
+            a.x > b.x ? a.x : b.x,
+            a.y > b.y ? a.y : b.y,
+            a.z > b.z ? a.z : b.z);
+    }
 };
 
 } // namespace Math

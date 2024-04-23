@@ -171,6 +171,18 @@ struct Vector2D
     {
         return Vector2D(x - other.x, y - other.y);
     }
+
+    // Static functions
+
+    static Vector2D min(const Vector2D& a, const Vector2D& b)
+    {
+        return Vector2D(a.x < b.x ? a.x : b.x, a.y < b.y ? a.y : b.y);
+    }
+
+    static Vector2D max(const Vector2D& a, const Vector2D& b)
+    {
+        return Vector2D(a.x > b.x ? a.x : b.x, a.y > b.y ? a.y : b.y);
+    }
 };
 
 Vector2D operator *(float scalar, const Vector2D& vector)
