@@ -36,6 +36,16 @@ public:
     {
         return m_end - m_start;
     }
+
+    Vector2D pointAt(float t) const
+    {
+        return m_start + (m_end - m_start) * t;
+    }
+
+    Vector2D normal() const
+    {
+        return Vector2D(m_end.y - m_start.y, m_start.x - m_end.x).normalize();
+    }
 };
 
 } // namespace Math

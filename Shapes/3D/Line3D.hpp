@@ -35,6 +35,11 @@ struct Line3D
     {
         return m_end - m_start;
     }
+
+    Vector3D pointAt(float t) const
+    {
+        return m_start + (m_end - m_start) * t;
+    }
 };
 
 } // namespace Math
