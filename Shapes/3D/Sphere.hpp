@@ -27,6 +27,16 @@ public:
         return 4.0f / 3.0f * PI * m_radius * m_radius * m_radius;
     }
 
+    float surfaceArea() const
+    {
+        return 4.0f * PI * m_radius * m_radius;
+    }
+
+    Vector3D centroid() const
+    {
+        return m_center;
+    }
+
     bool contains(const Vector3D &point) const
     {
         return (point - m_center).lengthSquared() <= m_radius * m_radius;

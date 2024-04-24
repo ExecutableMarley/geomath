@@ -24,11 +24,6 @@ public:
 
     //BBox3D(const Vector3D &center, const Vector3D &halfSize) : m_min(center - halfSize), m_max(center + halfSize) {}
 
-    Vector3D center() const
-    {
-        return (m_min + m_max) * 0.5f;
-    }
-
     Vector3D halfSize() const
     {
         return (m_max - m_min) * 0.5f;
@@ -43,6 +38,17 @@ public:
     {
         const Vector3D s = size();
         return s.x * s.y * s.z;
+    }
+
+    float surfaceArea() const
+    {
+        const Vector3D s = size();
+        return 2.0f * (s.x * s.y + s.x * s.z + s.y * s.z);
+    }
+
+    Vector3D centroid() const
+    {
+        return (m_min + m_max) * 0.5f;
     }
 
     bool contains(const Vector3D &point) const
