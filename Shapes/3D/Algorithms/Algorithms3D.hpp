@@ -8,13 +8,14 @@
 #include <math.h>
 
 #include "Vector3D.hpp"
-#include "Line3D.hpp"
 
 namespace Utility
 {
 
 namespace Math
 {
+
+class Line3D;
 
 // Distance based algorithms
 
