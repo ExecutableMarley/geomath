@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Marley Arns
+ * Licensed under the MIT License.
+*/
+
 #pragma once
 
 #include <math.h>
@@ -45,6 +50,12 @@ public:
     Vector2D normal() const
     {
         return Vector2D(m_end.y - m_start.y, m_start.x - m_end.x).normalize();
+    }
+
+    float closestParameter(const Vector2D &point) const
+    {
+        Vector2D deltaVector = m_end - m_start;
+        return (point - m_start).dot(deltaVector) / (deltaVector).lengthSquared();
     }
 };
 

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Marley Arns
+ * Licensed under the MIT License.
+*/
+
 #pragma once
 
 #include <math.h>
@@ -39,6 +44,12 @@ struct Line3D
     Vector3D pointAt(float t) const
     {
         return m_start + (m_end - m_start) * t;
+    }
+
+    float closestParameter(const Vector3D &point) const
+    {
+        Vector3D deltaVector = m_end - m_start;
+        return (point - m_start).dot(deltaVector) / (deltaVector).lengthSquared();
     }
 };
 
