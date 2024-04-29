@@ -88,34 +88,37 @@ struct Vector3D
             x * other.y - y * other.x);
     }
 
-    void rotateAroundX(float angle)
+    Vector3D& rotateAroundX(float angle)
     {
         const float cosAngle = cos(angle);
         const float sinAngle = sin(angle);
         const float newY = y * cosAngle - z * sinAngle;
         z = y * sinAngle + z * cosAngle;
         y = newY;
+        return *this;
     }
 
-    void rotateAroundY(float angle)
+    Vector3D& rotateAroundY(float angle)
     {
         const float cosAngle = cos(angle);
         const float sinAngle = sin(angle);
         const float newZ = z * cosAngle - x * sinAngle;
         x = z * sinAngle + x * cosAngle;
         z = newZ;
+        return *this;
     }
 
-    void rotateAroundZ(float angle)
+    Vector3D& rotateAroundZ(float angle)
     {
         const float cosAngle = cos(angle);
         const float sinAngle = sin(angle);
         const float newX = x * cosAngle - y * sinAngle;
         y = x * sinAngle + y * cosAngle;
         x = newX;
+        return *this;
     }
 
-    void rotate(float xAngle = 0.f, float yAngle = 0.f, float zAngle = 0.f)
+    Vector3D& rotate(float xAngle = 0.f, float yAngle = 0.f, float zAngle = 0.f)
     {
         if (xAngle != 0.f)
             rotateAroundX(xAngle);
@@ -123,6 +126,12 @@ struct Vector3D
             rotateAroundY(yAngle);
         if (zAngle != 0.f)
             rotateAroundZ(zAngle);
+        return *this;
+    }
+
+    Vector3D& rotateAround(float xAngle, float yAngle, float zAngle, const Vector3D& point)
+    {
+        return (*this -= point).rotate(xAngle, yAngle, zAngle) += point;
     }
 
     operator float*()
