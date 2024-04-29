@@ -179,20 +179,27 @@ struct Vector2D
         return Vector2D(a.x < b.x ? a.x : b.x, a.y < b.y ? a.y : b.y);
     }
 
+    template <typename... Args>
+    static Vector2D min(const Vector2D& a, const Vector2D& b, Args... args)
+    {
+        return min(a, min(b, args...));
+    }
+
     static Vector2D max(const Vector2D& a, const Vector2D& b)
     {
         return Vector2D(a.x > b.x ? a.x : b.x, a.y > b.y ? a.y : b.y);
+    }
+
+    template <typename... Args>
+    static Vector2D max(const Vector2D& a, const Vector2D& b, Args... args)
+    {
+        return max(a, max(b, args...));
     }
 };
 
 Vector2D operator *(float scalar, const Vector2D& vector)
 {
     return vector * scalar;
-}
-
-Vector2D operator /(float scalar, const Vector2D& vector)
-{
-    return Vector2D(scalar / vector.x, scalar / vector.y);
 }
 
 } // namespace Math

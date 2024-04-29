@@ -221,6 +221,12 @@ struct Vector3D
             a.z < b.z ? a.z : b.z);
     }
 
+    template <typename... Args>
+    static Vector3D min(const Vector3D& a, const Vector3D& b, Args... args)
+    {
+        return min(a, min(b, args...));
+    }
+
     static Vector3D max(const Vector3D& a, const Vector3D& b)
     {
         return Vector3D(
@@ -228,7 +234,18 @@ struct Vector3D
             a.y > b.y ? a.y : b.y,
             a.z > b.z ? a.z : b.z);
     }
+
+    template <typename... Args>
+    static Vector3D max(const Vector3D& a, const Vector3D& b, Args... args)
+    {
+        return max(a, max(b, args...));
+    }
 };
+
+Vector3D operator *(float scalar, const Vector3D& vector)
+{
+    return vector * scalar;
+}
 
 } // namespace Math
 
