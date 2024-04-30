@@ -1,6 +1,13 @@
+/*
+ * Copyright (c) Marley Arns
+ * Licensed under the MIT License.
+*/
+
 #pragma once
 
 #include <math.h>
+
+#include "Geometry/Vector3D.hpp"
 
 namespace Utility
 {
@@ -80,13 +87,19 @@ struct Quaternion
         return Quaternion(0,0,0,0);
     }
 
+    Vector3D rotate(const Vector3D &vec) const
+    {
+        Quaternion q = *this * Quaternion(vec.x, vec.y, vec.z, 0) * conjugate();
+        return Vector3D(q.x, q.y, q.z);
+    }
+
     Quaternion operator*(const Quaternion &other) const
     {
         return Quaternion(
+            this->w * other.w - this->x * other.x - this->y * other.y - this->z * other.z,
             this->w * other.x + this->x * other.w + this->y * other.z - this->z * other.y,
             this->w * other.y - this->x * other.z + this->y * other.w + this->z * other.x,
-            this->w * other.z + this->x * other.y - this->y * other.x + this->z * other.w,
-            this->w * other.w - this->x * other.x - this->y * other.y - this->z * other.z
+            this->w * other.z + this->x * other.y - this->y * other.x + this->z * other.w
         );
     }
 
