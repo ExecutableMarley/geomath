@@ -47,10 +47,10 @@ bool intersects(const Line3D &line1, const Line3D &line2, Vector3D *intersection
 
 bool linePlaneIntersection(const Line3D& line, const Vector3D& planeNormal, const Vector3D& planePoint, Vector3D& intersection)
 {
-    Vector3D lineDirection = line.direction();
-    Vector3D lineStart = line.m_start;
+    const Vector3D lineDelta = line.deltaVector();
+    const Vector3D lineStart = line.m_start;
 
-    float denominator = planeNormal.dot(lineDirection);
+    float denominator = planeNormal.dot(lineDelta);
 
     if (denominator == 0)
     {
@@ -61,7 +61,7 @@ bool linePlaneIntersection(const Line3D& line, const Vector3D& planeNormal, cons
 
     if (t > 0.f && t < 1.f)
     {
-        intersection = lineStart + lineDirection * t;
+        intersection = lineStart + lineDelta * t;
         return true;
     }
     return false;
