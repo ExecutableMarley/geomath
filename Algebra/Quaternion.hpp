@@ -96,10 +96,10 @@ struct Quaternion
     Quaternion operator*(const Quaternion &other) const
     {
         return Quaternion(
-            this->w * other.w - this->x * other.x - this->y * other.y - this->z * other.z,
-            this->w * other.x + this->x * other.w + this->y * other.z - this->z * other.y,
-            this->w * other.y - this->x * other.z + this->y * other.w + this->z * other.x,
-            this->w * other.z + this->x * other.y - this->y * other.x + this->z * other.w
+            this->w * other.x + this->x * other.w + this->y * other.z - this->z * other.y, // x
+            this->w * other.y - this->x * other.z + this->y * other.w + this->z * other.x, // y
+            this->w * other.z + this->x * other.y - this->y * other.x + this->z * other.w, // z
+            this->w * other.w - this->x * other.x - this->y * other.y - this->z * other.z  // w
         );
     }
 
