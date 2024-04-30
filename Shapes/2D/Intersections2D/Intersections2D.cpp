@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Marley Arns
+ * Licensed under the MIT License.
+*/
+
 #include "Intersections2D.hpp"
 #include "CommonMath.hpp"
 
@@ -84,6 +89,17 @@ bool intersects(const Line2D& line, const Circle& circle, Vector2D* intersection
         if (intersection)
             *intersection = line.m_start + t2 * lineDelta;
         return true;
+    }
+    return false;
+}
+
+bool intersects(const Line2D& line, const Polygon& polygon, Vector2D* intersection)
+{
+    for (size_t i = 0; i < polygon.m_vertices.size(); i++)
+    {
+        Line2D edge(polygon.m_vertices[i], polygon.m_vertices[(i + 1) % polygon.m_vertices.size()]);
+        if (intersects(line, edge, intersection))
+            return true;
     }
     return false;
 }

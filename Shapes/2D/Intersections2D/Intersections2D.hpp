@@ -1,12 +1,17 @@
+/*
+ * Copyright (c) Marley Arns
+ * Licensed under the MIT License.
+*/
+
 #pragma once
 
 #include <math.h>
 
-#include "Vector2D.hpp"
-#include "Line2D.hpp"
-#include "BBox2D.hpp"
-#include "Circle.hpp"
-
+#include "Geometry/Vector2D.hpp"
+#include "../Line2D.hpp"
+#include "../BBox2D.hpp"
+#include "../Circle.hpp"
+#include "../Polygon.hpp"
 
 namespace Utility
 {
@@ -28,6 +33,10 @@ bool intersects(const Line2D& line, const BBox2D& rectangle, Vector2D* intersect
 
 bool intersects(const Line2D& line, const Circle& circle, Vector2D* intersection = nullptr);
 
+
+//[Line-Polygon Intersection]
+
+bool intersects(const Line2D& line, const Polygon& polygon, Vector2D* intersection = nullptr);
 
 } // namespace Math
 
