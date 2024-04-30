@@ -7,10 +7,12 @@
 
 #include <math.h>
 
-#include "Vector3D.hpp"
-#include "Line3D.hpp"
-#include "BBox3D.hpp"
-#include "Sphere.hpp"
+#include "Geometry/Vector3D.hpp"
+#include "../Line3D.hpp"
+#include "../BBox3D.hpp"
+#include "../Sphere.hpp"
+#include "../Cylinder.hpp"
+#include "../Capsule.hpp"
 
 namespace Utility
 {
@@ -23,6 +25,11 @@ bool intersects(const Line3D &line1, const Line3D &line2, Vector3D *intersection
 bool intersects(const Line3D &line, const BBox3D &bbox, Vector3D *intersection = nullptr);
 
 bool intersects(const Line3D &line, const Sphere &sphere, Vector3D *intersection = nullptr);
+
+bool intersects(const Line3D &line, const Cylinder &cylinder, Vector3D *intersection = nullptr);
+
+bool intersects(const Line3D &line, const Capsule &capsule, Vector3D *intersection = nullptr);
+
 
 } // namespace Math
 

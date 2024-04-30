@@ -126,19 +126,55 @@ bool intersects(const Line3D &line, const BBox3D &bbox, Vector3D* intersection)
 
 bool intersects(const Line3D &line, const Sphere &sphere, Vector3D *intersection)
 {
-    Vector3D cloestPoint;
-    float distance = distancePointToLine(sphere.m_center, line, &cloestPoint);
+    Vector3D closestPoint;
+    float distance = distancePointToLine(sphere.m_center, line, &closestPoint);
     if (distance <= sphere.m_radius)
     {
         if (intersection)
         {
-            *intersection = cloestPoint;
+            *intersection = closestPoint;
         }
         return true;
     }
     return false;
 }
 
+bool intersects(const Line3D &line, const Cylinder &cylinder, Vector3D *intersection)
+{
+    Vector3D closestOnLine, closestOnCylinder;
+    float distance = distanceLineToLine(line.m_start, line.m_end, cylinder.m_startPoint, cylinder.m_endPoint, &closestOnLine, &closestOnCylinder);
+
+    if (distance <= cylinder.m_radius) 
+    {
+        Vector3D lineDir = (line.m_end - line.m_start).normalize();
+        Vector3D cylinderDir = (cylinder.m_endPoint - cylinder.m_startPoint).normalize();
+
+        if ((closestOnLine - line.m_start).dot(lineDir) >= 0 && (closestOnLine - line.m_end).dot(lineDir) <= 0 &&
+            (closestOnCylinder - cylinder.m_startPoint).dot(cylinderDir) >= 0 && (closestOnCylinder - cylinder.m_endPoint).dot(cylinderDir) <= 0) 
+            {
+            if (intersection) {
+                *intersection = closestOnLine;
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+bool intersects(const Line3D &line, const Capsule &capsule, Vector3D *intersection)
+{
+    Vector3D closestPoint;
+    float distance = distanceLineToLine(line.m_start, line.m_end, capsule.m_startPoint, capsule.m_endPoint, &closestPoint);
+    if (distance <= capsule.m_radius)
+    {
+        if (intersection)
+        {
+            *intersection = closestPoint;
+        }
+        return true;
+    }
+    return false;
+}
 
 } // namespace Math
 
