@@ -8,9 +8,9 @@
 #include <math.h>
 
 #include "CommonMath.hpp"
-#include "Vector3D.hpp"
+#include "Geometry/Vector3D.hpp"
 #include "BBox3D.hpp"
-#include "Algorithms3D.hpp"
+#include "Algorithms/Algorithms3D.hpp"
 
 namespace Utility
 {

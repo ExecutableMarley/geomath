@@ -1,9 +1,14 @@
+/*
+ * Copyright (c) Marley Arns
+ * Licensed under the MIT License.
+*/
+
 #pragma once
 
 #include <math.h>
 
 #include "CommonMath.hpp"
-#include "Vector3D.hpp"
+#include "Geometry/Vector3D.hpp"
 #include "BBox3D.hpp"
 
 namespace Utility

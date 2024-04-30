@@ -4,7 +4,7 @@
 */
 
 #include "Algorithms3D.hpp"
-#include "Line3D.hpp"
+#include "../Line3D.hpp"
 
 namespace Utility
 {

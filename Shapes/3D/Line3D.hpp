@@ -7,7 +7,7 @@
 
 #include <math.h>
 
-#include "Vector3D.hpp"
+#include "Geometry/Vector3D.hpp"
 
 namespace Utility
 {

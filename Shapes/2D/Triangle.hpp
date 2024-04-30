@@ -1,9 +1,14 @@
+/*
+ * Copyright (c) Marley Arns
+ * Licensed under the MIT License.
+*/
+
 #pragma once
 
 #include <math.h>
 
 #include "CommonMath.hpp"
-#include "Vector2D.hpp"
+#include "Geometry/Vector2D.hpp"
 #include "BBox2D.hpp"
 
 namespace Utility

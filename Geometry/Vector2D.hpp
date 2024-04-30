@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Marley Arns
+ * Licensed under the MIT License.
+*/
+
 #pragma once
 
 #include <math.h>
@@ -167,9 +172,9 @@ struct Vector2D
         return !approximatelyEqual(x, other.x) || !approximatelyEqual(y, other.y);
     }
 
-    Vector2D operator-(const Vector2D& other) const
+    Vector2D operator-() const
     {
-        return Vector2D(x - other.x, y - other.y);
+        return Vector2D(-x, -y);
     }
 
     // Static functions
