@@ -1,8 +1,13 @@
+/*
+ * Copyright (c) Marley Arns
+ * Licensed under the MIT License.
+*/
+
 #pragma once
 
 #include <math.h>
 
-#include "Vector2D.hpp"
+#include "Geometry/Vector2D.hpp"
 
 namespace Utility
 {
@@ -64,6 +69,13 @@ struct BBox2D
     bool intersects(const BBox2D &rectangle) const
     {
         return m_min.x <= rectangle.m_max.x && m_max.x >= rectangle.m_min.x && m_min.y <= rectangle.m_max.y && m_max.y >= rectangle.m_min.y;
+    }
+
+    // Static functions
+
+    static BBox2D merge(const BBox2D &box1, const BBox2D &box2)
+    {
+        return BBox2D(Vector2D::min(box1.m_min, box2.m_min), Vector2D::max(box1.m_max, box2.m_max));
     }
 };
 
