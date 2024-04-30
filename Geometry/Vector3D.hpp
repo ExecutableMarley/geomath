@@ -247,7 +247,7 @@ struct Vector3D
     }
 };
 
-Vector3D operator *(float scalar, const Vector3D& vector)
+inline Vector3D operator *(float scalar, const Vector3D& vector)
 {
     return vector * scalar;
 }

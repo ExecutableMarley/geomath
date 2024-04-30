@@ -202,7 +202,7 @@ struct Vector2D
     }
 };
 
-Vector2D operator *(float scalar, const Vector2D& vector)
+inline Vector2D operator *(float scalar, const Vector2D& vector)
 {
     return vector * scalar;
 }
