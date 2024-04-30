@@ -12,7 +12,7 @@ namespace Utility
 namespace Math
 {
 
-float distancePointLine(const Vector3D& point, const Vector3D& lineStart, const Vector3D& lineEnd, Vector3D* closestPoint)
+float distancePointToLine(const Vector3D& point, const Vector3D& lineStart, const Vector3D& lineEnd, Vector3D* closestPoint)
 {
     Vector3D v = lineEnd - lineStart;
     Vector3D w = point - lineStart;
@@ -40,12 +40,12 @@ float distancePointLine(const Vector3D& point, const Vector3D& lineStart, const 
     return (point - tmp).length();   
 }
 
-float distancePointLine(const Vector3D& point, const Line3D& line, Vector3D* closestPoint)
+float distancePointToLine(const Vector3D& point, const Line3D& line, Vector3D* closestPoint)
 {
-    return distancePointLine(point, line.m_start, line.m_end, closestPoint);
+    return distancePointToLine(point, line.m_start, line.m_end, closestPoint);
 }
 
-float distanceLineLine(const Vector3D& s1, const Vector3D& s2, const Vector3D& k1, const Vector3D& k2, Vector3D* closestPoint1, Vector3D* closestPoint2)
+float distanceLineToLine(const Vector3D& s1, const Vector3D& s2, const Vector3D& k1, const Vector3D& k2, Vector3D* closestPoint1, Vector3D* closestPoint2)
 {
     const Vector3D   u = s2 - s1; // Line 1 Delta
 	const Vector3D   v = k2 - k1; // Line 2 Delta
@@ -130,9 +130,9 @@ float distanceLineLine(const Vector3D& s1, const Vector3D& s2, const Vector3D& k
 	return deltaP.length();
 }
 
-float distanceLineLine(const Line3D& line1, const Line3D& line2, Vector3D* closestPoint1 = nullptr, Vector3D* closestPoint2 = nullptr)
+float distanceLineToLine(const Line3D& line1, const Line3D& line2, Vector3D* closestPoint1, Vector3D* closestPoint2)
 {
-    distanceLineLine(line1.m_start, line1.m_end, line2.m_start, line2.m_end, closestPoint1, closestPoint2);
+    return distanceLineToLine(line1.m_start, line1.m_end, line2.m_start, line2.m_end, closestPoint1, closestPoint2);
 }
 
 

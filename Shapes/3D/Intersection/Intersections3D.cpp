@@ -4,7 +4,7 @@
 */
 
 #include "Intersections3D.hpp"
-#include "Algorithms3D.hpp"
+#include "../Algorithms/Algorithms3D.hpp"
 
 namespace Utility
 {
