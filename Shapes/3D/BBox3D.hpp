@@ -61,6 +61,13 @@ public:
         return *this;
     }
 
+    BBox3D& encapsulate(const Vector3D &point)
+    {
+        m_min = Vector3D::min(m_min, point);
+        m_max = Vector3D::max(m_max, point);
+        return *this;
+    }
+
     bool contains(const Vector3D &point) const
     {
         return point.x >= m_min.x && point.x <= m_max.x && point.y >= m_min.y && point.y <= m_max.y && point.z >= m_min.z && point.z <= m_max.z;

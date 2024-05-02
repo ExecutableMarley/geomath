@@ -24,6 +24,8 @@ struct BBox2D
     
     BBox2D(const Vector2D &min, const Vector2D &max) : m_min(min), m_max(max) {}
 
+    BBox2D(const Vector2D &point, float width = 0.f, float height = 0.f) : m_min(point), m_max(point.x + width, point.y + height) {}
+
     float width() const
     {
         return m_max.x - m_min.x;
@@ -53,6 +55,13 @@ struct BBox2D
     {
         m_min += translation;
         m_max += translation;
+        return *this;
+    }
+
+    BBox2D& encapsulate(const Vector2D &point)
+    {
+        m_min = Vector2D::min(m_min, point);
+        m_max = Vector2D::max(m_max, point);
         return *this;
     }
 
