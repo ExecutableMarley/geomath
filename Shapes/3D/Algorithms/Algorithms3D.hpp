@@ -15,7 +15,7 @@ namespace Utility
 namespace Math
 {
 
-class Line3D;
+struct Line3D;
 
 // Distance based algorithms
 
