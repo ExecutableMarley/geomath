@@ -57,6 +57,46 @@ bool intersects(const Line2D& line, const BBox2D& rectangle, Vector2D* intersect
     return false;
 }
 
+bool intersects(const Line2D& line, const Triangle& triangle, Vector2D* intersection)
+{
+    Line2D edge1(triangle.m_a, triangle.m_b);
+    Line2D edge2(triangle.m_b, triangle.m_c);
+    Line2D edge3(triangle.m_c, triangle.m_a);
+
+    if (intersects(line, edge1, intersection))
+        return true;
+
+    if (intersects(line, edge2, intersection))
+        return true;
+
+    if (intersects(line, edge3, intersection))
+        return true;
+
+    return false;
+}
+
+bool intersects(const Line2D& line, const Rectangle& rectangle, Vector2D* intersection)
+{
+    Line2D line1(rectangle.m_a, rectangle.m_b);
+    Line2D line2(rectangle.m_b, rectangle.m_c);
+    Line2D line3(rectangle.m_c, rectangle.m_d);
+    Line2D line4(rectangle.m_d, rectangle.m_a);
+
+    if (intersects(line, line1, intersection))
+        return true;
+
+    if (intersects(line, line2, intersection))
+        return true;
+
+    if (intersects(line, line3, intersection))
+        return true;
+
+    if (intersects(line, line4, intersection))
+        return true;
+
+    return false;
+}
+
 bool intersects(const Line2D& line, const Circle& circle, Vector2D* intersection)
 {
     const Vector2D lineDelta = line.deltaVector();
@@ -103,6 +143,18 @@ bool intersects(const Line2D& line, const Polygon& polygon, Vector2D* intersecti
     }
     return false;
 }
+
+/*
+Todo:
+Improve efficiency for:
+1. Line2D - BBox2D
+2. Line2D - Triangle
+3. Line2D - Rectangle
+
+Consider move code to Algorithms2D
+Consider renaming intersection functions
+*/
+
 
 } // namespace Math
 
