@@ -176,6 +176,24 @@ bool intersects(const Line3D &line, const Capsule &capsule, Vector3D *intersecti
     return false;
 }
 
+bool intersects(const Line3D &line, const Triangle3D &triangle, Vector3D *intersection)
+{
+    Vector3D normal = triangle.normal();
+    //Plane plane(triangle.m_point1, triangle.m_point2, triangle.m_point3);
+
+    Vector3D intersectionPoint;
+    if (linePlaneIntersection(line, normal, triangle.m_a, intersectionPoint))
+    {
+        if (triangle.contains(intersectionPoint))
+        {
+            if (intersection)
+                *intersection = intersectionPoint;
+            return true;
+        }
+    }
+    return false;
+}
+
 } // namespace Math
 
 } // namespace Utility

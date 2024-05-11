@@ -13,6 +13,7 @@
 #include "../Sphere.hpp"
 #include "../Cylinder.hpp"
 #include "../Capsule.hpp"
+#include "../Triangle3D.hpp"
 
 namespace Utility
 {
@@ -30,6 +31,7 @@ bool intersects(const Line3D &line, const Cylinder &cylinder, Vector3D *intersec
 
 bool intersects(const Line3D &line, const Capsule &capsule, Vector3D *intersection = nullptr);
 
+bool intersects(const Line3D &line, const Triangle3D &triangle, Vector3D *intersection = nullptr);
 
 } // namespace Math
 
