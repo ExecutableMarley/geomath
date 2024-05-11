@@ -87,6 +87,11 @@ struct Vector2D
         return x * other.y - y * other.x;
     }
 
+    bool isParallel(const Vector2D& other) const
+    {
+        return approximatelyZero(cross(other));
+    }
+
     Vector2D& rotate(float degree)
     {
         float cosAngle, sinAngle;

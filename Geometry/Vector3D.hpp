@@ -93,6 +93,11 @@ struct Vector3D
             x * other.y - y * other.x);
     }
 
+    bool isParallel(const Vector3D& other) const
+    {
+        return approximatelyZero(cross(other).length());
+    }
+
     Vector3D& rotateAroundX(float angle)
     {
         const float cosAngle = cos(angle);
