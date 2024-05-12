@@ -36,6 +36,11 @@ struct Vector3D
         return x * x + y * y + z * z;
     }
 
+    bool isZero() const
+    {
+        return approximatelyZero(x) && approximatelyZero(y) && approximatelyZero(z);
+    }
+
     Vector3D& normalize()
     {
         const float len = length();
@@ -78,6 +83,14 @@ struct Vector3D
             return Vector3D(x * newLength / len, y * newLength / len, z * newLength / len);
         }
         return Vector3D();
+    }
+
+    Vector3D& clamp(const Vector3D& min, const Vector3D& max)
+    {
+        x = Utility::Math::clamp(x, min.x, max.x);
+        y = Utility::Math::clamp(y, min.y, max.y);
+        z = Utility::Math::clamp(z, min.z, max.z);
+        return *this;
     }
 
     float dot(const Vector3D& other) const

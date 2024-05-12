@@ -35,6 +35,11 @@ struct Vector2D
         return x * x + y * y;
     }
 
+    bool isZero() const
+    {
+        return approximatelyZero(x) && approximatelyZero(y);
+    }
+
     Vector2D& normalize()
     {
         const float len = length();
@@ -75,6 +80,13 @@ struct Vector2D
             return Vector2D(x * newLength / len, y * newLength / len);
         }
         return Vector2D();
+    }
+
+    Vector2D& clamp(const Vector2D& min, const Vector2D& max)
+    {
+        x = Utility::Math::clamp(x, min.x, max.x);
+        y = Utility::Math::clamp(y, min.y, max.y);
+        return *this;
     }
 
     float dot(const Vector2D& other) const
