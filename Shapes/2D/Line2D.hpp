@@ -55,7 +55,8 @@ public:
     float closestParameter(const Vector2D &point) const
     {
         Vector2D deltaVector = m_end - m_start;
-        return (point - m_start).dot(deltaVector) / (deltaVector).lengthSquared();
+        const float lengthSquared = deltaVector.lengthSquared();
+        return lengthSquared == 0.f ? 0.f : (point - m_start).dot(deltaVector) / lengthSquared;
     }
 };
 
