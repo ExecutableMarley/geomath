@@ -10,7 +10,7 @@
 #include "CommonMath.hpp"
 #include "Geometry/Vector3D.hpp"
 #include "BBox3D.hpp"
-#include "Algorithms/Algorithms3D.hpp"
+#include "Algorithms3D/Algorithms3D.hpp"
 
 namespace Utility
 {
