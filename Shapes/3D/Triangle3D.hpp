@@ -54,10 +54,8 @@ public:
         return (m_b - m_a).cross(m_c - m_a).normalize();
     }
 
-    //Todo: Problematic
     bool contains(const Vector3D &point) const
     {
-        Vector3D n = normal();
         Vector3D ab = m_b - m_a;
         Vector3D bc = m_c - m_b;
         Vector3D ca = m_a - m_c;
@@ -66,7 +64,16 @@ public:
         Vector3D bp = point - m_b;
         Vector3D cp = point - m_c;
 
-        if (n.dot(ab.cross(ap)) > 0.0f && n.dot(bc.cross(bp)) > 0.0f && n.dot(ca.cross(cp)) > 0.0f)
+        Vector3D crossAB_AP = ab.cross(ap);
+        Vector3D crossBC_BP = bc.cross(bp);
+        Vector3D crossCA_CP = ca.cross(cp);
+
+        float cross1 = crossAB_AP.dot(crossBC_BP);
+        float cross2 = crossBC_BP.dot(crossCA_CP);
+        float cross3 = crossCA_CP.dot(crossAB_AP);
+
+        if ((cross1 >= 0 && cross2 >= 0 && cross3 >= 0) 
+            || (cross1 <= 0 && cross2 <= 0 && cross3 <= 0))
         {
             return true;
         }
