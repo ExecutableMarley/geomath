@@ -6,6 +6,7 @@
 #pragma once
 
 #include <math.h>
+#include <stdexcept>
 
 namespace Utility
 {
@@ -27,6 +28,9 @@ public:
 
     IMatrix& operator+=(const IMatrix& other)
     {
+        if (rows() != other.rows() || columns() != other.columns())
+            throw std::invalid_argument("Matrix dimensions do not match for addition");
+
         for (int i = 0; i < rows(); i++)
             for (int j = 0; j < columns(); j++)
                 (*this)(i, j) += other(i, j);
@@ -43,6 +47,9 @@ public:
 
     IMatrix& operator-=(const IMatrix& other)
     {
+        if (rows() != other.rows() || columns() != other.columns())
+            throw std::invalid_argument("Matrix dimensions do not match for subtraction");
+
         for (int i = 0; i < rows(); i++)
             for (int j = 0; j < columns(); j++)
                 (*this)(i, j) -= other(i, j);
