@@ -63,7 +63,7 @@ public:
                 m_data[i][j] = other(i, j);
     }
 
-    //Overriding the IMatrix interface
+    // IMatrix interface
 
     size_t rows()    const override { return m_rows;}
 
