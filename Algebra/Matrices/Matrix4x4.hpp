@@ -1,0 +1,178 @@
+/*
+ * Copyright (c) Marley Arns
+ * Licensed under the MIT License.
+*/
+
+#pragma once
+
+#include <math.h>
+#include <stdexcept>
+
+#include "IMatrix.hpp"
+
+namespace Utility
+{
+
+namespace Math
+{
+
+class Matrix4x4 : public IMatrix
+{
+protected:
+    float m_data[4][4];
+public:
+
+    Matrix4x4(float initValue = 0.0f)
+    {
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                m_data[i][j] = initValue;
+    }
+
+    Matrix4x4(float m00, float m01, float m02, float m03,
+              float m10, float m11, float m12, float m13,
+              float m20, float m21, float m22, float m23,
+              float m30, float m31, float m32, float m33)
+    {
+        m_data[0][0] = m00;
+        m_data[0][1] = m01;
+        m_data[0][2] = m02;
+        m_data[0][3] = m03;
+
+        m_data[1][0] = m10;
+        m_data[1][1] = m11;
+        m_data[1][2] = m12;
+        m_data[1][3] = m13;
+
+        m_data[2][0] = m20;
+        m_data[2][1] = m21;
+        m_data[2][2] = m22;
+        m_data[2][3] = m23;
+
+        m_data[3][0] = m30;
+        m_data[3][1] = m31;
+        m_data[3][2] = m32;
+        m_data[3][3] = m33;
+    }
+
+    Matrix4x4(const IMatrix& other)
+    {
+        if (other.rows() != 4 || other.columns() != 4)
+            throw std::invalid_argument("Matrix must be 4x4.");
+
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                m_data[i][j] = other(i, j);
+    }
+
+    // IMatrix Interface
+
+    size_t rows()    const override { return 4; }
+    size_t columns() const override { return 4; }
+
+    float &operator()(size_t row, size_t column) override
+    {
+        return m_data[row][column];
+    }
+
+    const float &operator()(size_t row, size_t column) const override
+    {
+        return m_data[row][column];
+    }
+
+    // Operators
+
+    Matrix4x4 operator-()
+    {
+        Matrix4x4 result;
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                result(i, j) = -m_data[i][j];
+        return result;
+    }
+
+    //[+]
+
+    Matrix4x4 operator+(const IMatrix& other) const
+    {
+        if (other.rows() != 4 || other.columns() != 4)
+            throw std::invalid_argument("Matrix dimensions do not match for addition");
+
+        Matrix4x4 result;
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                result(i, j) = m_data[i][j] + other(i, j);
+        return result;
+    }
+
+    Matrix4x4 operator+(float scalar) const
+    {
+        Matrix4x4 result;
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                result(i, j) = m_data[i][j] + scalar;
+        return result;
+    }
+
+    //[-]
+
+    Matrix4x4 operator-(const IMatrix& other) const
+    {
+        if (other.rows() != 4 || other.columns() != 4)
+            throw std::invalid_argument("Matrix dimensions do not match for subtraction");
+
+        Matrix4x4 result;
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                result(i, j) = m_data[i][j] - other(i, j);
+        return result;
+    }
+
+    Matrix4x4 operator-(float scalar) const
+    {
+        Matrix4x4 result;
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                result(i, j) = m_data[i][j] - scalar;
+        return result;
+    }
+
+    //[*]
+
+    Matrix4x4 operator*(const Matrix4x4 &other) const
+    {
+        Matrix4x4 result;
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                result(i, j) = m_data[i][0] * other(0, j) +
+                               m_data[i][1] * other(1, j) +
+                               m_data[i][2] * other(2, j) +
+                               m_data[i][3] * other(3, j);
+        return result;
+    }
+
+    Matrix4x4 operator*(float scalar) const
+    {
+        Matrix4x4 result;
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                result(i, j) = m_data[i][j] * scalar;
+        return result;
+    }
+
+    //[/]
+
+    Matrix4x4 operator/(float scalar) const
+    {
+        Matrix4x4 result;
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                result(i, j) = m_data[i][j] / scalar;
+        return result;
+    }
+};
+
+
+} // namespace Math
+
+} // namespace Utility
