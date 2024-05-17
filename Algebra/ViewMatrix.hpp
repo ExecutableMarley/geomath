@@ -7,9 +7,9 @@
 
 #include <math.h>
 
-#include "Vector2D.hpp"
-#include "Vector3D.hpp"
-#include "Vector4D.hpp"
+#include "Geometry/Vector2D.hpp"
+#include "Geometry/Vector3D.hpp"
+#include "Geometry/Vector4D.hpp"
 
 #include "Matrices/Matrix4x4.hpp"
 
