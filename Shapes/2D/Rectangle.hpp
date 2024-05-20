@@ -9,6 +9,7 @@
 
 #include "Geometry/Vector2D.hpp"
 #include "BBox2D.hpp"
+#include "IShape2D.hpp"
 
 namespace Utility
 {
@@ -16,8 +17,9 @@ namespace Utility
 namespace Math
 {
 
-struct Rectangle
+class Rectangle : public IShape2D
 { 
+public:
     Vector2D m_a;
     Vector2D m_b;
     Vector2D m_c;
@@ -39,22 +41,22 @@ struct Rectangle
         return (m_d - m_a).length();
     }
 
-    float area() const
+    float area() const override
     {
         return width() * height();
     }
 
-    float perimeter() const
+    float perimeter() const override
     {
         return 2.0f * (width() + height());
     }
 
-    Vector2D centroid() const
+    Vector2D centroid() const override
     {
         return (m_a + m_b + m_c + m_d) / 4.0f;
     }
 
-    Rectangle& translate(const Vector2D &translation)
+    Rectangle& translate(const Vector2D &translation) override
     {
         m_a += translation;
         m_b += translation;
@@ -73,7 +75,7 @@ struct Rectangle
         return *this;
     }
 
-    bool contains(const Vector2D &point) const
+    bool contains(const Vector2D &point) const override
     {
         const Vector2D ab = m_b - m_a;
         const Vector2D ap = point - m_a;
@@ -92,7 +94,7 @@ struct Rectangle
         return contains(rectangle.m_a) && contains(rectangle.m_b) && contains(rectangle.m_c) && contains(rectangle.m_d);
     }
 
-    BBox2D boundingBox() const
+    BBox2D boundingBox() const override
     {
         return BBox2D(Vector2D::min(m_a, m_b, m_c, m_d), Vector2D::max(m_a, m_b, m_c, m_d));
     }

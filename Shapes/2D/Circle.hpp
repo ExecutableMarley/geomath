@@ -9,7 +9,8 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
-#include "Shapes/2D/BBox2D.hpp"
+#include "BBox2D.hpp"
+#include "IShape2D.hpp"
 
 namespace Utility
 {
@@ -17,8 +18,9 @@ namespace Utility
 namespace Math
 {
 
-struct Circle
+class Circle : public IShape2D
 {
+public:
     Vector2D m_center;
     float m_radius;
 
@@ -26,7 +28,12 @@ struct Circle
 
     Circle(const Vector2D &center, float radius) : m_center(center), m_radius(radius) {}
 
-    float area() const
+    ShapeType2D type() const override
+    {
+        return SHAPE2D_CIRCLE;
+    }
+
+    float area() const override
     {
         return PI * m_radius * m_radius;
     }
@@ -36,17 +43,17 @@ struct Circle
         return 2.0f * PI * m_radius;
     }
 
-    float perimeter() const
+    float perimeter() const override
     {
         return circumference();
     }
 
-    Vector2D centroid() const
+    Vector2D centroid() const override
     {
         return m_center;
     }
 
-    Circle& translate(const Vector2D &translation)
+    Circle& translate(const Vector2D &translation) override
     {
         m_center += translation;
         return *this;
@@ -57,7 +64,7 @@ struct Circle
         return *this;
     }
 
-    bool contains(const Vector2D &point) const
+    bool contains(const Vector2D &point) const override
     {
         return (point - m_center).lengthSquared() <= m_radius * m_radius;
     }
@@ -72,7 +79,7 @@ struct Circle
         return (m_center - circle.m_center).lengthSquared() <= (m_radius + circle.m_radius) * (m_radius + circle.m_radius);
     }
 
-    BBox2D boundingBox() const
+    BBox2D boundingBox() const override
     {
         return BBox2D(m_center - Vector2D(m_radius, m_radius), m_center + Vector2D(m_radius, m_radius));
     }

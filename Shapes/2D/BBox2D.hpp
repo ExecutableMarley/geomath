@@ -15,8 +15,9 @@ namespace Utility
 namespace Math
 {
 
-struct BBox2D
+class BBox2D
 {
+public:
     Vector2D m_min;
     Vector2D m_max;
 
