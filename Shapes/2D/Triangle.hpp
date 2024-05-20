@@ -29,6 +29,11 @@ public:
 
     Triangle(const Vector2D &a, const Vector2D &b, const Vector2D &c) : m_a(a), m_b(b), m_c(c) {}
 
+    ShapeType2D type() const override
+    {
+        return SHAPE2D_TRIANGLE;
+    }
+
     float area() const override
     {
         return 0.5f * fabs((m_a.x - m_c.x) * (m_b.y - m_c.y) - (m_b.x - m_c.x) * (m_a.y - m_c.y));

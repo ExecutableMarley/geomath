@@ -27,6 +27,11 @@ public:
 
     Polygon(const std::vector<Vector2D> &vertices) : m_vertices(vertices) {}
 
+    ShapeType2D type() const
+    {
+        return SHAPE2D_POLYGON;
+    }
+
     size_t vertexCount() const
     {
         return m_vertices.size();

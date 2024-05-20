@@ -31,6 +31,11 @@ public:
 
     Rectangle(const Vector2D &pos, float width, float height) : m_a(pos), m_b(pos + Vector2D(width, 0)), m_c(pos + Vector2D(width, height)), m_d(pos + Vector2D(0, height)) {}
 
+    ShapeType2D type() const override
+    {
+        return SHAPE2D_RECTANGLE;
+    }
+
     float width() const
     {
         return (m_b - m_a).length();
