@@ -15,8 +15,9 @@ namespace Utility
 namespace Math
 {
 
-struct Line3D
+class Line3D
 {
+public:
     Vector3D m_start;
     Vector3D m_end;
 
