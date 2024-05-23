@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Marley Arns
+ * Licensed under the MIT License.
+*/
+
 #pragma once
 
 #include <math.h>
@@ -8,8 +13,9 @@ namespace Utility
 namespace Math
 {
 
-struct EulerAngles
+class EulerAngles
 {
+public:
     float m_pitch;
     float m_yaw;
     float m_roll;
@@ -82,27 +88,32 @@ struct EulerAngles
 
     EulerAngles lerp(const EulerAngles &other, float t) const
     {
-        return EulerAngles(m_pitch + (other.m_pitch - m_pitch) * t, m_yaw + (other.m_yaw - m_yaw) * t, m_roll + (other.m_roll - m_roll) * t);
+        return EulerAngles(m_pitch + (other.m_pitch - m_pitch) * t, m_yaw + (other.m_yaw - m_yaw) * t, m_roll + (other.m_roll - m_roll) * t).normalize();
+    }
+
+    float distance(const EulerAngles &other) const
+    {
+        return (*this - other).length();
     }
 
     EulerAngles operator+(const EulerAngles &other) const
     {
-        return EulerAngles(m_pitch + other.m_pitch, m_yaw + other.m_yaw, m_roll + other.m_roll);
+        return EulerAngles(m_pitch + other.m_pitch, m_yaw + other.m_yaw, m_roll + other.m_roll).normalize();
     }
 
     EulerAngles operator-(const EulerAngles &other) const
     {
-        return EulerAngles(m_pitch - other.m_pitch, m_yaw - other.m_yaw, m_roll - other.m_roll);
+        return EulerAngles(m_pitch - other.m_pitch, m_yaw - other.m_yaw, m_roll - other.m_roll).normalize();
     }
 
     EulerAngles operator*(float scalar) const
     {
-        return EulerAngles(m_pitch * scalar, m_yaw * scalar, m_roll * scalar);
+        return EulerAngles(m_pitch * scalar, m_yaw * scalar, m_roll * scalar).normalize();
     }
 
     EulerAngles operator/(float scalar) const
     {
-        return EulerAngles(m_pitch / scalar, m_yaw / scalar, m_roll / scalar);
+        return EulerAngles(m_pitch / scalar, m_yaw / scalar, m_roll / scalar).normalize();
     }
 
     EulerAngles& operator+=(const EulerAngles &other)
@@ -110,7 +121,7 @@ struct EulerAngles
         m_pitch += other.m_pitch;
         m_yaw += other.m_yaw;
         m_roll += other.m_roll;
-        return *this;
+        return this->normalize();
     }
 
     EulerAngles& operator-=(const EulerAngles &other)
@@ -118,7 +129,7 @@ struct EulerAngles
         m_pitch -= other.m_pitch;
         m_yaw -= other.m_yaw;
         m_roll -= other.m_roll;
-        return *this;
+        return this->normalize();
     }
 
     EulerAngles& operator*=(float scalar)
@@ -126,7 +137,7 @@ struct EulerAngles
         m_pitch *= scalar;
         m_yaw *= scalar;
         m_roll *= scalar;
-        return *this;
+        return this->normalize();
     }
 
     EulerAngles& operator/=(float scalar)
@@ -134,7 +145,7 @@ struct EulerAngles
         m_pitch /= scalar;
         m_yaw /= scalar;
         m_roll /= scalar;
-        return *this;
+        return this->normalize();
     }
 
     bool operator==(const EulerAngles &other) const
