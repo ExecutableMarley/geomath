@@ -29,6 +29,11 @@ public:
 
     Cylinder(const Vector3D &startPoint, const Vector3D &endPoint, float radius) : m_startPoint(startPoint), m_endPoint(endPoint), m_radius(radius) {}
 
+    ShapeType3D type() const override
+    {
+        return ShapeType3D::Cylinder;
+    }
+
     float volume() const override
     {
         return PI * m_radius * m_radius * (m_endPoint - m_startPoint).length();

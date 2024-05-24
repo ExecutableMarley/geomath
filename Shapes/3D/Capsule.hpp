@@ -30,6 +30,11 @@ public:
     
     Capsule(const Vector3D &startPoint, const Vector3D &endPoint, float radius) : m_startPoint(startPoint), m_endPoint(endPoint), m_radius(radius) {}
 
+    ShapeType3D type() const override
+    {
+        return ShapeType3D::Capsule;
+    }
+
     float volume() const override
     {
         return PI * m_radius * m_radius * (4.0f / 3.0f * m_radius + (m_endPoint - m_startPoint).length());

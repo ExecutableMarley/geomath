@@ -28,6 +28,11 @@ public:
 
     Sphere(const Vector3D &center, float radius) : m_center(center), m_radius(radius) {}
 
+    ShapeType3D type() const override
+    {
+        return ShapeType3D::Sphere;
+    }
+
     float volume() const override
     {
         return 4.0f / 3.0f * PI * m_radius * m_radius * m_radius;
