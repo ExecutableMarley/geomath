@@ -30,7 +30,7 @@ public:
 
     ShapeType3D type() const override
     {
-        return ShapeType3D::Sphere;
+        return ShapeType3D::SPHERE;
     }
 
     float volume() const override

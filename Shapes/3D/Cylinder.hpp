@@ -31,7 +31,7 @@ public:
 
     ShapeType3D type() const override
     {
-        return ShapeType3D::Cylinder;
+        return ShapeType3D::CYLINDER;
     }
 
     float volume() const override
