@@ -111,6 +111,11 @@ struct Vector3D
         return approximatelyZero(cross(other).length());
     }
 
+    bool isOrthogonal(const Vector3D& other) const
+    {
+        return approximatelyZero(dot(other));
+    }
+
     Vector3D& rotateAroundX(float angle)
     {
         const float cosAngle = cos(angle);

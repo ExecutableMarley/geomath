@@ -104,6 +104,11 @@ struct Vector2D
         return approximatelyZero(cross(other));
     }
 
+    bool isOrthogonal(const Vector2D& other) const
+    {
+        return approximatelyZero(dot(other));
+    }
+
     Vector2D& rotate(float degree)
     {
         float cosAngle, sinAngle;
