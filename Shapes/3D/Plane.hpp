@@ -7,6 +7,7 @@
 
 #include <math.h>
 
+#include "CommonMath.hpp"
 #include "Geometry/Vector3D.hpp"
 
 namespace Utility
@@ -46,6 +47,26 @@ public:
     bool isParallel(const Plane &plane) const
     {
         return m_normal.isParallel(plane.m_normal);
+    }
+
+    bool isOrthogonal(const Plane &plane) const
+    {
+        return m_normal.isOrthogonal(plane.m_normal);
+    }
+
+    bool isOnPlane(const Vector3D &point) const
+    {
+        return approximatelyZero(distance(point));
+    }
+
+    bool contains(const Vector3D &point) const
+    {
+        return isOnPlane(point);
+    }
+
+    bool intersects(const Plane &plane) const
+    {
+        return !isParallel(plane);
     }
 };
 
