@@ -7,6 +7,7 @@
 
 #include <math.h>
 
+#include "CommonMath.hpp"
 #include "Geometry/Vector3D.hpp"
 
 namespace Utility
@@ -135,6 +136,16 @@ struct Quaternion
         z /= scalar;
         w /= scalar;
         return *this;
+    }
+
+    bool operator==(const Quaternion &other) const
+    {
+        return approximatelyEqual(x, other.x) && approximatelyEqual(y, other.y) && approximatelyEqual(z, other.z) && approximatelyEqual(w, other.w);
+    }
+
+    bool operator!=(const Quaternion &other) const
+    {
+        return !approximatelyEqual(x, other.x) || !approximatelyEqual(y, other.y) || !approximatelyEqual(z, other.z) || !approximatelyEqual(w, other.w);
     }
 };
 

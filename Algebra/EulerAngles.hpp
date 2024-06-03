@@ -7,6 +7,8 @@
 
 #include <math.h>
 
+#include "CommonMath.hpp"
+
 namespace Utility
 {
 
@@ -150,12 +152,12 @@ public:
 
     bool operator==(const EulerAngles &other) const
     {
-        return m_pitch == other.m_pitch && m_yaw == other.m_yaw && m_roll == other.m_roll;
+        return approximatelyEqual(m_pitch, other.m_pitch) && approximatelyEqual(m_yaw, other.m_yaw) && approximatelyEqual(m_roll, other.m_roll);
     }
 
     bool operator!=(const EulerAngles &other) const
     {
-        return m_pitch != other.m_pitch || m_yaw != other.m_yaw || m_roll != other.m_roll;
+        return !approximatelyEqual(m_pitch, other.m_pitch) || !approximatelyEqual(m_yaw, other.m_yaw) || !approximatelyEqual(m_roll, other.m_roll);
     }
 };
 
