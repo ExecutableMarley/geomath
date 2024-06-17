@@ -78,6 +78,17 @@ public:
         return m_data[row][column];
     }
 
+    //
+
+    Matrix3x3 transpose() const
+    {
+        Matrix3x3 result;
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                result(i, j) = m_data[j][i];
+        return result;
+    }
+
     // Operators
 
     Matrix3x3 operator-() const

@@ -80,6 +80,17 @@ public:
         return m_data[row][column];
     }
 
+    //
+
+    Matrix4x4 transpose() const
+    {
+        Matrix4x4 result;
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                result(i, j) = m_data[j][i];
+        return result;
+    }
+
     // Operators
 
     Matrix4x4 operator-()

@@ -78,6 +78,18 @@ public:
     {
         return m_data[row][column];
     }
+
+    //
+
+    Matrix transpose() const
+    {
+        Matrix result(m_columns, m_rows);
+        for (int i = 0; i < m_rows; i++)
+            for (int j = 0; j < m_columns; j++)
+                result(j, i) = m_data[i][j];
+
+        return result;
+    }
 };
 
 } // namespace Math
