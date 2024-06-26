@@ -98,6 +98,14 @@ public:
         return *this;
     }
 
+    Polygon& scale(float factor)
+    {
+        const Vector2D centroid = this->centroid();
+        for (int i = 0; i < m_vertices.size(); i++)
+            m_vertices[i] = centroid + (m_vertices[i] - centroid) * factor;
+        return *this;
+    }
+
     /*This only works for "simple" (non self intersecting) polygons*/
     bool contains(const Vector2D &point) const
     {

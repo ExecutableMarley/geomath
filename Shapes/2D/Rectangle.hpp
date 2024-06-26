@@ -80,6 +80,16 @@ public:
         return *this;
     }
 
+    Rectangle& scale(float factor)
+    {
+        const Vector2D centroid = this->centroid();
+        m_a = centroid + (m_a - centroid) * factor;
+        m_b = centroid + (m_b - centroid) * factor;
+        m_c = centroid + (m_c - centroid) * factor;
+        m_d = centroid + (m_d - centroid) * factor;
+        return *this;
+    }
+
     bool contains(const Vector2D &point) const override
     {
         const Vector2D ab = m_b - m_a;

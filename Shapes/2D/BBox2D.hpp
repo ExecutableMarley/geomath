@@ -59,6 +59,15 @@ public:
         return *this;
     }
 
+    BBox2D& scale(float factor)
+    {
+        Vector2D center = centroid();
+        Vector2D halfSize = (m_max - m_min) * 0.5f;
+        m_min = center - halfSize * factor;
+        m_max = center + halfSize * factor;
+        return *this;
+    }
+
     BBox2D& encapsulate(const Vector2D &point)
     {
         m_min = Vector2D::min(m_min, point);

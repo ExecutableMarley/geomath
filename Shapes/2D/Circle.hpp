@@ -64,6 +64,12 @@ public:
         return *this;
     }
 
+    Circle& scale(float factor)
+    {
+        m_radius *= factor;
+        return *this;
+    }
+
     bool contains(const Vector2D &point) const override
     {
         return (point - m_center).lengthSquared() <= m_radius * m_radius;
