@@ -6,6 +6,7 @@
 #pragma once
 
 #include <math.h>
+#include <stdexcept>
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
@@ -32,6 +33,21 @@ public:
     ShapeType2D type() const override
     {
         return SHAPE2D_TRIANGLE;
+    }
+
+    const Vector2D& vertexAt(size_t index) const
+    {
+        if (index > 2)
+            throw std::out_of_range("Index out of range");
+
+        return (&m_a)[index];
+    }
+
+    Vector2D& vertexAt(size_t index)
+    {
+        if (index > 2)
+            throw std::out_of_range("Index out of range");
+        return (&m_a)[index];
     }
 
     float area() const override

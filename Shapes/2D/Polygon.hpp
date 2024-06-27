@@ -37,14 +37,14 @@ public:
         return m_vertices.size();
     }
 
+    Vector2D vertexAt(size_t index) const
+    {
+        return m_vertices[index];
+    }
+
     std::vector<Vector2D> getVertices() const
     {
         return m_vertices;
-    }
-
-    Vector2D getVertexAt(size_t index) const
-    {
-        return m_vertices[index];
     }
 
     float area() const
