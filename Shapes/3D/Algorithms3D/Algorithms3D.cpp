@@ -303,7 +303,7 @@ bool intersectRayWithCylinder(const Ray3D& ray, const Cylinder& cylinder, float 
     
     if (discriminant < 0) return false;
     
-    float sqrtDiscriminant = std::sqrt(discriminant);
+    float sqrtDiscriminant = sqrt(discriminant);
     float t0 = (-b - sqrtDiscriminant) / a;
     float t1 = (-b + sqrtDiscriminant) / a;
     
