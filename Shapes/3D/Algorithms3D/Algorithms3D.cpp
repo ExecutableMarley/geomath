@@ -4,7 +4,14 @@
 */
 
 #include "Algorithms3D.hpp"
+#include "../Ray3D.hpp"
 #include "../Line3D.hpp"
+#include "../BBox3D.hpp"
+#include "../Plane.hpp"
+#include "../Triangle3D.hpp"
+#include "../Sphere.hpp"
+#include "../Cylinder.hpp"
+#include "../Capsule.hpp"
 
 namespace Utility
 {
@@ -135,7 +142,232 @@ float distanceLineToLine(const Line3D& line1, const Line3D& line2, Vector3D* clo
     return distanceLineToLine(line1.m_start, line1.m_end, line2.m_start, line2.m_end, closestPoint1, closestPoint2);
 }
 
+// Intersection calculation algorithms
 
+struct HitInfo3D
+{
+    float t;
+    Vector3D intersectionPoint;
+    //Vector3D normal;
+    //IShape3D* shape;
+};
+
+bool intersectRayWithBBox(const Ray3D& ray, const BBox3D& bbox, float t_min, float t_max, HitInfo3D* hitInfo)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        float invD = 1.0f / ray.m_direction[i];
+        float t0 = (bbox.m_min[i] - ray.m_origin[i]) * invD;
+        float t1 = (bbox.m_max[i] - ray.m_origin[i]) * invD;
+
+        if (invD < 0.0f)
+        {
+            std::swap(t0, t1);
+        }
+
+        t_min = t0 > t_min ? t0 : t_min;
+        t_max = t1 < t_max ? t1 : t_max;
+
+        if (t_max <= t_min)
+        {
+            return false;
+        }
+    }
+
+	if (hitInfo)
+	{
+		hitInfo->t = t_min;
+    	hitInfo->intersectionPoint = ray.pointAt(t_min);
+	}
+
+    return true;
+}
+
+bool intersectRayWithSphere(const Ray3D& ray, const Sphere& sphere, float t_min, float t_max, HitInfo3D* hitInfo)
+{
+    Vector3D oc = ray.m_origin - sphere.m_center;
+    float a = ray.m_direction.lengthSquared();
+    float b = oc.dot(ray.m_direction);
+    float c = oc.lengthSquared() - sphere.m_radius * sphere.m_radius;
+    float discriminant = b * b - a * c;
+
+    if (discriminant > 0)
+    {
+        float temp = (-b - sqrt(discriminant)) / a;
+        if (temp < t_max && temp > t_min)
+        {
+			if (hitInfo)
+			{
+				hitInfo->t = temp;
+            	hitInfo->intersectionPoint = ray.pointAt(temp);
+			}
+            return true;
+        }
+
+        temp = (-b + sqrt(discriminant)) / a;
+        if (temp < t_max && temp > t_min)
+        {
+			if (hitInfo)
+			{
+				hitInfo->t = temp;
+            	hitInfo->intersectionPoint = ray.pointAt(temp);
+            	//Vector3D normal = (hitInfo.intersectionPoint - sphere.m_center) / sphere.m_radius;
+			}
+            return true;
+        }
+    }
+    return false;
+}
+
+bool intersectRayWithPlane(const Ray3D& ray, const Plane& plane, float t_min, float t_max, HitInfo3D* hitInfo)
+{
+    float denominator = plane.m_normal.dot(ray.m_direction);
+
+    if (approximatelyZero(denominator))
+    {
+        return false;
+    }
+
+    float t = (plane.m_normal.dot(plane.m_planePoint) - plane.m_normal.dot(ray.m_origin)) / denominator;
+
+    if (t > t_min && t < t_max)
+    {
+		if (hitInfo)
+		{
+			hitInfo->t = t;
+        	hitInfo->intersectionPoint = ray.pointAt(t);
+        	//Vector3D normal = plane.m_normal;
+		}
+        return true;
+    }
+    return false;
+}
+
+bool intersectRayWithTriangle(const Ray3D& ray, const Triangle3D& triangle, float t_min, float t_max, HitInfo3D* hitInfo)
+{
+    Vector3D edge1 = triangle.m_b - triangle.m_a;
+    Vector3D edge2 = triangle.m_c - triangle.m_a;
+    Vector3D h = ray.m_direction.cross(edge2);
+    float a = edge1.dot(h);
+
+    if (approximatelyZero(a))
+    {
+        return false;
+    }
+
+    float f = 1.0f / a;
+    Vector3D s = ray.m_origin - triangle.m_a;
+    float u = f * s.dot(h);
+
+    if (u < 0.0f || u > 1.0f)
+    {
+        return false;
+    }
+
+    Vector3D q = s.cross(edge1);
+    float v = f * ray.m_direction.dot(q);
+
+    if (v < 0.0f || u + v > 1.0f)
+        return false;
+
+    float t = f * edge2.dot(q);
+
+    if (t > t_min && t < t_max)
+    {
+		if (hitInfo)
+		{
+			hitInfo->t = t;
+        	hitInfo->intersectionPoint = ray.pointAt(t);
+        	//Vector3D normal = triangle.normal();
+		}
+        return true;
+    }
+    return false;
+}
+
+bool intersectRayWithCylinder(const Ray3D& ray, const Cylinder& cylinder, float t_min, float t_max, HitInfo3D* hitInfo)
+{
+    Vector3D d = cylinder.m_endPoint - cylinder.m_startPoint;
+    Vector3D m = ray.m_origin - cylinder.m_startPoint;
+    Vector3D n = ray.m_direction;
+    
+    float dd = d.dot(d);
+    float nd = n.dot(d);
+    float md = m.dot(d);
+    
+    float a = dd - nd * nd;
+    float b = dd * m.dot(n) - md * nd;
+    float c = dd * m.dot(m) - md * md - cylinder.m_radius * cylinder.m_radius * dd;
+    
+    float discriminant = b * b - a * c;
+    
+    if (discriminant < 0) return false;
+    
+    float sqrtDiscriminant = std::sqrt(discriminant);
+    float t0 = (-b - sqrtDiscriminant) / a;
+    float t1 = (-b + sqrtDiscriminant) / a;
+    
+    if (t0 > t1) std::swap(t0, t1);
+    
+    if (t1 < t_min || t0 > t_max) return false;
+    
+    float t = t0;
+    if (t < t_min) t = t1;
+    if (t < t_min || t > t_max) return false;
+    
+    Vector3D hitPoint = ray.pointAt(t);
+    Vector3D projOnCylinderAxis = cylinder.m_startPoint + d * ((hitPoint - cylinder.m_startPoint).dot(d) / dd);
+    
+    if ((projOnCylinderAxis - cylinder.m_startPoint).dot(d) < 0 || 
+        (projOnCylinderAxis - cylinder.m_endPoint).dot(d) > 0) 
+    {
+        return false;
+    }
+    
+    if (hitInfo) 
+    {
+        hitInfo->t = t;
+        hitInfo->intersectionPoint = hitPoint;
+    }
+    
+    return true;
+}
+
+bool intersectRayWithCapsule(const Ray3D& ray, const Capsule& capsule, float t_min, float t_max)
+{
+    Vector3D startPoint = ray.pointAt(t_min);
+    Vector3D endPoint = ray.pointAt(t_max);
+    float distance = distanceLineToLine(startPoint, endPoint, capsule.m_startPoint, capsule.m_endPoint);
+    if (distance <= capsule.m_radius)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool intersectRayWithCapsule(const Ray3D& ray, const Capsule& capsule, float t_min, float t_max, HitInfo3D* hitInfo)
+{
+    Sphere sphere1(capsule.m_startPoint, capsule.m_radius);
+    Sphere sphere2(capsule.m_endPoint  , capsule.m_radius);
+    Cylinder cylinder(capsule.m_startPoint, capsule.m_endPoint, capsule.m_radius);
+
+    bool hit = false;
+    if (intersectRayWithSphere(ray, sphere1, t_min, t_max, hitInfo))
+    {
+        t_max = hitInfo->t;
+        hit = true;
+    }
+    if (intersectRayWithSphere(ray, sphere2, t_min, t_max, hitInfo))
+    {
+        t_max = hitInfo->t;
+        hit = true;
+    }
+    if (intersectRayWithCylinder(ray, cylinder, t_min, t_max, hitInfo))
+    {
+        hit = true;
+    }
+    return hit;
+}
 
 } // namespace Math
 
