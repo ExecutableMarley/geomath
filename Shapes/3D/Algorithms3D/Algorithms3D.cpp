@@ -7,6 +7,7 @@
 #include "../Ray3D.hpp"
 #include "../Line3D.hpp"
 #include "../BBox3D.hpp"
+#include "../IShape3D.hpp"
 #include "../Plane.hpp"
 #include "../Triangle3D.hpp"
 #include "../Sphere.hpp"
@@ -143,14 +144,6 @@ float distanceLineToLine(const Line3D& line1, const Line3D& line2, Vector3D* clo
 }
 
 // Intersection calculation algorithms
-
-struct HitInfo3D
-{
-    float t;
-    Vector3D intersectionPoint;
-    //Vector3D normal;
-    //IShape3D* shape;
-};
 
 bool intersectRayWithBBox(const Ray3D& ray, const BBox3D& bbox, float t_min, float t_max, HitInfo3D* hitInfo)
 {
