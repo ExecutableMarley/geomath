@@ -68,6 +68,25 @@ public:
         return *this;
     }
 
+    BBox3D& encapsulate(const BBox3D &box)
+    {
+        m_min = Vector3D::min(m_min, box.m_min);
+        m_max = Vector3D::max(m_max, box.m_max);
+        return *this;
+    }
+
+    /*
+    Todo: Test this
+    Vector3D normalAt(const Vector3D &point) const
+    {
+        const Vector3D half = halfSize();
+        const Vector3D d = (point - m_min) / half;
+        const Vector3D absD = Vector3D(fabs(d.x), fabs(d.y), fabs(d.z));
+        const Vector3D sign = Vector3D(d.x < 0.0f ? -1.0f : 1.0f, d.y < 0.0f ? -1.0f : 1.0f, d.z < 0.0f ? -1.0f : 1.0f);
+        const Vector3D normal = Vector3D(absD.x == 1.0f ? sign.x : 0.0f, absD.y == 1.0f ? sign.y : 0.0f, absD.z == 1.0f ? sign.z : 0.0f);
+        return normal;
+    }*/
+
     bool contains(const Vector3D &point) const
     {
         return point.x >= m_min.x && point.x <= m_max.x && point.y >= m_min.y && point.y <= m_max.y && point.z >= m_min.z && point.z <= m_max.z;

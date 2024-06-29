@@ -75,6 +75,13 @@ public:
         return *this;
     }
 
+    BBox2D& encapsulate(const BBox2D &bbox)
+    {
+        m_min = Vector2D::min(m_min, bbox.m_min);
+        m_max = Vector2D::max(m_max, bbox.m_max);
+        return *this;
+    }
+
     bool contains(const Vector2D &point) const
     {
         return point.x >= m_min.x && point.x <= m_max.x && point.y >= m_min.y && point.y <= m_max.y;
