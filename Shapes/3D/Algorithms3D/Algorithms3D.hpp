@@ -22,7 +22,7 @@ class Line3D;
 class BBox3D;
 class ISHape3D;
 class Plane;
-class Triangle;
+class Triangle3D;
 class Sphere;
 class Cylinder;
 class Capsule;
