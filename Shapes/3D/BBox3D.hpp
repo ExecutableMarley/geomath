@@ -61,6 +61,15 @@ public:
         return *this;
     }
 
+    BBox3D& scale(float scaleFactor)
+    {
+        Vector3D center = centroid();
+        Vector3D halfSize = halfSize;
+        m_min = center - halfSize * scaleFactor;
+        m_max = center + halfSize * scaleFactor;
+        return *this;
+    }
+
     BBox3D& encapsulate(const Vector3D &point)
     {
         m_min = Vector3D::min(m_min, point);

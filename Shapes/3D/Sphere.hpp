@@ -63,6 +63,12 @@ public:
         m_center += translation;
         return *this;
     }
+
+    Sphere& scale(float scaleFactor)
+    {
+        m_radius *= scaleFactor;
+        return *this;
+    }
     
     bool intersects(const Sphere &sphere) const
     {

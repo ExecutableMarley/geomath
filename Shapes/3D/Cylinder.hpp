@@ -70,6 +70,15 @@ public:
         return *this;
     }
 
+    Cylinder& scale(float scaleFactor)
+    {
+        Vector3D centroid = this->centroid();
+        m_startPoint = centroid + scaleFactor * (m_startPoint - centroid);
+        m_endPoint   = centroid + scaleFactor * (m_endPoint - centroid);
+        m_radius    *= scaleFactor;
+        return *this;
+    }
+
     BBox3D boundingBox() const override
     {
         const Vector3D min = Vector3D::min(m_startPoint, m_endPoint) - Vector3D(m_radius, m_radius, m_radius);

@@ -49,6 +49,15 @@ public:
         return *this;
     }
 
+    Triangle3D& scale(float scaleFactor)
+    {
+        Vector3D centroid = this->centroid();
+        m_a = centroid + scaleFactor * (m_a - centroid);
+        m_b = centroid + scaleFactor * (m_b - centroid);
+        m_c = centroid + scaleFactor * (m_c - centroid);
+        return *this;
+    }
+
     Vector3D normal() const
     {
         return (m_b - m_a).cross(m_c - m_a).normalize();
