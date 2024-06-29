@@ -69,11 +69,13 @@ inline int sign(float value)
 inline float wrapValue(float value, float min, float max)
 {
     const float range = max - min;
-    while (value < min)
+    if (range == 0) 
+        return min;
+    value = fmod(value - min, range);
+    if (value < 0) 
         value += range;
-    while (value >= max)
-        value -= range;
-    return value;
+    
+    return value + min;
 }
 
 inline float degToRad(float degrees)

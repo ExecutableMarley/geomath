@@ -38,30 +38,9 @@ public:
 
     EulerAngles& normalize()
     {
-        while (m_pitch > 180)
-        {
-            m_pitch -= 360;
-        }
-        while (m_pitch < -180)
-        {
-            m_pitch += 360;
-        }
-        while (m_yaw > 180)
-        {
-            m_yaw -= 360;
-        }
-        while (m_yaw < -180)
-        {
-            m_yaw += 360;
-        }
-        while (m_roll > 180)
-        {
-            m_roll -= 360;
-        }
-        while (m_roll < -180)
-        {
-            m_roll += 360;
-        }
+        m_pitch = wrapValue(m_pitch, -180.f, 180.f);
+        m_yaw   = wrapValue(m_yaw,   -180.f, 180.f);
+        m_roll  = wrapValue(m_roll,  -180.f, 180.f);
         return *this;
     }
     
