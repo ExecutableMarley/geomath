@@ -9,6 +9,8 @@
 #include <stdexcept>
 
 #include "IMatrix.hpp"
+#include "Geometry/Vector2D.hpp"
+#include "Geometry/Vector3D.hpp"
 
 namespace Utility
 {
@@ -89,6 +91,20 @@ public:
         return result;
     }
 
+    //
+
+    Vector2D transform(const Vector2D& vec) const
+    {
+        return Vector2D(
+            m_data[0][0] * vec.x + m_data[0][1] * vec.y + m_data[0][2] * 1,
+            m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2] * 1);
+    }
+
+    float* operator[](size_t row)
+    {
+        return m_data[row];
+    }
+
     // Operators
 
     Matrix3x3 operator-() const
@@ -163,6 +179,14 @@ public:
             }
         }
         return result;
+    }
+
+    Vector3D operator*(const Vector3D& other) const
+    {
+        return Vector3D(
+            m_data[0][0] * other.x + m_data[0][1] * other.y + m_data[0][2] * other.z,
+            m_data[1][0] * other.x + m_data[1][1] * other.y + m_data[1][2] * other.z,
+            m_data[2][0] * other.x + m_data[2][1] * other.y + m_data[2][2] * other.z);
     }
 
     Matrix3x3 operator*(float scalar) const

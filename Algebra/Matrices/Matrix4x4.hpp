@@ -9,6 +9,7 @@
 #include <stdexcept>
 
 #include "IMatrix.hpp"
+#include "Geometry/Vector3D.hpp"
 
 namespace Utility
 {
@@ -89,6 +90,21 @@ public:
             for (int j = 0; j < 4; j++)
                 result(i, j) = m_data[j][i];
         return result;
+    }
+
+    //
+
+    Vector3D transform(const Vector3D& vec) const
+    {
+        return Vector3D(
+            m_data[0][0] * vec.x + m_data[0][1] * vec.y + m_data[0][2] * 1,
+            m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2] * 1,
+            m_data[2][0] * vec.x + m_data[2][1] * vec.y + m_data[2][2] * 1);
+    }
+
+    float* operator[](size_t row)
+    {
+        return m_data[row];
     }
 
     // Operators
