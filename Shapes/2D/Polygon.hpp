@@ -98,6 +98,13 @@ public:
         return *this;
     }
 
+    Polygon& rotate(float angle, const Vector2D& point)
+    {
+        for (int i = 0; i < m_vertices.size(); i++)
+            m_vertices[i].rotateAround(angle, point);
+        return *this;
+    }
+
     Polygon& scale(float factor)
     {
         const Vector2D centroid = this->centroid();

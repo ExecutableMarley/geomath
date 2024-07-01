@@ -96,6 +96,15 @@ public:
         return *this;
     }
 
+    Rectangle& rotate(float angle, const Vector2D& point)
+    {
+        m_a.rotateAround(angle, point);
+        m_b.rotateAround(angle, point);
+        m_c.rotateAround(angle, point);
+        m_d.rotateAround(angle, point);
+        return *this;
+    }
+
     Rectangle& scale(float factor)
     {
         const Vector2D centroid = this->centroid();

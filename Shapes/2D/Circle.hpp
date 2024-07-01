@@ -64,6 +64,12 @@ public:
         return *this;
     }
 
+    Circle& rotate(float angle, const Vector2D& point)
+    {
+        this->m_center.rotateAround(angle, point);
+        return *this;
+    }
+
     Circle& scale(float factor)
     {
         m_radius *= factor;
