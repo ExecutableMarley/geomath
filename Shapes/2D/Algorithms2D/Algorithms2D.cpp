@@ -7,8 +7,9 @@
 
 #include "CommonMath.hpp"
 #include "../Ray2D.hpp"
+#include "../Line2D.hpp"
 #include "../BBox2D.hpp"
-//#include "Shapes/2D/IShape2D.hpp"
+#include "../IShape2D.hpp"
 #include "../Circle.hpp"
 #include "../Triangle.hpp"
 #include "../Rectangle.hpp"
@@ -89,14 +90,6 @@ float distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* clo
 
 // Intersection calculation algorithms
 
-struct HitInfo2D
-{
-    float t;
-    Vector2D intersectionPoint;
-    //Vector2D normal;
-    //IShape2D* shape;
-};
-
 bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, float t_min, float t_max, HitInfo2D* hitInfo)
 {
     for (int i = 0; i < 2; i++)
@@ -155,6 +148,7 @@ bool intersectRayWithCircle(const Ray2D& ray, const Circle& circle, float t_min,
     {
         hitInfo->t = t;
         hitInfo->intersectionPoint = ray.pointAt(t);
+        //Vector2D normal = (hitInfo->intersectionPoint - circle.m_center).normalize();
     }
 
     return true;

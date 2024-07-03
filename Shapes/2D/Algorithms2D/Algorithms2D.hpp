@@ -16,7 +16,25 @@ namespace Utility
 namespace Math
 {
 
-// Distance based algorithms
+// Forward declarations
+class Ray2D;
+class Line2D;
+class BBox2D;
+class IShape2D;
+class Circle;
+class Triangle; // rename?
+class Rectangle;
+class Polygon;
+
+struct HitInfo2D
+{
+    float t;
+    Vector2D intersectionPoint;
+    //Vector2D normal;
+    //IShape2D* shape;
+};
+
+// Distance calculation algorithms
 
 float distancePointToLine(const Vector2D& point, const Vector2D& lineStart, const Vector2D& lineEnd, Vector2D* closestPoint = nullptr);
 
@@ -26,6 +44,23 @@ float distanceLineToLine(const Vector2D& s1, const Vector2D& s2, const Vector2D&
 
 float distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 
+// Intersection calculation algorithms
+
+bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+
+bool intersectRayWithCircle(const Ray2D& ray, const Circle& circle, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+
+bool intersectRayWithTriangle(const Ray2D& ray, const Triangle& triangle, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+
+bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2D& p2, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+
+bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle& rectangle, float t_min, float t_max);
+
+bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle& rectangle, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+
+bool intersectRayWithPolygon(const Ray2D& ray, const Polygon& polygon, float t_min, float t_max);
+
+bool intersectRayWithPolygon(const Ray2D& ray, const Polygon& polygon, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
 
 } // namespace Math
 
