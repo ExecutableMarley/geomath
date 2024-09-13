@@ -64,9 +64,9 @@ public:
     BBox3D& scale(float scaleFactor)
     {
         Vector3D center = centroid();
-        Vector3D halfSize = halfSize;
-        m_min = center - halfSize * scaleFactor;
-        m_max = center + halfSize * scaleFactor;
+        Vector3D vHalfSize = this->halfSize();
+        m_min = center - vHalfSize * scaleFactor;
+        m_max = center + vHalfSize * scaleFactor;
         return *this;
     }
 
