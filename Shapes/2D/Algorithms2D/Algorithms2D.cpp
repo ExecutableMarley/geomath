@@ -224,7 +224,7 @@ bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2
     return false;
 }
 
-bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle& rectangle, float t_min, float t_max)
+bool intersectRayWithRectangleOptimized(const Ray2D& ray, const Rectangle& rectangle, float t_min, float t_max)
 {
     for (int i = 0; i < 4; i++)
     {
@@ -241,6 +241,9 @@ bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle& rectangle, flo
 
 bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle& rectangle, float t_min, float t_max, HitInfo2D* hitInfo)
 {
+    if (hitInfo == nullptr)
+        return intersectRayWithRectangleOptimized(ray, rectangle, t_min, t_max);
+
     bool hit = false;
     float t = t_max;
 
@@ -258,7 +261,7 @@ bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle& rectangle, flo
     return hit;
 }
 
-bool intersectRayWithPolygon(const Ray2D& ray, const Polygon& polygon, float t_min, float t_max)
+bool intersectRayWithPolygonOptimized(const Ray2D& ray, const Polygon& polygon, float t_min, float t_max)
 {
     for (int i = 0; i < polygon.vertexCount(); i++)
     {
@@ -275,6 +278,9 @@ bool intersectRayWithPolygon(const Ray2D& ray, const Polygon& polygon, float t_m
 
 bool intersectRayWithPolygon(const Ray2D& ray, const Polygon& polygon, float t_min, float t_max, HitInfo2D* hitInfo)
 {
+    if (hitInfo == nullptr)
+        return intersectRayWithPolygonOptimized(ray, polygon, t_min, t_max);
+
     bool hit = false;
     float t = t_max;
 
@@ -290,6 +296,24 @@ bool intersectRayWithPolygon(const Ray2D& ray, const Polygon& polygon, float t_m
         }
     }
     return hit;
+}
+
+bool intersectRayWithShape(const Ray2D& ray, const IShape2D& shape, float t_min, float t_max, HitInfo2D* hitInfo)
+{
+    switch(shape.type())
+    {
+        case ShapeType2D::SHAPE2D_CIRCLE:
+            return intersectRayWithCircle(ray, dynamic_cast<const Circle&>(shape), t_min, t_max, hitInfo);
+        case ShapeType2D::SHAPE2D_RECTANGLE:
+            return intersectRayWithRectangle(ray, dynamic_cast<const Rectangle&>(shape), t_min, t_max, hitInfo);
+        case ShapeType2D::SHAPE2D_TRIANGLE:
+            return intersectRayWithTriangle(ray, dynamic_cast<const Triangle&>(shape), t_min, t_max, hitInfo);
+        case ShapeType2D::SHAPE2D_POLYGON:
+            return intersectRayWithPolygon(ray, dynamic_cast<const Polygon&>(shape), t_min, t_max, hitInfo);
+        default:
+            //Todo: we might just want to throw and error here
+            return false;
+    }
 }
 
 } // namespace Math

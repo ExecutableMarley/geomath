@@ -54,13 +54,11 @@ bool intersectRayWithTriangle(const Ray2D& ray, const Triangle& triangle, float 
 
 bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2D& p2, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle& rectangle, float t_min, float t_max);
-
 bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle& rectangle, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithPolygon(const Ray2D& ray, const Polygon& polygon, float t_min, float t_max);
-
 bool intersectRayWithPolygon(const Ray2D& ray, const Polygon& polygon, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+
+bool intersectRayWithShape(const Ray2D& ray, const IShape2D& shape, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
 
 } // namespace Math
 
