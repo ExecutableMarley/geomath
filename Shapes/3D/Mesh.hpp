@@ -59,6 +59,21 @@ public:
         return true;
     }
 
+    unsigned int findClosestVertex(const Vector3D& point)
+    {
+        int iClosest = -1;
+        float fClosest = std::numeric_limits<float>().max();
+        for (int i = 0; i < m_vertices.size(); i++)
+        {
+            float dist = (point - m_vertices[i]).length();
+            if (dist < fClosest)
+            {
+                fClosest = dist;
+            }
+        }
+        return iClosest;
+    }
+
     bool addTriangle(const Triangle3D& triangle)
     {
         return addTriangle(triangle.m_a, triangle.m_b, triangle.m_c);
