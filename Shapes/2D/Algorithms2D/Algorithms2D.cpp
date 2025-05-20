@@ -266,7 +266,7 @@ bool intersectRayWithPolygonOptimized(const Ray2D& ray, const Polygon& polygon, 
     for (int i = 0; i < polygon.vertexCount(); i++)
     {
         const Vector2D& p1 = polygon.vertexAt(i);
-        const Vector2D& p2 = polygon.vertexAt((i + 1) % 4);
+        const Vector2D& p2 = polygon.vertexAt((i + 1) % polygon.vertexCount());
 
         if (intersectRayWithSegment(ray, p1, p2, t_min, t_max, NULL))
         {
@@ -287,7 +287,7 @@ bool intersectRayWithPolygon(const Ray2D& ray, const Polygon& polygon, float t_m
     for (int i = 0; i < polygon.vertexCount(); i++)
     {
         const Vector2D& p1 = polygon.vertexAt(i);
-        const Vector2D& p2 = polygon.vertexAt((i + 1) % 4);
+        const Vector2D& p2 = polygon.vertexAt((i + 1) % polygon.vertexCount());
 
         if (intersectRayWithSegment(ray, p1, p2, t_min, t_max, hitInfo))
         {
