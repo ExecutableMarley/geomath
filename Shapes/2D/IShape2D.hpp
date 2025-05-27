@@ -45,6 +45,40 @@ public:
     virtual BBox2D boundingBox() const = 0;
 };
 
+class IBaseShape2D
+{
+public:
+    virtual ShapeType2D type() const = 0;
+
+    virtual IBaseShape2D& translate(const Vector2D &translation) = 0;
+
+    virtual bool contains(const Vector2D &point) const = 0;
+
+    template <class T>
+    const T* shape_cast()
+    {
+        return (this->type() == T::shapeType) ? dynamic_cast<const T*>(this) : nullptr;
+    }
+};
+
+class IFiniteShape2D : public IBaseShape2D
+{
+public:
+    virtual float area() const = 0;
+
+    virtual float perimeter() const = 0;
+
+    virtual Vector2D centroid() const = 0;
+
+    virtual BBox2D boundingBox() const = 0;
+};
+
+template <class T>
+const T* shape_cast(const IShape2D* shape)
+{
+    return (shape->type() == T::shapeType) ? dynamic_cast<const T*>(shape) : nullptr;
+}
+
 } // namespace Math
 
 } // namespace Utility
