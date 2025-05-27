@@ -19,7 +19,7 @@ namespace Utility
 namespace Math
 {
 
-class Triangle : public IShape2D
+class Triangle : public IFiniteShape2D
 {
 public:
     Vector2D m_a;

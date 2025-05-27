@@ -18,7 +18,7 @@ namespace Utility
 namespace Math
 {
 
-class Rectangle : public IShape2D
+class Rectangle : public IFiniteShape2D
 { 
 public:
     Vector2D m_a;

@@ -18,7 +18,7 @@ namespace Utility
 namespace Math
 {
 
-class Circle : public IShape2D
+class Circle : public IFiniteShape2D
 {
 public:
     Vector2D m_center;
