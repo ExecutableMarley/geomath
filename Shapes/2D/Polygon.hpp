@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "Geometry/Vector2D.hpp"
+#include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
 #include "BBox2D.hpp"
 #include "IShape2D.hpp"
 
@@ -115,6 +116,24 @@ public:
 
     /*This only works for "simple" (non self intersecting) polygons*/
     bool contains(const Vector2D &point) const
+    {
+        bool contains = false;
+        for (int i = 0, j = m_vertices.size() - 1; i < m_vertices.size(); j = i++)
+        {
+            if (isPointOnSegment(point, m_vertices[i], m_vertices[j]))
+                return true;
+
+            if (((m_vertices[i].y > point.y) != (m_vertices[j].y > point.y)) &&
+                (point.x < (m_vertices[j].x - m_vertices[i].x) * (point.y - m_vertices[i].y) / (m_vertices[j].y - m_vertices[i].y) + m_vertices[i].x))
+            {
+                contains = !contains;
+            }
+        }
+
+        return contains;
+    }
+
+    bool strictlyContains(const Vector2D &point) const
     {
         bool contains = false;
         for (int i = 0, j = m_vertices.size() - 1; i < m_vertices.size(); j = i++)
