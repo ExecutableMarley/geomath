@@ -8,7 +8,7 @@
 #include <math.h>
 
 #include "Geometry/Vector2D.hpp"
-#include "../Line2D.hpp"
+//#include "../Line2D.hpp"
 
 namespace Utility
 {
@@ -33,6 +33,12 @@ struct HitInfo2D
     //Vector2D normal;
     //IShape2D* shape;
 };
+
+//
+
+bool isPointOnSegment(const Vector2D& point, const Vector2D& segmentStart, const Vector2D& segmentEnd);
+
+bool isPointOnSegment(const Vector2D& point, const Line2D& line);
 
 // Distance calculation algorithms
 

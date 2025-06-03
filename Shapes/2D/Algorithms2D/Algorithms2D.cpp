@@ -22,6 +22,26 @@ namespace Utility
 namespace Math
 {
 
+bool isPointOnSegment(const Vector2D& point, const Vector2D& segmentStart, const Vector2D& segmentEnd)
+{
+    Vector2D r = segmentEnd - segmentStart;
+    Vector2D s = point - segmentStart;
+    float cross = r.cross(s);
+    if (!approximatelyZero(cross))
+        return false;
+
+    float dot = r.dot(s);
+    if (dot < 0.0 || dot > r.lengthSquared())
+        return false;
+
+    return true;
+}
+
+bool isPointOnSegment(const Vector2D& point, const Line2D& line)
+{
+    return isPointOnSegment(point, line.m_start, line.m_end);
+}
+
 // Distance calculation algorithms
 
 float distancePointToLine(const Vector2D& point, const Vector2D& lineStart, const Vector2D& lineEnd, Vector2D* closestPoint = nullptr)
