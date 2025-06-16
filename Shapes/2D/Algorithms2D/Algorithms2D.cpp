@@ -46,11 +46,15 @@ bool isPointOnSegment(const Vector2D& point, const Line2D& line)
 
 float distancePointToLine(const Vector2D& point, const Vector2D& lineStart, const Vector2D& lineEnd, Vector2D* closestPoint)
 {
-    return distancePointToLine(point, Line2D(lineStart, lineEnd), closestPoint);
-
     const Vector2D r = lineEnd - lineStart;
     const Vector2D s = point - lineStart;
-    const float t = s.dot(r) / r.dot(r);
+    const float rDotR = r.dot(r);
+    if (rDotR == 0.0f)
+    {
+        if (closestPoint) *closestPoint = lineStart;
+        return (point - lineStart).length();
+    }
+    float t = std::clamp(s.dot(r) / rDotR, 0.0f, 1.0f);
     const Vector2D projection = lineStart + r * t;
     if (closestPoint)
         *closestPoint = projection;
