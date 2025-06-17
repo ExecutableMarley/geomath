@@ -6,6 +6,7 @@
 #pragma once
 
 #include <math.h>
+#include <vector>
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
@@ -31,6 +32,23 @@ public:
     ShapeType2D type() const override
     {
         return SHAPE2D_CIRCLE;
+    }
+
+    std::vector<Vector2D> getVertices(int resolution = 32) const
+    {
+        std::vector<Vector2D> vertices;
+        vertices.reserve(resolution);
+
+        const float step = 2.0f * static_cast<float>(PI) / resolution;
+        for (int i = 0; i < resolution; ++i)
+        {
+            float angle = i * step;
+            float x = m_center.x + m_radius * std::cos(angle);
+            float y = m_center.y + m_radius * std::sin(angle);
+            vertices.emplace_back(x, y);
+        }
+
+        return vertices;
     }
 
     float area() const override

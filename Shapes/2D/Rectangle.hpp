@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <stdexcept>
+#include <vector>
 
 #include "Geometry/Vector2D.hpp"
 #include "BBox2D.hpp"
@@ -50,6 +51,11 @@ public:
         if (index > 3)
             throw std::out_of_range("Index out of range");
         return (&m_a)[index];
+    }
+
+    std::vector<Vector2D> getVertices() const
+    {
+        return {m_a, m_b, m_c, m_d};
     }
 
     float width() const

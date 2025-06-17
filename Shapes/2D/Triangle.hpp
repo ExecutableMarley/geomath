@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <stdexcept>
+#include <vector>
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
@@ -48,6 +49,11 @@ public:
         if (index > 2)
             throw std::out_of_range("Index out of range");
         return (&m_a)[index];
+    }
+
+    std::vector<Vector2D> getVertices() const
+    {
+        return {m_a, m_b, m_c};
     }
 
     float area() const override
