@@ -6,6 +6,7 @@
 #pragma once
 
 #include <math.h>
+#include <algorithm>
 
 #include "Geometry/Vector2D.hpp"
 
@@ -80,6 +81,22 @@ public:
         m_min = Vector2D::min(m_min, bbox.m_min);
         m_max = Vector2D::max(m_max, bbox.m_max);
         return *this;
+    }
+
+    float minDistanceSquared(const Vector2D& point) const
+    {
+        float dx = std::max(0.0f, std::max(m_min.x - point.x, point.x - m_max.x));
+        float dy = std::max(0.0f, std::max(m_min.y - point.y, point.y - m_max.y));
+        return dx * dx + dy * dy;
+    }
+
+    float maxDistanceSquared(const Vector2D& point) const
+    {
+        double dx1 = point.x - m_min.x;
+        double dx2 = point.x - m_max.x;
+        double dy1 = point.y - m_min.y;
+        double dy2 = point.y - m_max.y;
+        return std::max(dx1*dx1, dx2*dx2) + std::max(dy1*dy1, dy2*dy2);
     }
 
     bool contains(const Vector2D &point) const
