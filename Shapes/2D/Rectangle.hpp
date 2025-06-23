@@ -38,6 +38,11 @@ public:
         return SHAPE2D_RECTANGLE;
     }
 
+    size_t vertexCount() const
+    {
+        return 4;
+    }
+
     const Vector2D& vertexAt(size_t index) const
     {
         if (index > 3)
@@ -143,6 +148,16 @@ public:
     BBox2D boundingBox() const override
     {
         return BBox2D(Vector2D::min(m_a, m_b, m_c, m_d), Vector2D::max(m_a, m_b, m_c, m_d));
+    }
+
+    Vector2D& operator[](size_t index)
+    {
+        return vertexAt(index);
+    }
+
+    const Vector2D& operator[](size_t index) const
+    {
+        return vertexAt(index);
     }
 };
 

@@ -57,7 +57,7 @@ public:
             area += m_vertices[i].x * m_vertices[(i + 1) % m_vertices.size()].y - m_vertices[(i + 1) % m_vertices.size()].x * m_vertices[i].y;
         }
 
-        return area / 2;
+        return area / 2.0f;
     }
 
     float perimeter() const
@@ -162,6 +162,16 @@ public:
         }
 
         return BBox2D(min, max);
+    }
+
+    Vector2D& operator[](size_t index)
+    {
+        return m_vertices[index];
+    }
+
+    const Vector2D& operator[](size_t index) const
+    {
+        return m_vertices[index];
     }
 };
 
