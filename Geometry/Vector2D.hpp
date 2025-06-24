@@ -89,6 +89,16 @@ struct Vector2D
         return *this;
     }
 
+    float distance(const Vector2D& other) const
+    {
+        return (*this - other).length();
+    }
+
+    float distanceSquared(const Vector2D& other) const
+    {
+        return (*this - other).lengthSquared();
+    }
+
     float dot(const Vector2D& other) const
     {
         return x * other.x + y * other.y;
