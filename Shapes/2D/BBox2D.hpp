@@ -69,6 +69,13 @@ public:
         return *this;
     }
 
+    BBox2D& pad(float amount)
+    {
+        m_min = m_min - Vector2D(amount, amount);
+        m_max = m_max + Vector2D(amount, amount);
+        return *this;
+    }
+
     BBox2D& encapsulate(const Vector2D &point)
     {
         m_min = Vector2D::min(m_min, point);
