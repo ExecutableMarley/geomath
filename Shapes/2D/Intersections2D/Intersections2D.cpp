@@ -144,6 +144,23 @@ bool intersects(const Line2D& line, const Polygon& polygon, Vector2D* intersecti
     return false;
 }
 
+bool intersects(const Line2D& line, const IShape2D& shape2D, Vector2D* intersection)
+{
+    switch (shape2D.type())
+    {
+    case SHAPE2D_TRIANGLE:
+        return intersects(line, *dynamic_cast<const Triangle*>(&shape2D), intersection);
+    case SHAPE2D_RECTANGLE:
+        return intersects(line, *dynamic_cast<const Rectangle*>(&shape2D), intersection);
+    case SHAPE2D_CIRCLE:
+        return intersects(line, *dynamic_cast<const Circle*>(&shape2D), intersection);
+    case SHAPE2D_POLYGON:
+        return intersects(line, *dynamic_cast<const Polygon*>(&shape2D), intersection);
+    default:
+        return false;
+    }
+}
+
 /*
 Todo:
 Improve efficiency for:
