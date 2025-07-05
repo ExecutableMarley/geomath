@@ -66,7 +66,7 @@ float distancePointToLine(const Vector2D& point, const Line2D& line, Vector2D* c
     return distancePointToLine(point, line.m_start, line.m_end, closestPoint);
 }
 
-float distanceLineToLine(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2)
+float distanceLineToLine(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     const Vector2D delta1 = s2 - s1;
     const Vector2D delta2 = k2 - k1;
@@ -107,7 +107,7 @@ float distanceLineToLine(const Vector2D& s1, const Vector2D& s2, const Vector2D&
     return (closestPointOnLine1 - closestPointOnLine2).length();
 }
 
-float distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2)
+float distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     return distanceLineToLine(line1.m_start, line1.m_end, line2.m_start, line2.m_end, closestPoint1, closestPoint2);
 }
@@ -338,6 +338,43 @@ bool intersectRayWithShape(const Ray2D& ray, const IShape2D& shape, float t_min,
             //Todo: we might just want to throw and error here
             return false;
     }
+}
+
+bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo)
+{
+    Vector2D r = p2 - p1;
+    Vector2D s = q2 - q1;
+    Vector2D qp = q1 - p1;
+
+    float rxs = r.cross(s);
+    float qpxr = qp.cross(r);
+
+    if (approximatelyZero(rxs))
+        return false; // Parallel/collinear
+
+    float t = qp.cross(s) / rxs;
+    float u = qp.cross(r) / rxs;
+
+    if (t <= 0.0f || t >= 1.0f || u <= 0.0f || u >= 1.0f)
+        return false;
+
+    if (hitInfo)
+    {
+        hitInfo->t = t;
+        hitInfo->intersectionPoint = p1 + r * t;
+    }
+
+    return true;
+}
+
+bool intersectSegmentWithSegmentStrict(const Line2D& line1, const Line2D& line2, HitInfo2D* hitInfo)
+{
+    return intersectSegmentWithSegmentStrict(line1.m_start, line1.m_end, line2.m_start, line2.m_end, hitInfo);
+}
+
+bool intersectSegmentWithPolygon(const Line2D& line, const Polygon& polygon, HitInfo2D* hitInfo)
+{
+    return(intersectRayWithPolygon(Ray2D(line.m_start, line.direction()), polygon, 0.0f, line.length(), hitInfo));
 }
 
 } // namespace Math

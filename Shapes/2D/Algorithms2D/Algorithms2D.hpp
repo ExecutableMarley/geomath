@@ -66,6 +66,11 @@ bool intersectRayWithPolygon(const Ray2D& ray, const Polygon& polygon, float t_m
 
 bool intersectRayWithShape(const Ray2D& ray, const IShape2D& shape, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
 
+bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo = nullptr);
+
+bool intersectSegmentWithSegmentStrict(const Line2D& line1, const Line2D& line2, HitInfo2D* hitInfo = nullptr);
+
+bool intersectSegmentWithPolygon(const Line2D& line, const Polygon& polygon, HitInfo2D* hitInfo = nullptr);
 } // namespace Math
 
 } // namespace Utility
