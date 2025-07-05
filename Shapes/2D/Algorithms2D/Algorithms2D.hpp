@@ -21,10 +21,10 @@ class Ray2D;
 class Line2D;
 class BBox2D;
 class IShape2D;
-class Circle;
-class Triangle; // rename?
-class Rectangle;
-class Polygon;
+class Circle2D;
+class Triangle2D;
+class Rectangle2D;
+class Polygon2D;
 
 struct HitInfo2D
 {
@@ -54,15 +54,15 @@ float distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* clo
 
 bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithCircle(const Ray2D& ray, const Circle& circle, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithCircle(const Ray2D& ray, const Circle2D& circle, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithTriangle(const Ray2D& ray, const Triangle& triangle, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithTriangle(const Ray2D& ray, const Triangle2D& triangle, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
 
 bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2D& p2, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle& rectangle, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle2D& rectangle, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithPolygon(const Ray2D& ray, const Polygon& polygon, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithPolygon(const Ray2D& ray, const Polygon2D& polygon, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
 
 bool intersectRayWithShape(const Ray2D& ray, const IShape2D& shape, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
 
@@ -70,7 +70,7 @@ bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, c
 
 bool intersectSegmentWithSegmentStrict(const Line2D& line1, const Line2D& line2, HitInfo2D* hitInfo = nullptr);
 
-bool intersectSegmentWithPolygon(const Line2D& line, const Polygon& polygon, HitInfo2D* hitInfo = nullptr);
+bool intersectSegmentWithPolygon(const Line2D& line, const Polygon2D& polygon, HitInfo2D* hitInfo = nullptr);
 } // namespace Math
 
 } // namespace Utility

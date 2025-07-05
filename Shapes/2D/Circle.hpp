@@ -20,15 +20,15 @@ namespace Utility
 namespace Math
 {
 
-class Circle : public IFiniteShape2D
+class Circle2D : public IFiniteShape2D
 {
 public:
     Vector2D m_center;
     float m_radius;
 
-    Circle() : m_center(), m_radius(0) {}
+    Circle2D() : m_center(), m_radius(0) {}
 
-    Circle(const Vector2D &center, float radius) : m_center(center), m_radius(radius) {}
+    Circle2D(const Vector2D &center, float radius) : m_center(center), m_radius(radius) {}
 
     ShapeType2D type() const override
     {
@@ -72,24 +72,24 @@ public:
         return m_center;
     }
 
-    Circle& translate(const Vector2D &translation) override
+    Circle2D& translate(const Vector2D &translation) override
     {
         m_center += translation;
         return *this;
     }
 
-    Circle& rotate(float angle)
+    Circle2D& rotate(float angle)
     {
         return *this;
     }
 
-    Circle& rotate(float angle, const Vector2D& point)
+    Circle2D& rotate(float angle, const Vector2D& point)
     {
         this->m_center.rotateAround(angle, point);
         return *this;
     }
 
-    Circle& scale(float factor)
+    Circle2D& scale(float factor)
     {
         m_radius *= factor;
         return *this;
@@ -100,12 +100,12 @@ public:
         return (point - m_center).lengthSquared() <= m_radius * m_radius;
     }
 
-    bool contains(const Circle &circle) const
+    bool contains(const Circle2D &circle) const
     {
         return (m_center - circle.m_center).lengthSquared() + circle.m_radius * circle.m_radius <= m_radius * m_radius;
     }
 
-    bool intersects(const Circle &circle) const
+    bool intersects(const Circle2D &circle) const
     {
         return (m_center - circle.m_center).lengthSquared() <= (m_radius + circle.m_radius) * (m_radius + circle.m_radius);
     }

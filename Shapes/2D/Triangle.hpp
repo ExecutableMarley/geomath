@@ -20,16 +20,16 @@ namespace Utility
 namespace Math
 {
 
-class Triangle : public IFiniteShape2D
+class Triangle2D : public IFiniteShape2D
 {
 public:
     Vector2D m_a;
     Vector2D m_b;
     Vector2D m_c;
 
-    Triangle() : m_a(), m_b(), m_c() {}
+    Triangle2D() : m_a(), m_b(), m_c() {}
 
-    Triangle(const Vector2D &a, const Vector2D &b, const Vector2D &c) : m_a(a), m_b(b), m_c(c) {}
+    Triangle2D(const Vector2D &a, const Vector2D &b, const Vector2D &c) : m_a(a), m_b(b), m_c(c) {}
 
     ShapeType2D type() const override
     {
@@ -76,7 +76,7 @@ public:
         return (m_a + m_b + m_c) / 3.0f;
     }
 
-    Triangle& translate(const Vector2D &translation) override
+    Triangle2D& translate(const Vector2D &translation) override
     {
         m_a += translation;
         m_b += translation;
@@ -84,7 +84,7 @@ public:
         return *this;
     }
 
-    Triangle& rotate(float angle)
+    Triangle2D& rotate(float angle)
     {
         const Vector2D centroid = this->centroid();
         m_a.rotateAround(angle, centroid);
@@ -93,7 +93,7 @@ public:
         return *this;
     }
 
-    Triangle& rotate(float angle, const Vector2D& point)
+    Triangle2D& rotate(float angle, const Vector2D& point)
     {
         m_a.rotateAround(angle, point);
         m_b.rotateAround(angle, point);
@@ -101,7 +101,7 @@ public:
         return *this;
     }
 
-    Triangle& scale(float factor)
+    Triangle2D& scale(float factor)
     {
         const Vector2D centroid = this->centroid();
         m_a = centroid + (m_a - centroid) * factor;
@@ -119,7 +119,7 @@ public:
         return approximatelyEqual(areaABC, areaPBC + areaPCA + areaPAB);
     }
 
-    bool contains(const Triangle &triangle) const
+    bool contains(const Triangle2D &triangle) const
     {
         return contains(triangle.m_a) && contains(triangle.m_b) && contains(triangle.m_c);
     }

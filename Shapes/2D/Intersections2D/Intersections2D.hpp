@@ -34,22 +34,22 @@ bool intersects(const Line2D& line, const BBox2D& rectangle, Vector2D* intersect
 
 //[Line-Triangle Intersection]
 
-bool intersects(const Line2D& line, const Triangle& triangle, Vector2D* intersection = nullptr);
+bool intersects(const Line2D& line, const Triangle2D& triangle, Vector2D* intersection = nullptr);
 
 
 //[Line-Rectangle Intersection]
 
-bool intersects(const Line2D& line, const Rectangle& rectangle, Vector2D* intersection = nullptr);
+bool intersects(const Line2D& line, const Rectangle2D& rectangle, Vector2D* intersection = nullptr);
 
 
 //[Line-Circle Intersection]
 
-bool intersects(const Line2D& line, const Circle& circle, Vector2D* intersection = nullptr);
+bool intersects(const Line2D& line, const Circle2D& circle, Vector2D* intersection = nullptr);
 
 
 //[Line-Polygon Intersection]
 
-bool intersects(const Line2D& line, const Polygon& polygon, Vector2D* intersection = nullptr);
+bool intersects(const Line2D& line, const Polygon2D& polygon, Vector2D* intersection = nullptr);
 
 } // namespace Math
 

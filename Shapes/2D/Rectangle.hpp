@@ -19,19 +19,19 @@ namespace Utility
 namespace Math
 {
 
-class Rectangle : public IFiniteShape2D
-{ 
+class Rectangle2D : public IFiniteShape2D
+{
 public:
     Vector2D m_a;
     Vector2D m_b;
     Vector2D m_c;
     Vector2D m_d;
 
-    Rectangle() : m_a(), m_b(), m_c(), m_d() {}
+    Rectangle2D() : m_a(), m_b(), m_c(), m_d() {}
 
-    Rectangle(const Vector2D &a, const Vector2D &b, const Vector2D &c, const Vector2D &d) : m_a(a), m_b(b), m_c(c), m_d(d) {}
+    Rectangle2D(const Vector2D &a, const Vector2D &b, const Vector2D &c, const Vector2D &d) : m_a(a), m_b(b), m_c(c), m_d(d) {}
 
-    Rectangle(const Vector2D &pos, float width, float height) : m_a(pos), m_b(pos + Vector2D(width, 0)), m_c(pos + Vector2D(width, height)), m_d(pos + Vector2D(0, height)) {}
+    Rectangle2D(const Vector2D &pos, float width, float height) : m_a(pos), m_b(pos + Vector2D(width, 0)), m_c(pos + Vector2D(width, height)), m_d(pos + Vector2D(0, height)) {}
 
     ShapeType2D type() const override
     {
@@ -88,7 +88,7 @@ public:
         return (m_a + m_b + m_c + m_d) / 4.0f;
     }
 
-    Rectangle& translate(const Vector2D &translation) override
+    Rectangle2D& translate(const Vector2D &translation) override
     {
         m_a += translation;
         m_b += translation;
@@ -97,7 +97,7 @@ public:
         return *this;
     }
 
-    Rectangle& rotate(float angle)
+    Rectangle2D& rotate(float angle)
     {
         const Vector2D centroid = this->centroid();
         m_a.rotateAround(angle, centroid);
@@ -107,7 +107,7 @@ public:
         return *this;
     }
 
-    Rectangle& rotate(float angle, const Vector2D& point)
+    Rectangle2D& rotate(float angle, const Vector2D& point)
     {
         m_a.rotateAround(angle, point);
         m_b.rotateAround(angle, point);
@@ -116,7 +116,7 @@ public:
         return *this;
     }
 
-    Rectangle& scale(float factor)
+    Rectangle2D& scale(float factor)
     {
         const Vector2D centroid = this->centroid();
         m_a = centroid + (m_a - centroid) * factor;
@@ -140,7 +140,7 @@ public:
         return ab.cross(ap) >= 0 && bc.cross(bp) >= 0 && cd.cross(cp) >= 0 && da.cross(dp) >= 0;
     }
 
-    bool contains(const Rectangle &rectangle) const
+    bool contains(const Rectangle2D &rectangle) const
     {
         return contains(rectangle.m_a) && contains(rectangle.m_b) && contains(rectangle.m_c) && contains(rectangle.m_d);
     }

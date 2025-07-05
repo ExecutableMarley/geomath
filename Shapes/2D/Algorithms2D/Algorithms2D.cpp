@@ -148,7 +148,7 @@ bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, float t_min, flo
     return true;
 }
 
-bool intersectRayWithCircle(const Ray2D& ray, const Circle& circle, float t_min, float t_max, HitInfo2D* hitInfo)
+bool intersectRayWithCircle(const Ray2D& ray, const Circle2D& circle, float t_min, float t_max, HitInfo2D* hitInfo)
 {
     const Vector2D oc = ray.m_origin - circle.m_center;
     const float a = ray.m_direction.dot(ray.m_direction);
@@ -178,7 +178,7 @@ bool intersectRayWithCircle(const Ray2D& ray, const Circle& circle, float t_min,
     return true;
 }
 
-bool intersectRayWithTriangle(const Ray2D& ray, const Triangle& triangle, float t_min, float t_max, HitInfo2D* hitInfo)
+bool intersectRayWithTriangle(const Ray2D& ray, const Triangle2D& triangle, float t_min, float t_max, HitInfo2D* hitInfo)
 {
     const Vector2D edge1 = triangle.m_b - triangle.m_a;
     const Vector2D edge2 = triangle.m_c - triangle.m_a;
@@ -248,7 +248,7 @@ bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2
     return false;
 }
 
-bool intersectRayWithRectangleOptimized(const Ray2D& ray, const Rectangle& rectangle, float t_min, float t_max)
+bool intersectRayWithRectangleOptimized(const Ray2D& ray, const Rectangle2D& rectangle, float t_min, float t_max)
 {
     for (int i = 0; i < 4; i++)
     {
@@ -263,7 +263,7 @@ bool intersectRayWithRectangleOptimized(const Ray2D& ray, const Rectangle& recta
     return false;
 }
 
-bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle& rectangle, float t_min, float t_max, HitInfo2D* hitInfo)
+bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle2D& rectangle, float t_min, float t_max, HitInfo2D* hitInfo)
 {
     if (hitInfo == nullptr)
         return intersectRayWithRectangleOptimized(ray, rectangle, t_min, t_max);
@@ -285,7 +285,7 @@ bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle& rectangle, flo
     return hit;
 }
 
-bool intersectRayWithPolygonOptimized(const Ray2D& ray, const Polygon& polygon, float t_min, float t_max)
+bool intersectRayWithPolygonOptimized(const Ray2D& ray, const Polygon2D& polygon, float t_min, float t_max)
 {
     for (int i = 0; i < polygon.vertexCount(); i++)
     {
@@ -300,7 +300,7 @@ bool intersectRayWithPolygonOptimized(const Ray2D& ray, const Polygon& polygon, 
     return false;
 }
 
-bool intersectRayWithPolygon(const Ray2D& ray, const Polygon& polygon, float t_min, float t_max, HitInfo2D* hitInfo)
+bool intersectRayWithPolygon(const Ray2D& ray, const Polygon2D& polygon, float t_min, float t_max, HitInfo2D* hitInfo)
 {
     if (hitInfo == nullptr)
         return intersectRayWithPolygonOptimized(ray, polygon, t_min, t_max);
@@ -327,13 +327,13 @@ bool intersectRayWithShape(const Ray2D& ray, const IShape2D& shape, float t_min,
     switch(shape.type())
     {
         case ShapeType2D::SHAPE2D_CIRCLE:
-            return intersectRayWithCircle(ray, dynamic_cast<const Circle&>(shape), t_min, t_max, hitInfo);
+            return intersectRayWithCircle(ray, dynamic_cast<const Circle2D&>(shape), t_min, t_max, hitInfo);
         case ShapeType2D::SHAPE2D_RECTANGLE:
-            return intersectRayWithRectangle(ray, dynamic_cast<const Rectangle&>(shape), t_min, t_max, hitInfo);
+            return intersectRayWithRectangle(ray, dynamic_cast<const Rectangle2D&>(shape), t_min, t_max, hitInfo);
         case ShapeType2D::SHAPE2D_TRIANGLE:
-            return intersectRayWithTriangle(ray, dynamic_cast<const Triangle&>(shape), t_min, t_max, hitInfo);
+            return intersectRayWithTriangle(ray, dynamic_cast<const Triangle2D&>(shape), t_min, t_max, hitInfo);
         case ShapeType2D::SHAPE2D_POLYGON:
-            return intersectRayWithPolygon(ray, dynamic_cast<const Polygon&>(shape), t_min, t_max, hitInfo);
+            return intersectRayWithPolygon(ray, dynamic_cast<const Polygon2D&>(shape), t_min, t_max, hitInfo);
         default:
             //Todo: we might just want to throw and error here
             return false;
@@ -372,7 +372,7 @@ bool intersectSegmentWithSegmentStrict(const Line2D& line1, const Line2D& line2,
     return intersectSegmentWithSegmentStrict(line1.m_start, line1.m_end, line2.m_start, line2.m_end, hitInfo);
 }
 
-bool intersectSegmentWithPolygon(const Line2D& line, const Polygon& polygon, HitInfo2D* hitInfo)
+bool intersectSegmentWithPolygon(const Line2D& line, const Polygon2D& polygon, HitInfo2D* hitInfo)
 {
     return(intersectRayWithPolygon(Ray2D(line.m_start, line.direction()), polygon, 0.0f, line.length(), hitInfo));
 }

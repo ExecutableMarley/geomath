@@ -19,14 +19,14 @@ namespace Utility
 namespace Math
 {
 
-class Polygon
+class Polygon2D
 {
 public:
     std::vector<Vector2D> m_vertices;
 
-    Polygon() : m_vertices() {}
+    Polygon2D() : m_vertices() {}
 
-    Polygon(const std::vector<Vector2D> &vertices) : m_vertices(vertices) {}
+    Polygon2D(const std::vector<Vector2D> &vertices) : m_vertices(vertices) {}
 
     ShapeType2D type() const
     {
@@ -84,14 +84,14 @@ public:
         return centroid / m_vertices.size();
     }
 
-    Polygon& translate(const Vector2D &translation)
+    Polygon2D& translate(const Vector2D &translation)
     {
         for (int i = 0; i < m_vertices.size(); i++)
             m_vertices[i] += translation;
         return *this;
     }
 
-    Polygon& rotate(float angle)
+    Polygon2D& rotate(float angle)
     {
         const Vector2D centroid = this->centroid();
         for (int i = 0; i < m_vertices.size(); i++)
@@ -99,14 +99,14 @@ public:
         return *this;
     }
 
-    Polygon& rotate(float angle, const Vector2D& point)
+    Polygon2D& rotate(float angle, const Vector2D& point)
     {
         for (int i = 0; i < m_vertices.size(); i++)
             m_vertices[i].rotateAround(angle, point);
         return *this;
     }
 
-    Polygon& scale(float factor)
+    Polygon2D& scale(float factor)
     {
         const Vector2D centroid = this->centroid();
         for (int i = 0; i < m_vertices.size(); i++)

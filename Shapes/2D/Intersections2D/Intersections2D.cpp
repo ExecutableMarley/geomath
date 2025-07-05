@@ -57,7 +57,7 @@ bool intersects(const Line2D& line, const BBox2D& rectangle, Vector2D* intersect
     return false;
 }
 
-bool intersects(const Line2D& line, const Triangle& triangle, Vector2D* intersection)
+bool intersects(const Line2D& line, const Triangle2D& triangle, Vector2D* intersection)
 {
     Line2D edge1(triangle.m_a, triangle.m_b);
     Line2D edge2(triangle.m_b, triangle.m_c);
@@ -75,7 +75,7 @@ bool intersects(const Line2D& line, const Triangle& triangle, Vector2D* intersec
     return false;
 }
 
-bool intersects(const Line2D& line, const Rectangle& rectangle, Vector2D* intersection)
+bool intersects(const Line2D& line, const Rectangle2D& rectangle, Vector2D* intersection)
 {
     Line2D line1(rectangle.m_a, rectangle.m_b);
     Line2D line2(rectangle.m_b, rectangle.m_c);
@@ -97,7 +97,7 @@ bool intersects(const Line2D& line, const Rectangle& rectangle, Vector2D* inters
     return false;
 }
 
-bool intersects(const Line2D& line, const Circle& circle, Vector2D* intersection)
+bool intersects(const Line2D& line, const Circle2D& circle, Vector2D* intersection)
 {
     const Vector2D lineDelta = line.deltaVector();
     const Vector2D f = line.m_start - circle.m_center;
@@ -133,7 +133,7 @@ bool intersects(const Line2D& line, const Circle& circle, Vector2D* intersection
     return false;
 }
 
-bool intersects(const Line2D& line, const Polygon& polygon, Vector2D* intersection)
+bool intersects(const Line2D& line, const Polygon2D& polygon, Vector2D* intersection)
 {
     for (size_t i = 0; i < polygon.m_vertices.size(); i++)
     {
@@ -149,13 +149,13 @@ bool intersects(const Line2D& line, const IShape2D& shape2D, Vector2D* intersect
     switch (shape2D.type())
     {
     case SHAPE2D_TRIANGLE:
-        return intersects(line, *dynamic_cast<const Triangle*>(&shape2D), intersection);
+        return intersects(line, *dynamic_cast<const Triangle2D*>(&shape2D), intersection);
     case SHAPE2D_RECTANGLE:
-        return intersects(line, *dynamic_cast<const Rectangle*>(&shape2D), intersection);
+        return intersects(line, *dynamic_cast<const Rectangle2D*>(&shape2D), intersection);
     case SHAPE2D_CIRCLE:
-        return intersects(line, *dynamic_cast<const Circle*>(&shape2D), intersection);
+        return intersects(line, *dynamic_cast<const Circle2D*>(&shape2D), intersection);
     case SHAPE2D_POLYGON:
-        return intersects(line, *dynamic_cast<const Polygon*>(&shape2D), intersection);
+        return intersects(line, *dynamic_cast<const Polygon2D*>(&shape2D), intersection);
     default:
         return false;
     }
