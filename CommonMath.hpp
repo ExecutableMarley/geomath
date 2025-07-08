@@ -66,6 +66,18 @@ inline int sign(float value)
     return (value > 0) - (value < 0);
 }
 
+inline int wrapValue(int value, int min, int max)
+{
+    const int range = max - min;
+    if (range == 0)
+        return min;
+    value = (value - min) % range;
+    if (value < 0) 
+        value += range;
+    
+    return value + min;
+}
+
 inline float wrapValue(float value, float min, float max)
 {
     const float range = max - min;
