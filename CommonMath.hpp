@@ -6,6 +6,7 @@
 #pragma once
 
 #include <math.h>
+#include <cmath>
 #include <algorithm>
 
 namespace Utility
@@ -16,27 +17,70 @@ namespace Math
 
 
 #define PI 3.14159265359f
-#define EPSILON 0.00001f
 
-inline bool approximatelyZero(float value, float epsilon = EPSILON)
+constexpr float FloatRelEpsilon = 1e-5f;
+constexpr float FloatAbsEpsilon = 1e-6f;
+constexpr double DoubleRelEpsilon = 1e-10;
+constexpr double DoubleAbsEpsilon = 1e-12;
+
+inline bool approximatelyZero(float value, float epsilon = FloatAbsEpsilon)
 {
     return fabs(value) < epsilon;
 }
 
-inline bool approximatelyEqual(float a, float b, float epsilon = EPSILON)
+inline bool approximatelyEqual(float a, float b, 
+                                float absEpsilon = FloatAbsEpsilon,
+                                float relEpsilon = FloatRelEpsilon)
 {
-    return approximatelyZero(a - b, epsilon);
+    float diff = std::fabs(a - b);
+    if (diff <= absEpsilon)
+        return true;
+
+    return diff <= relEpsilon * std::max(std::fabs(a), std::fabs(b));
 }
 
-inline bool approximatelyGreater(float a, float b, float epsilon = EPSILON)
+inline bool approximatelyGreater(float a, float b,
+                                 float relEpsilon = FloatRelEpsilon,
+                                 float absEpsilon = FloatAbsEpsilon)
 {
-    return (a - b) > epsilon;
+    if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
+    {
+        return false;
+    }
+    return a > b;
 }
 
-inline bool approximatelyLess(float a, float b, float epsilon = EPSILON)
+inline bool approximatelyLess(float a, float b,
+                              float relEpsilon = FloatRelEpsilon,
+                              float absEpsilon = FloatAbsEpsilon)
+{
+    if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
+    {
+        return false;
+    }
+    return a < b;
+}
+
+inline bool approximatelyZeroAbs(float value, float absEpsilon = FloatAbsEpsilon)
+{
+    return fabs(value) < absEpsilon;
+}
+
+inline bool approximatelyEqualAbs(float a, float b, float absEpsilon = FloatAbsEpsilon)
+{
+    return approximatelyZero(a - b, absEpsilon);
+}
+
+inline bool approximatelyGreaterAbs(float a, float b, float absEpsilon = FloatAbsEpsilon)
+{
+    return (a - b) > absEpsilon;
+}
+
+inline bool approximatelyLessAbs(float a, float b, float epsilon = FloatAbsEpsilon)
 {
     return (b - a) > epsilon;
 }
+
 
 // Included in C++17
 inline float clamp(float value, float minVal, float maxVal)
