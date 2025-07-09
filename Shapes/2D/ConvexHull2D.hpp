@@ -18,7 +18,6 @@ namespace Utility
 namespace Math
 {
 
-//Todo: Consider renaming to convexPolygon
 class ConvexPolygon2D : public Polygon2D
 {
 public:
@@ -36,48 +35,43 @@ private:
         return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
     }
 
-    std::vector<Vector2D> convex_hull(std::vector<Vector2D> P)
+    std::vector<Vector2D> convex_hull(std::vector<Vector2D> points)
     {
-        size_t n = P.size(), k = 0;
-	    
-        //Check for duplicates
-        //Handle n <= 3 better
-
-        if (n <= 3) 
-            return P;
-        
-	    std::vector<Vector2D> H(2*n);
-
-	    // Sort points lexicographically
-        sort(P.begin(), P.end(), [](Vector2D a, Vector2D b)
+        sort(points.begin(), points.end(), [](const Vector2D& a, const Vector2D& b)
             {
                 return a.x < b.x || (a.x == b.x && a.y < b.y);
             });
 
-	    // Build lower hull
+        points.erase(std::unique(points.begin(), points.end(), [](Vector2D a, Vector2D b)
+            { return a == b; }), points.end());
+
+        size_t hullSize = 0;
+        size_t n = points.size();
+
+        if (n <= 1)
+            return points;
+        
+	    std::vector<Vector2D> hull(2*n);
+
 	    for (size_t i = 0; i < n; ++i)
         {
-	    	while (k >= 2 && cross(H[k-2], H[k-1], P[i]) <= 0) k--;
-	    	H[k++] = P[i];
+	    	while (hullSize >= 2 && cross(hull[hullSize-2], hull[hullSize-1], points[i]) <= 0)
+                hullSize--;
+	    	hull[hullSize++] = points[i];
 	    }
 
-	    // Build upper hull
-	    for (size_t i = n-1, t = k+1; i > 0; --i)
+	    for (size_t i = n-1, t = hullSize+1; i > 0; --i)
         {
-	    	while (k >= t && cross(H[k-2], H[k-1], P[i-1]) <= 0) k--;
-	    	H[k++] = P[i-1];
+	    	while (hullSize >= t && cross(hull[hullSize-2], hull[hullSize-1], points[i-1]) <= 0)
+                hullSize--;
+	    	hull[hullSize++] = points[i-1];
 	    }
 
-	    H.resize(k-1);
-	    return H;
+	    hull.resize(hullSize-1);
+	    return hull;
     }
 };
 
 }
 
 }
-
-/*
-https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
-https://github.com/JernejPuc/convex-hull
-*/
