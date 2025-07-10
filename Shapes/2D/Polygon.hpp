@@ -43,6 +43,18 @@ public:
         return m_vertices[index];
     }
 
+    Vector2D wrappedVertexAt(std::ptrdiff_t index) const
+    {
+        size_t n = m_vertices.size();
+        if (n == 0)
+            throw std::out_of_range("Cannot access element in empty vector");
+        
+        std::ptrdiff_t wrapped = index % static_cast<std::ptrdiff_t>(n);
+        if (wrapped < 0)
+            wrapped += n;
+        return m_vertices[wrapped];
+    }
+
     std::vector<Vector2D> getVertices() const
     {
         return m_vertices;
