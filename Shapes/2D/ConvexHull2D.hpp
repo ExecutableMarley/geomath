@@ -10,7 +10,7 @@
 #include "Geometry/Vector2D.hpp"
 #include "BBox2D.hpp"
 #include "IShape2D.hpp"
-#include "Polygon.hpp"
+#include "Polygon2D.hpp"
 
 namespace Utility
 {
