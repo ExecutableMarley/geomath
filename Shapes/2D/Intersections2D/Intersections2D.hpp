@@ -11,10 +11,10 @@
 #include "../Line2D.hpp"
 #include "../BBox2D.hpp"
 #include "../IShape2D.hpp"
-#include "../Triangle.hpp"
-#include "../Rectangle.hpp"
-#include "../Circle.hpp"
-#include "../Polygon.hpp"
+#include "../Triangle2D.hpp"
+#include "../Rectangle2D.hpp"
+#include "../Circle2D.hpp"
+#include "../Polygon2D.hpp"
 
 namespace Utility
 {
