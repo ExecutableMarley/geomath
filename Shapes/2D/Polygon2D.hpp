@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <vector>
+#include <stdexcept>
 
 #include "Geometry/Vector2D.hpp"
 #include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
