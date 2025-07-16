@@ -68,6 +68,13 @@ public:
     {
         return !isParallel(plane);
     }
+
+    static Plane fromAxisNormal(const Vector3D &point, int axis)
+    {
+        Vector3D normal(0,0,0);
+        normal[axis] = 1.f;
+        return Plane(point, normal);
+    }
 };
 
 
