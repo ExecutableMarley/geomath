@@ -62,11 +62,13 @@ public:
 
     float area() const
     {
-        float area = 0;
-
+        double area = 0;
         for (int i = 0; i < m_vertices.size(); i++)
         {
-            area += m_vertices[i].x * m_vertices[(i + 1) % m_vertices.size()].y - m_vertices[(i + 1) % m_vertices.size()].x * m_vertices[i].y;
+            const Vector2D& a = m_vertices[i];
+            const Vector2D& b = m_vertices[(i + 1 == m_vertices.size()) ? 0 : i + 1];
+            area += static_cast<double>(a.x) * static_cast<double>(b.y)
+              - static_cast<double>(b.x) * static_cast<double>(a.y);
         }
 
         return area / 2.0f;
