@@ -23,16 +23,16 @@ namespace Utility
 namespace Math
 {
 
-class Mesh
+class TriangleMesh3D
 {
 public:
     std::vector<Vector3D> m_vertices;
     std::vector<unsigned int> m_indices;
     BBox3D m_boundingBox;
 
-    Mesh() : m_vertices(), m_indices() {}
+    TriangleMesh3D() : m_vertices(), m_indices() {}
 
-    Mesh(const std::vector<Vector3D> &vertices, const std::vector<unsigned int> &indices) : m_vertices(vertices), m_indices(indices) 
+    TriangleMesh3D(const std::vector<Vector3D> &vertices, const std::vector<unsigned int> &indices) : m_vertices(vertices), m_indices(indices) 
     {
         if (m_vertices.empty() || m_indices.empty())
             return;
@@ -116,7 +116,7 @@ public:
         return true;
     }
 
-    bool addMesh(const Mesh& mesh)
+    bool addMesh(const TriangleMesh3D& mesh)
     {
         return addTriangles(mesh.m_vertices, mesh.m_indices);
     }
@@ -189,7 +189,7 @@ public:
         return centroid / (m_indices.size() / 3);
     }
 
-    Mesh& translate(const Vector3D &translation)
+    TriangleMesh3D& translate(const Vector3D &translation)
     {
         for (size_t i = 0; i < m_vertices.size(); ++i)
         {
