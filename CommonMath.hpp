@@ -134,6 +134,32 @@ inline float wrapValue(float value, float min, float max)
     return value + min;
 }
 
+template <class T>
+T wrapValue(T value, T min, T max)
+{
+    const T range = max - min;
+    if (range == T(0))
+        return min;
+
+    if constexpr (std::is_integral_v<T>)
+    {
+        value = (value - min) % range;
+        if (value < 0)
+            value += range;
+    }
+    else if constexpr (std::is_floating_point_v<T>)
+    {
+        value = std::fmod(value - min, range);
+        if (value < T(0))
+            value += range;
+    }
+    else
+    {
+        static_assert(std::is_arithmetic_v<T>, "wrapValue requires arithmetic types.");
+    }
+    return value + min;
+}
+
 inline float degToRad(float degrees)
 {
     return degrees * (PI / 180.0f);
