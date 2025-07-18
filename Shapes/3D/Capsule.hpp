@@ -66,6 +66,22 @@ public:
         return *this;
     }
 
+    Capsule& rotate(float xAngle, float yAngle, float zAngle)
+    {
+        Vector3D centroid = this->centroid();
+        m_startPoint = m_startPoint.rotateAround(xAngle, yAngle, zAngle, centroid);
+        m_endPoint   = m_endPoint.rotateAround(xAngle, yAngle, zAngle, centroid);
+        return *this;
+    }
+
+    /*
+    Capsule& rotate(float angle, const Vector3D &axis)
+    {
+        m_startPoint = m_startPoint.rotate(angle, axis);
+        m_endPoint   = m_endPoint.rotate(angle, axis);
+        return *this;
+    }*/
+
     bool contains(const Vector3D &point) const override
     {
         return distancePointToLine(m_startPoint, m_endPoint, point) < m_radius;
