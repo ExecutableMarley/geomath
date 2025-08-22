@@ -340,6 +340,16 @@ bool intersectRayWithShape(const Ray2D& ray, const IShape2D& shape, float t_min,
     }
 }
 
+bool intersectSegmentWithSegment(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo)
+{
+    return intersectRayWithSegment(Ray2D(p1, p2 - p1), q1, q2, 0.f, 1.f, hitInfo);
+}
+
+bool intersectSegmentWithSegment(const Line2D& line1, const Line2D& line2, HitInfo2D* hitInfo)
+{
+    return intersectRayWithSegment(Ray2D(line1.m_start, line1.deltaVector()), line2.m_start, line2.m_end, 0.f, 1.f, hitInfo);
+}
+
 bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo)
 {
     Vector2D r = p2 - p1;
@@ -370,6 +380,26 @@ bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, c
 bool intersectSegmentWithSegmentStrict(const Line2D& line1, const Line2D& line2, HitInfo2D* hitInfo)
 {
     return intersectSegmentWithSegmentStrict(line1.m_start, line1.m_end, line2.m_start, line2.m_end, hitInfo);
+}
+
+bool intersectSegmentWithBBox(const Line2D& line, const BBox2D& bbox, HitInfo2D* hitInfo)
+{
+    return intersectRayWithBBox(Ray2D(line.m_start, line.deltaVector()), bbox, 0.f, 1.f, hitInfo);
+}
+
+bool intersectSegmentWithCircle(const Line2D& line, const Circle2D& circle, HitInfo2D* hitInfo)
+{
+    return intersectRayWithCircle(Ray2D(line.m_start, line.deltaVector()), circle, 0.f, 1.f, hitInfo);
+}
+
+bool intersectSegmentWithTriangle(const Line2D& line, const Triangle2D& triangle, HitInfo2D* hitInfo)
+{
+    return intersectRayWithTriangle(Ray2D(line.m_start, line.deltaVector()), triangle, 0.f, 1.f, hitInfo);
+}
+
+bool intersectSegmentWithRectangle(const Line2D& line, const Rectangle2D& rectangle, HitInfo2D* hitInfo)
+{
+    return intersectRayWithRectangle(Ray2D(line.m_start, line.deltaVector()), rectangle, 0.f, 1.f, hitInfo);
 }
 
 bool intersectSegmentWithPolygon(const Line2D& line, const Polygon2D& polygon, HitInfo2D* hitInfo)

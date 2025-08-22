@@ -66,9 +66,23 @@ bool intersectRayWithPolygon(const Ray2D& ray, const Polygon2D& polygon, float t
 
 bool intersectRayWithShape(const Ray2D& ray, const IShape2D& shape, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
 
+//    --- Segments ---
+
+bool intersectSegmentWithSegment(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo = nullptr);
+
+bool intersectSegmentWithSegment(const Line2D& line1, const Line2D& line2, HitInfo2D* hitInfo = nullptr);
+
 bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo = nullptr);
 
 bool intersectSegmentWithSegmentStrict(const Line2D& line1, const Line2D& line2, HitInfo2D* hitInfo = nullptr);
+
+bool intersectSegmentWithBBox(const Line2D& line, const BBox2D& bbox, HitInfo2D* hitInfo = nullptr);
+
+bool intersectSegmentWithCircle(const Line2D& line, const Circle2D& circle, HitInfo2D* hitInfo = nullptr);
+
+bool intersectSegmentWithTriangle(const Line2D& line, const Triangle2D& triangle, HitInfo2D* hitInfo = nullptr);
+
+bool intersectSegmentWithRectangle(const Line2D& line, const Rectangle2D& rectangle, HitInfo2D* hitInfo = nullptr);
 
 bool intersectSegmentWithPolygon(const Line2D& line, const Polygon2D& polygon, HitInfo2D* hitInfo = nullptr);
 } // namespace Math
