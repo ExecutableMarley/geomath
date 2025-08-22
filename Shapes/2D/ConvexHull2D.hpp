@@ -23,6 +23,7 @@ class ConvexPolygon2D : public Polygon2D
 public:
     ConvexPolygon2D() = default;
 
+    //Todo: This is bad
     ConvexPolygon2D(const std::vector<Vector2D> points)
     {
         this->m_vertices = convex_hull(points);
@@ -30,12 +31,12 @@ public:
 
 private:
     //Todo: Consider moving this to Vector2D file
-    float cross(const Vector2D& a, const Vector2D& b, const Vector2D& c)
+    static float cross(const Vector2D& a, const Vector2D& b, const Vector2D& c)
     {
         return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
     }
 
-    std::vector<Vector2D> convex_hull(std::vector<Vector2D> points)
+    static std::vector<Vector2D> convex_hull(std::vector<Vector2D> points)
     {
         sort(points.begin(), points.end(), [](const Vector2D& a, const Vector2D& b)
             {
@@ -51,7 +52,7 @@ private:
         if (n <= 1)
             return points;
         
-	    std::vector<Vector2D> hull(2*n);
+	    std::vector<Vector2D> hull(n*2);
 
 	    for (size_t i = 0; i < n; ++i)
         {
@@ -69,6 +70,14 @@ private:
 
 	    hull.resize(hullSize-1);
 	    return hull;
+    }
+
+public:
+    static ConvexPolygon2D fromPoints(const std::vector<Vector2D>& points)
+    {
+        ConvexPolygon2D convexPolygon;
+        convexPolygon.m_vertices = convex_hull(points);
+        return convexPolygon;
     }
 };
 
