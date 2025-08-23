@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cmath>
+#include <cstdint>
+#include <stdexcept>
 
 #define DefaultPrecision 5
 
@@ -10,23 +12,26 @@ namespace Utility
 namespace Math
 {
 
-//Todo: Currently not able to represent double precision
-//Consider using long instead of int
-
 class Fraction
 {
 public:
-    int numerator;
-    int denominator;
+    int64_t numerator;
+    int64_t denominator;
 
     Fraction() : numerator(0), denominator(1) {}
 
-    //Prevent denominator == 0
-    Fraction(int numerator, int denominator = 1) : numerator(numerator), denominator(denominator) {}
+    Fraction(int64_t numerator, int64_t denominator = 1) : numerator(numerator), denominator(denominator)
+    {
+        if (denominator == 0)
+        {
+            throw std::invalid_argument("Denominator cannot be zero.");
+        }
+        simplify();
+    }
 
     Fraction(float decimal, int maxPrecision)
     {
-        int num = floor(decimal * maxPrecision);
+        int64_t num = floor(decimal * maxPrecision);
         this->numerator = num;
         this->denominator = maxPrecision;
         this->simplify();
@@ -34,7 +39,7 @@ public:
 
     Fraction(double decimal, int maxPrecision)
     {
-        int num = floor(decimal * maxPrecision);
+        int64_t num = floor(decimal * maxPrecision);
         this->numerator = num;
         this->denominator = maxPrecision;
         this->simplify();
@@ -62,11 +67,11 @@ public:
         return tmp;
     }
 
-    int gcd(int a, int b)
+    int64_t gcd(int64_t a, int64_t b)
     {
         while (b != 0)
         {
-            int tmp = b;
+            int64_t tmp = b;
             b = a % b;
             a = tmp;
         }
