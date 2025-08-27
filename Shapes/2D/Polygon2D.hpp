@@ -29,6 +29,8 @@ public:
 
     Polygon2D(const std::vector<Vector2D> &vertices) : m_vertices(vertices) {}
 
+    Polygon2D(std::vector<Vector2D>&& vertices) noexcept : m_vertices(std::move(vertices)) {}
+
     ShapeType2D type() const
     {
         return SHAPE2D_POLYGON;
