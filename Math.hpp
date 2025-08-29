@@ -50,8 +50,11 @@
 #include "Shapes/2D/Rectangle2D.hpp"
 #include "Shapes/2D/Polygon2D.hpp"
 #include "Shapes/2D/ConvexPolygon2D.hpp"
+#include "Shapes/2D/TriangleMesh2D.hpp"
 
 #include "Shapes/2D/Intersections2D/Intersections2D.hpp"
+
+#include "Shapes/2D/Algorithms2D/Delaunay/DelaunayTriangulation.hpp"
 
 // 3D
 #include "Shapes/3D/Algorithms3D/Algorithms3D.hpp"
