@@ -167,6 +167,9 @@ public:
 
     BBox2D boundingBox() const
     {
+        if (m_vertices.empty())
+            return BBox2D();
+
         Vector2D min = m_vertices[0];
         Vector2D max = m_vertices[0];
 
