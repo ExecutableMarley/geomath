@@ -25,9 +25,9 @@ struct TriangleIndices
     {
         switch (index)
         {
-        case 1: return v0;
-        case 2: return v1;
-        case 3: return v2;
+        case 0: return v0;
+        case 1: return v1;
+        case 2: return v2;
         default:
             return 0; //Throw exception
         }
