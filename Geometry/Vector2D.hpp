@@ -89,6 +89,16 @@ struct Vector2D
         return *this;
     }
 
+    Vector2D createPerpendicular() const
+    {
+        return Vector2D(-y, x);
+    }
+
+    Vector2D createUnitPerpendicular() const
+    {
+        return createPerpendicular().normalize();
+    }
+
     float distance(const Vector2D& other) const
     {
         return (*this - other).length();
@@ -109,6 +119,11 @@ struct Vector2D
         return x * other.y - y * other.x;
     }
 
+    bool isNormalized() const
+    {
+        return approximatelyEqual(length(), 1);
+    }
+
     bool isParallel(const Vector2D& other) const
     {
         return approximatelyZero(cross(other));
@@ -117,6 +132,11 @@ struct Vector2D
     bool isOrthogonal(const Vector2D& other) const
     {
         return approximatelyZero(dot(other));
+    }
+
+    bool isPerpendicular(const Vector2D& other) const
+    {
+        return isOrthogonal(other);
     }
 
     Vector2D& rotate(float degree)
