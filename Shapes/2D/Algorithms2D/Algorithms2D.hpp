@@ -8,7 +8,6 @@
 #include <math.h>
 
 #include "Geometry/Vector2D.hpp"
-//#include "../Line2D.hpp"
 
 namespace Utility
 {
@@ -25,6 +24,7 @@ class Circle2D;
 class Triangle2D;
 class Rectangle2D;
 class Polygon2D;
+class ConvexPolygon2D;
 
 struct HitInfo2D
 {
@@ -52,19 +52,19 @@ float distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* clo
 
 // Intersection calculation algorithms
 
-bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, float t_min = 0, float t_max = std::numeric_limits<float>::max(), HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithCircle(const Ray2D& ray, const Circle2D& circle, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithCircle(const Ray2D& ray, const Circle2D& circle, float t_min = 0, float t_max = std::numeric_limits<float>::max(), HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithTriangle(const Ray2D& ray, const Triangle2D& triangle, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithTriangle(const Ray2D& ray, const Triangle2D& triangle, float t_min = 0, float t_max = std::numeric_limits<float>::max(), HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2D& p2, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2D& p2, float t_min = 0, float t_max = std::numeric_limits<float>::max(), HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle2D& rectangle, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle2D& rectangle, float t_min = 0, float t_max = std::numeric_limits<float>::max(), HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithPolygon(const Ray2D& ray, const Polygon2D& polygon, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithPolygon(const Ray2D& ray, const Polygon2D& polygon, float t_min = 0, float t_max = std::numeric_limits<float>::max(), HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithShape(const Ray2D& ray, const IShape2D& shape, float t_min, float t_max, HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithShape(const Ray2D& ray, const IBaseShape2D& shape, float t_min = 0, float t_max = std::numeric_limits<float>::max(), HitInfo2D* hitInfo = nullptr);
 
 //    --- Segments ---
 
@@ -85,6 +85,27 @@ bool intersectSegmentWithTriangle(const Line2D& line, const Triangle2D& triangle
 bool intersectSegmentWithRectangle(const Line2D& line, const Rectangle2D& rectangle, HitInfo2D* hitInfo = nullptr);
 
 bool intersectSegmentWithPolygon(const Line2D& line, const Polygon2D& polygon, HitInfo2D* hitInfo = nullptr);
+
+// --- Bounding Box ---
+
+bool intersectBBoxWithBBox(const BBox2D& b1, const BBox2D& b2);
+
+bool intersectBBoxWithTriangle(const BBox2D& bbox, const Triangle2D& triangle);
+
+bool intersectBBoxWithRectangle(const BBox2D& bbox, const Rectangle2D& rectangle);
+
+bool intersectBBoxWithPolygon(const BBox2D& bbox, const Polygon2D& polygon);
+
+bool intersectBBoxWithCircle(const BBox2D& bbox, const Circle2D& circle);
+
+// --- Triangles ---
+
+// --- Rectangles ---
+
+// --- Polygons --- 
+
+// --- Circles ---
+
 } // namespace Math
 
 } // namespace Utility

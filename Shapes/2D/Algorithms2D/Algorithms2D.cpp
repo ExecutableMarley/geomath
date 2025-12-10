@@ -14,7 +14,7 @@
 #include "../Triangle2D.hpp"
 #include "../Rectangle2D.hpp"
 #include "../Polygon2D.hpp"
-
+#include "../ConvexPolygon2D.hpp"
 
 namespace Utility
 {
@@ -322,7 +322,7 @@ bool intersectRayWithPolygon(const Ray2D& ray, const Polygon2D& polygon, float t
     return hit;
 }
 
-bool intersectRayWithShape(const Ray2D& ray, const IShape2D& shape, float t_min, float t_max, HitInfo2D* hitInfo)
+bool intersectRayWithShape(const Ray2D& ray, const IBaseShape2D& shape, float t_min, float t_max, HitInfo2D* hitInfo)
 {
     switch(shape.type())
     {
@@ -406,6 +406,234 @@ bool intersectSegmentWithPolygon(const Line2D& line, const Polygon2D& polygon, H
 {
     return(intersectRayWithPolygon(Ray2D(line.m_start, line.direction()), polygon, 0.0f, line.length(), hitInfo));
 }
+
+// --- Misc Helper ---
+
+//Todo: Specialize for direct use on BBox2D and other shapes
+inline void projectPointSetOntoAxis(const Vector2D* pts, int count,
+                                    const Vector2D& axis,
+                                    float& outMin, float& outMax)
+{
+    //float v = dot(pts[0], axis);
+    float v = pts[0].dot(axis);
+    outMin = outMax = v;
+    for (int i = 1; i < count; ++i)
+    {
+        //v = dot(pts[i], axis);
+        v = pts[i].dot(axis);
+        if (v < outMin) outMin = v;
+        if (v > outMax) outMax = v;
+    }
+}
+
+// --- Bounding Box ---
+
+bool intersectBBoxWithBBox(const BBox2D& b1, const BBox2D& b2)
+{
+    //Separating Axis Theorem (SAT)
+#if 0
+    bool separated_x = (b1.m_min.x > b2.m_max.x) || (b2.m_min.x > b1.m_max.x);
+    bool separated_y = (b1.m_min.y > b2.m_max.y) || (b2.m_min.y > b1.m_max.y);
+
+    if (separated_x || separated_y)
+        return false;
+
+    return true;
+#else
+    return intervalsOverlap(b1.m_min.x, b1.m_max.x, b2.m_min.x, b2.m_max.x) &&
+           intervalsOverlap(b1.m_min.y, b1.m_max.y, b2.m_min.y, b2.m_max.y);
+#endif
+}
+
+bool intersectBBoxWithTriangle(const BBox2D& bbox, const Triangle2D& triangle)
+{
+    Vector2D tri[3] = { triangle.m_a, triangle.m_b, triangle.m_c };
+
+    //Todo: Projecting Axis-Aligned boxes might not be required
+    Vector2D box[4] =
+    {
+        bbox.m_min,
+        Vector2D(bbox.m_max.x, bbox.m_min.y),
+        bbox.m_max,
+        Vector2D(bbox.m_min.x, bbox.m_max.y)
+    };
+
+    real_t bmin, bmax, tmin, tmax;
+
+    {
+        // X-axis
+        Vector2D axisX(1, 0);
+        projectPointSetOntoAxis(box, 4, axisX, bmin, bmax);
+        projectPointSetOntoAxis(tri, 3, axisX, tmin, tmax);
+        if (!intervalsOverlap(bmin, bmax, tmin, tmax)) return false;
+
+        // Y-axis
+        Vector2D axisY(0, 1);
+        projectPointSetOntoAxis(box, 4, axisY, bmin, bmax);
+        projectPointSetOntoAxis(tri, 3, axisY, tmin, tmax);
+        if (!intervalsOverlap(bmin, bmax, tmin, tmax)) return false;
+    }
+
+    Vector2D edges[3] =
+    {
+        triangle.m_b - triangle.m_a,
+        triangle.m_c - triangle.m_b,
+        triangle.m_a - triangle.m_c
+    };
+
+    for (int i = 0; i < 3; ++i)
+    {
+        // Edge normal
+        Vector2D axis = edges[i].createPerpendicular();
+
+        // Skip degenerate edges
+        if (axis.isZero())
+            continue;
+
+        projectPointSetOntoAxis(box, 4, axis, bmin, bmax);
+        projectPointSetOntoAxis(tri, 3, axis, tmin, tmax);
+
+        if (!intervalsOverlap(bmin, bmax, tmin, tmax))
+            return false;
+    }
+
+    // No separating axis -> intersection
+    return true;
+}
+
+bool intersectBBoxWithRectangle(const BBox2D& bbox, const Rectangle2D& rectangle)
+{
+    Vector2D rect[4] = { rectangle.m_a, rectangle.m_b, rectangle.m_c, rectangle.m_d };
+
+    //Todo: Projecting Axis-Aligned boxes might not be required
+    Vector2D box[4] =
+    {
+        bbox.m_min,
+        Vector2D(bbox.m_max.x, bbox.m_min.y),
+        bbox.m_max,
+        Vector2D(bbox.m_min.x, bbox.m_max.y)
+    };
+
+    real_t rmin, rmax, bmin, bmax;
+
+    {
+        // X-axis
+        Vector2D axisX(1, 0);
+        projectPointSetOntoAxis(rect, 4, axisX, rmin, rmax);
+        projectPointSetOntoAxis(box, 4, axisX, bmin, bmax);
+        if (!intervalsOverlap(rmin, rmax, bmin, bmax)) return false;
+
+        // Y-axis
+        Vector2D axisY(0, 1);
+        projectPointSetOntoAxis(rect, 4, axisY, rmin, rmax);
+        projectPointSetOntoAxis(box, 4, axisY, bmin, bmax);
+        if (!intervalsOverlap(rmin, rmax, bmin, bmax)) return false;
+    }
+
+    Vector2D e1 = rectangle.m_b - rectangle.m_a;
+    Vector2D e2 = rectangle.m_c - rectangle.m_b;
+
+    Vector2D axes[2] =
+    {
+        e1.createPerpendicular(), // normal to edge AB
+        e2.createPerpendicular()  // normal to edge BC
+    };
+
+    for (int i = 0; i < 2; ++i)
+    {
+        const Vector2D& axis = axes[i];
+
+        // Skip degenerate edges
+        if (axis.isZero())
+            continue;
+
+        projectPointSetOntoAxis(rect, 4, axis, rmin, rmax);
+        projectPointSetOntoAxis(box, 4, axis, bmin, bmax);
+
+        if (!intervalsOverlap(rmin, rmax, bmin, bmax))
+            return false;
+    }
+
+    // No separating axis -> intersection
+    return true;
+}
+
+bool intersectBBoxWithConvexPolygon(const BBox2D& bbox, const ConvexPolygon2D& poly)
+{
+    const auto& pts = poly.m_vertices;
+    const size_t n = pts.size();
+    if (n < 3) return false; // degenerate
+
+    //Todo: Projecting Axis-Aligned boxes might not be required
+    Vector2D box[4] =
+    {
+        bbox.m_min,
+        Vector2D(bbox.m_max.x, bbox.m_min.y),
+        bbox.m_max,
+        Vector2D(bbox.m_min.x, bbox.m_max.y)
+    };
+
+    real_t pmin, pmax, bmin, bmax;
+
+    {
+        // X-axis
+        Vector2D axisX(1, 0);
+        projectPointSetOntoAxis(pts.data(), (int)n, axisX, pmin, pmax);
+        projectPointSetOntoAxis(box, 4, axisX, bmin, bmax);
+        if (!intervalsOverlap(pmin, pmax, bmin, bmax)) return false;
+
+        // Y-axis
+        Vector2D axisY(0, 1);
+        projectPointSetOntoAxis(pts.data(), (int)n, axisY, pmin, pmax);
+        projectPointSetOntoAxis(box, 4, axisY, bmin, bmax);
+        if (!intervalsOverlap(pmin, pmax, bmin, bmax)) return false;
+    }
+
+    for (size_t i = 0; i < n; ++i)
+    {
+        const Vector2D& a = pts[i];
+        const Vector2D& b = pts[(i + 1) % n];
+        Vector2D edge = b - a;
+
+        // Normal
+        Vector2D axis = edge.createPerpendicular();
+
+        // Skip degenerate edges
+        if (axis.isZero())
+            continue;
+
+        projectPointSetOntoAxis(pts.data(), (int)n, axis, pmin, pmax);
+        projectPointSetOntoAxis(box, 4, axis, bmin, bmax);
+
+        if (!intervalsOverlap(pmin, pmax, bmin, bmax))
+            return false; // separating axis found
+    }
+
+    // No separating axis -> intersection
+    return true;
+}
+
+bool intersectBBoxWithPolygon(const BBox2D& bbox, const Polygon2D& polygon)
+{
+    //Todo:
+    //if (!poly.isConvex())
+    {
+        //Fallback test
+        return false;
+    }
+
+    const ConvexPolygon2D* convex = static_cast<const ConvexPolygon2D*>(&polygon);
+
+    return intersectBBoxWithConvexPolygon(bbox, *convex);
+}
+
+bool intersectBBoxWithCircle(const BBox2D& bbox, const Circle2D& circle)
+{
+    real_t distSq = bbox.minDistanceSquared(circle.m_center);
+    real_t rSq = circle.m_radius * circle.m_radius;
+    return distSq <= rSq;
+}
+
 
 } // namespace Math
 
