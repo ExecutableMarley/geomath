@@ -23,6 +23,8 @@ constexpr float FloatAbsEpsilon = 1e-6f;
 constexpr double DoubleRelEpsilon = 1e-10;
 constexpr double DoubleAbsEpsilon = 1e-12;
 
+using real_t = float;
+
 inline bool approximatelyZero(float value, float epsilon = FloatAbsEpsilon)
 {
     return fabs(value) < epsilon;
@@ -135,7 +137,7 @@ inline float wrapValue(float value, float min, float max)
 }
 
 template <class T>
-T wrapValue(T value, T min, T max)
+inline T wrapValue(T value, T min, T max)
 {
     const T range = max - min;
     if (range == T(0))
@@ -158,6 +160,24 @@ T wrapValue(T value, T min, T max)
         static_assert(std::is_arithmetic_v<T>, "wrapValue requires arithmetic types.");
     }
     return value + min;
+}
+
+template <typename T>
+inline bool inInterval(const T& x, const T& minVal, const T& maxVal)
+{
+    return (minVal <= x && x <= maxVal);
+}
+
+template <typename T>
+inline bool inIntervalExclusive(const T& x, const T& minVal, const T& maxVal)
+{
+    return (minVal < x && x < maxVal);
+}
+
+template <typename T>
+inline bool intervalsOverlap(const T& minA, const T& maxA, const T& minB, const T& maxB)
+{
+    return !(maxA < minB || maxB < minA);
 }
 
 inline float degToRad(float degrees)
