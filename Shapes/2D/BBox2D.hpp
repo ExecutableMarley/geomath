@@ -90,6 +90,14 @@ public:
         return *this;
     }
 
+    Vector2D closestPoint(const Vector2D& p) const
+    {
+    return Vector2D(
+        std::max(m_min.x, std::min(p.x, m_max.x)),
+        std::max(m_min.y, std::min(p.y, m_max.y))
+    );
+    }
+
     float minDistanceSquared(const Vector2D& point) const
     {
         float dx = std::max(0.0f, std::max(m_min.x - point.x, point.x - m_max.x));
