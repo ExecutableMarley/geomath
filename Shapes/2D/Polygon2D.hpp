@@ -63,6 +63,48 @@ public:
         return m_vertices;
     }
 
+    bool isConvex() const
+    {
+        const size_t n = m_vertices.size();
+        if (n < 3) 
+            return false;
+
+        int sign = 0;
+
+        for (size_t i = 0; i < n; ++i)
+        {
+            const Vector2D& a = m_vertices[i];
+            const Vector2D& b = m_vertices[(i + 1) % n];
+            const Vector2D& c = m_vertices[(i + 2) % n];
+
+            // Compute edge vectors
+            const Vector2D ab = b - a;
+            const Vector2D bc = c - b;
+
+            float cross = ab.cross(bc);
+
+            if (approximatelyZero(cross))
+            {
+                // Collinear points
+                continue;
+            }
+
+            int currentSign = (cross > 0) ? 1 : -1;
+
+            if (sign == 0)
+            {
+                // First turn
+                sign = currentSign;
+            }
+            else if (currentSign != sign)
+            {
+                // Turning direction changes -> concave
+                return false;
+            }
+        }
+        return true;
+    }
+
     float area() const
     {
         double area = 0;
