@@ -33,7 +33,25 @@ public:
         }
         return idx;
     }
-    //Todo: Additional add methods
+
+    size_t add(const IFiniteShape2D& shape)
+    {
+        return add(shape.clone());
+    }
+    
+    template <typename Container>
+    std::vector<size_t> add(const Container& shapes)
+    {
+        std::vector<size_t> indices;
+        indices.reserve(shapes.size());
+        
+        for (const auto& shape_ref : shapes)
+        {
+            indices.push_back(add(shape_ref.clone()));
+        }
+        
+        return indices;
+    }
 
     void remove(size_t index)
     {
@@ -43,7 +61,12 @@ public:
             _freeIndices.push_back(index);
         }
     }
-    //Todo: Additional remove methods?
+
+    void remove(const std::vector<size_t>& indices)
+    {
+        for (auto index : indices)
+            remove(index);
+    }
 
     void clear()
     {
@@ -57,8 +80,9 @@ public:
     }
 
     size_t count() const { return _shapes.size() - _freeIndices.size(); }
-    size_t size() const { return _shapes.size(); }
+    size_t size()  const { return _shapes.size(); }
     //size_t maxIndex() const { return size(); }
+    //Todo: Consider sorted active indices list
 
     bool isValid(size_t index) const
     {
