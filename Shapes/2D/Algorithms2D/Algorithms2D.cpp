@@ -616,7 +616,7 @@ bool intersectBBoxWithConvexPolygon(const BBox2D& bbox, const ConvexPolygon2D& p
 bool intersectBBoxWithPolygon(const BBox2D& bbox, const Polygon2D& polygon)
 {
     //Todo:
-    //if (!poly.isConvex())
+    if (!polygon.isConvex())
     {
         //Fallback test
         return false;

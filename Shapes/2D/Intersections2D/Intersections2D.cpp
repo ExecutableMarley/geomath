@@ -144,6 +144,7 @@ bool intersects(const Line2D& line, const Polygon2D& polygon, Vector2D* intersec
     return false;
 }
 
+/*
 bool intersects(const Line2D& line, const IShape2D& shape2D, Vector2D* intersection)
 {
     switch (shape2D.type())
@@ -159,7 +160,7 @@ bool intersects(const Line2D& line, const IShape2D& shape2D, Vector2D* intersect
     default:
         return false;
     }
-}
+}*/
 
 /*
 Todo:

@@ -19,7 +19,9 @@ namespace Math
 class Ray2D;
 class Line2D;
 class BBox2D;
-class IShape2D;
+//class IShape2D;
+class IBaseShape2D;
+class IFiniteShape2D;
 class Circle2D;
 class Triangle2D;
 class Rectangle2D;
