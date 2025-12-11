@@ -20,7 +20,7 @@ namespace Math
 
 // Unary operators
 
-Matrix operator-(const IMatrix& matrix)
+inline Matrix operator-(const IMatrix& matrix)
 {
     Matrix result(matrix.rows(), matrix.columns());
     for (int i = 0; i < matrix.rows(); i++)
@@ -33,7 +33,7 @@ Matrix operator-(const IMatrix& matrix)
 
 // [*]
 
-Matrix operator*(const IMatrix& lhs, const IMatrix& rhs)
+inline Matrix operator*(const IMatrix& lhs, const IMatrix& rhs)
 {
     if (lhs.columns() != rhs.rows())
         throw std::invalid_argument("Matrix dimensions do not match for multiplication");
@@ -48,7 +48,7 @@ Matrix operator*(const IMatrix& lhs, const IMatrix& rhs)
     return result;
 }
 
-Matrix operator*(const IMatrix& lhs, float scalar)
+inline Matrix operator*(const IMatrix& lhs, float scalar)
 {
     Matrix result(lhs.rows(), lhs.columns());
 
@@ -59,14 +59,14 @@ Matrix operator*(const IMatrix& lhs, float scalar)
     return result;
 }
 
-Matrix operator*(float scalar, const IMatrix& rhs)
+inline Matrix operator*(float scalar, const IMatrix& rhs)
 {
     return rhs * scalar;
 }
 
 // [/]
 
-Matrix operator/(const IMatrix& lhs, float scalar)
+inline Matrix operator/(const IMatrix& lhs, float scalar)
 {
     Matrix result(lhs.rows(), lhs.columns());
 
@@ -79,7 +79,7 @@ Matrix operator/(const IMatrix& lhs, float scalar)
 
 // [+]
 
-Matrix operator+(const IMatrix& lhs, const IMatrix& rhs)
+inline Matrix operator+(const IMatrix& lhs, const IMatrix& rhs)
 {
     if (lhs.rows() != rhs.rows() || lhs.columns() != rhs.columns())
         throw std::invalid_argument("Matrix dimensions do not match for addition");
@@ -92,7 +92,7 @@ Matrix operator+(const IMatrix& lhs, const IMatrix& rhs)
     return result;
 }
 
-Matrix operator+(const IMatrix& lhs, float scalar)
+inline Matrix operator+(const IMatrix& lhs, float scalar)
 {
     Matrix result(lhs.rows(), lhs.columns());
 
@@ -103,7 +103,7 @@ Matrix operator+(const IMatrix& lhs, float scalar)
     return result;
 }
 
-Matrix operator+(float scalar, const IMatrix& rhs)
+inline Matrix operator+(float scalar, const IMatrix& rhs)
 {
     return rhs + scalar;
     
@@ -111,7 +111,7 @@ Matrix operator+(float scalar, const IMatrix& rhs)
 
 // [-]
 
-Matrix operator-(const IMatrix& lhs, const IMatrix& rhs)
+inline Matrix operator-(const IMatrix& lhs, const IMatrix& rhs)
 {
     if (lhs.rows() != rhs.rows() || lhs.columns() != rhs.columns())
         throw std::invalid_argument("Matrix dimensions do not match for subtraction");
@@ -124,7 +124,7 @@ Matrix operator-(const IMatrix& lhs, const IMatrix& rhs)
     return result;
 }
 
-Matrix operator-(const IMatrix& lhs, float scalar)
+inline Matrix operator-(const IMatrix& lhs, float scalar)
 {
     Matrix result(lhs.rows(), lhs.columns());
 
