@@ -6,6 +6,7 @@
 #pragma once
 
 #include <math.h>
+#include <memory>
 
 #include "Geometry/Vector2D.hpp"
 #include "BBox2D.hpp"
@@ -24,7 +25,7 @@ enum ShapeType2D
     SHAPE2D_POLYGON
 };
 
-class IShape2D
+/*class IShape2D
 {
 public:
     virtual ShapeType2D type() const = 0;
@@ -43,7 +44,7 @@ public:
     //virtual bool intersects(const IShape2D &shape) const = 0;
 
     virtual BBox2D boundingBox() const = 0;
-};
+};*/
 
 class IBaseShape2D
 {
@@ -59,6 +60,8 @@ public:
     {
         return (this->type() == T::shapeType) ? dynamic_cast<const T*>(this) : nullptr;
     }
+
+    //virtual std::unique_ptr<IBaseShape2D> clone() const = 0;
 };
 
 class IFiniteShape2D : public IBaseShape2D
@@ -71,10 +74,12 @@ public:
     virtual Vector2D centroid() const = 0;
 
     virtual BBox2D boundingBox() const = 0;
+
+    virtual std::unique_ptr<IFiniteShape2D> clone() const = 0;
 };
 
 template <class T>
-const T* shape_cast(const IShape2D* shape)
+const T* shape_cast(const IBaseShape2D* shape)
 {
     return (shape->type() == T::shapeType) ? dynamic_cast<const T*>(shape) : nullptr;
 }

@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <vector>
+#include <memory>
 #include <stdexcept>
 
 #include "Geometry/Vector2D.hpp"
@@ -20,7 +21,7 @@ namespace Utility
 namespace Math
 {
 
-class Polygon2D
+class Polygon2D : public IFiniteShape2D
 {
 public:
     std::vector<Vector2D> m_vertices;
@@ -171,6 +172,16 @@ public:
         for (int i = 0; i < m_vertices.size(); i++)
             m_vertices[i] = centroid + (m_vertices[i] - centroid) * factor;
         return *this;
+    }
+
+    Polygon2D copy() const
+    {
+        return *this;
+    }
+
+    std::unique_ptr<IFiniteShape2D> clone() const
+    {
+        return std::make_unique<Polygon2D>(*this);        
     }
 
     /*This only works for "simple" (non self intersecting) polygons*/

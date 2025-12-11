@@ -8,6 +8,7 @@
 #include <cmath>
 #include <math.h>
 #include <vector>
+#include <memory>
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
@@ -93,6 +94,16 @@ public:
     {
         m_radius *= factor;
         return *this;
+    }
+
+    Circle2D copy() const
+    {
+        return *this;
+    }
+
+    std::unique_ptr<IFiniteShape2D>clone() const
+    {
+        return std::make_unique<Circle2D>(*this);        
     }
 
     bool contains(const Vector2D &point) const override

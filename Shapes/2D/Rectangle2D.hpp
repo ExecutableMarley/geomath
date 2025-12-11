@@ -6,8 +6,9 @@
 #pragma once
 
 #include <math.h>
-#include <stdexcept>
 #include <vector>
+#include <memory>
+#include <stdexcept>
 
 #include "Geometry/Vector2D.hpp"
 #include "BBox2D.hpp"
@@ -124,6 +125,16 @@ public:
         m_c = centroid + (m_c - centroid) * factor;
         m_d = centroid + (m_d - centroid) * factor;
         return *this;
+    }
+
+    Rectangle2D copy() const
+    {
+        return *this;
+    }
+
+    std::unique_ptr<IFiniteShape2D> clone() const
+    {
+        return std::make_unique<Rectangle2D>(*this);        
     }
 
     bool contains(const Vector2D &point) const override
