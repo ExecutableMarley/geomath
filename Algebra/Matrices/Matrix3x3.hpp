@@ -9,6 +9,7 @@
 #include <stdexcept>
 
 #include "IMatrix.hpp"
+#include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "Geometry/Vector3D.hpp"
 
@@ -189,6 +190,18 @@ public:
             m_data[2][0] * other.x + m_data[2][1] * other.y + m_data[2][2] * other.z);
     }
 
+    Vector2D operator*(const Vector2D& other)
+    {
+        real_t resultX = m_data[0][0] * other.x + m_data[0][1] * other.y + m_data[0][2] * 1.0f;
+        real_t resultY = m_data[1][0] * other.x + m_data[1][1] * other.y + m_data[1][2] * 1.0f;
+        real_t resultW = m_data[2][0] * other.x + m_data[2][1] * other.y + m_data[2][2] * 1.0f;
+
+        // Normalization
+        if (!approximatelyZero(resultW) && !approximatelyEqual(resultW, 1.0f))
+            return Vector2D(resultX / resultW, resultY / resultW);
+        return Vector2D(resultX, resultY);
+    }
+
     Matrix3x3 operator*(float scalar) const
     {
         Matrix3x3 result;
@@ -207,6 +220,47 @@ public:
             for (int j = 0; j < 3; j++)
                 result(i, j) = m_data[i][j] / scalar;
         return result;
+    }
+
+    //[Static]
+
+    static Matrix3x3 createTranslation(const Vector2D& translation)
+    {
+        return Matrix3x3(
+            1, 0, translation.x,
+            0, 1, translation.y,
+            0, 0, 1.f);
+    }
+
+    static Matrix3x3 createScale(real_t sx, real_t sy)
+    {
+        return Matrix3x3(
+            sx,   0.0f, 0.0f,
+            0.0f, sy,   0.0f,
+            0.0f, 0.0f, 1.0f
+        );
+    }
+
+    static Matrix3x3 createRotationRads(real_t angle)
+    {
+        float sin, cos;
+        sinCos(angle, sin, cos);
+        
+        return Matrix3x3(
+            cos, -sin, 0.f,
+            sin,  cos, 0.f,
+            0.f,  0.f, 1.f);
+    }
+
+    static Matrix3x3 createRotationDegs(real_t angle)
+    {
+        float sin, cos;
+        sinCosDeg(angle, sin, cos);
+        
+        return Matrix3x3(
+            cos, -sin, 0.f,
+            sin,  cos, 0.f,
+            0.f,  0.f, 1.f);
     }
 };
 
