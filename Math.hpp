@@ -34,7 +34,13 @@
 #include "Geometry/Vector4D.hpp"
 
 #include "Algebra/EulerAngles.hpp"
+#include "Algebra/Fraction.hpp"
 #include "Algebra/Quaternion.hpp"
+#include "Algebra/Matrices/IMatrix.hpp"
+#include "Algebra/Matrices/Matrix.hpp"
+#include "Algebra/Matrices/Matrix3x3.hpp"
+#include "Algebra/Matrices/Matrix4x4.hpp"
+#include "Algebra/Matrices/Operators.hpp"
 #include "Algebra/RotationMatrix.hpp"
 #include "Algebra/ViewMatrix.hpp"
 
@@ -55,6 +61,8 @@
 #include "Shapes/2D/Intersections2D/Intersections2D.hpp"
 
 #include "Shapes/2D/Algorithms2D/Delaunay/DelaunayTriangulation.hpp"
+#include "Shapes/2D/Structures/ShapeStore2D.hpp"
+#include "Shapes/2D/Structures/ISpatialIndex2D.hpp"
 
 // 3D
 #include "Shapes/3D/Algorithms3D/Algorithms3D.hpp"
