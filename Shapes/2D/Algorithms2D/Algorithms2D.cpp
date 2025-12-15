@@ -615,16 +615,49 @@ bool intersectBBoxWithConvexPolygon(const BBox2D& bbox, const ConvexPolygon2D& p
 
 bool intersectBBoxWithPolygon(const BBox2D& bbox, const Polygon2D& polygon)
 {
-    //Todo:
-    if (!polygon.isConvex())
+    if (polygon.isConvex())
     {
-        //Fallback test
-        return false;
+        const ConvexPolygon2D* convex = static_cast<const ConvexPolygon2D*>(&polygon);
+        return intersectBBoxWithConvexPolygon(bbox, *convex);
+    }
+    
+    Vector2D box[4] =
+    {
+        bbox.m_min,
+        Vector2D(bbox.m_max.x, bbox.m_min.y),
+        bbox.m_max,
+        Vector2D(bbox.m_min.x, bbox.m_max.y)
+    };
+
+    for (const Vector2D& p : box)
+        if (polygon.contains(p))
+            return true;
+
+    for (const Vector2D& p : polygon.m_vertices)
+        if (bbox.contains(p))
+            return true;
+
+    Vector2D boxEdges[4][2] =
+    {
+        { box[0], box[1] },
+        { box[1], box[2] },
+        { box[2], box[3] },
+        { box[3], box[0] }
+    };
+
+    const size_t n = polygon.m_vertices.size();
+
+    for (size_t i = 0; i < n; ++i)
+    {
+        Vector2D a = polygon.m_vertices[i];
+        Vector2D b = polygon.m_vertices[(i + 1) % n];
+
+        for (int j = 0; j < 4; ++j)
+            if (intersectSegmentWithSegment(a, b, boxEdges[j][0], boxEdges[j][1]))
+                return true;
     }
 
-    const ConvexPolygon2D* convex = static_cast<const ConvexPolygon2D*>(&polygon);
-
-    return intersectBBoxWithConvexPolygon(bbox, *convex);
+    return false;
 }
 
 bool intersectBBoxWithCircle(const BBox2D& bbox, const Circle2D& circle)
