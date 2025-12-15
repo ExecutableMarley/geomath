@@ -667,6 +667,160 @@ bool intersectBBoxWithCircle(const BBox2D& bbox, const Circle2D& circle)
     return distSq <= rSq;
 }
 
+// --- Triangles ---
+
+bool intersectTriangleWithTriangle(const Triangle2D& triangle1, const Triangle2D& triangle2)
+{
+    return intersectConvexPolygonWithConvexPolygon(triangle1.getVertices(), triangle2.getVertices());
+}
+
+bool intersectTriangleWithRectangle(const Triangle2D& triangle, const Rectangle2D& rectangle)
+{
+    return intersectConvexPolygonWithConvexPolygon(triangle.getVertices(), rectangle.getVertices());
+}
+
+bool intersectTriangleWithPolygon(const Triangle2D& triangle, const ConvexPolygon2D& polygon)
+{
+    return intersectConvexPolygonWithConvexPolygon(triangle.getVertices(), polygon.getVertices());
+}
+
+bool intersectTriangleWithCircle(const Triangle2D& triangle, const Circle2D& circle)
+{
+    if (triangle.contains(circle.centroid()))
+        return true;
+    
+    //Todo: Optimize with r^2
+    //real_t r2 = circle.m_radius * circle.m_radius;
+    real_t r = circle.m_radius;
+
+    if (distancePointToLine(circle.m_center, triangle.m_a, triangle.m_b) <= r)
+        return true;
+    if (distancePointToLine(circle.m_center, triangle.m_b, triangle.m_c) <= r)
+        return true;
+    if (distancePointToLine(circle.m_center, triangle.m_c, triangle.m_a) <= r)
+        return true;
+    return false;
+}
+
+// --- Rectangles ---
+
+bool intersectRectangleWithRectangle(const Rectangle2D& rectangle1, const Rectangle2D& rectangle2)
+{
+    //Todo: Can be optimized
+    return intersectConvexPolygonWithConvexPolygon(rectangle1.getVertices(), rectangle2.getVertices());
+}
+
+bool intersectRectangleWithPolygon(const Rectangle2D& rectangle, const ConvexPolygon2D& polygon)
+{
+    return intersectConvexPolygonWithConvexPolygon(rectangle.getVertices(), polygon.getVertices());
+}
+
+bool intersectRectangleWithCircle(const Rectangle2D& rectangle, const Circle2D& circle)
+{
+    if (rectangle.contains(circle.centroid()))
+        return true;
+
+    //Todo: Optimize with r^2
+    //real_t r2 = circle.m_radius * circle.m_radius;
+    real_t r = circle.m_radius;
+
+    for (int i = 0; i < 4; ++i)
+    {
+        const Vector2D& a = rectangle[i];
+        const Vector2D& b = rectangle[(i + 1) % 4];
+
+        if (distancePointToLine(circle.m_center, a, b) <= r)
+            return true;
+    }
+}
+
+// --- Polygons --- 
+
+bool intersectConvexPolygonWithConvexPolygon(const std::vector<Vector2D>& v1, const std::vector<Vector2D>& v2)
+{
+    const int n1 = (int)v1.size();
+    const int n2 = (int)v2.size();
+
+    if (n1 < 3 || n2 < 3)
+        return false;
+
+    real_t min1, max1, min2, max2;
+
+    for (int i = 0; i < n1; ++i)
+    {
+        const Vector2D& a = v1[i];
+        const Vector2D& b = v1[(i + 1) % n1];
+        Vector2D edge = b - a;
+
+        // Normal
+        Vector2D axis = edge.createPerpendicular();
+
+        // Skip degenerate edges
+        if (axis.isZero())
+            continue;
+
+        projectPointSetOntoAxis(v1.data(), n1, axis, min1, max1);
+        projectPointSetOntoAxis(v2.data(), n2, axis, min2, max2);
+
+        if (!intervalsOverlap(min1, max1, min2, max2))
+            return false; // separating axis found
+    }
+
+    for (int i = 0; i < n2; ++i)
+    {
+        const Vector2D& a = v2[i];
+        const Vector2D& b = v2[(i + 1) % n2];
+        Vector2D edge = b - a;
+
+        // Normal
+        Vector2D axis = edge.createPerpendicular();
+
+        // Skip degenerate edges
+        if (axis.isZero())
+            continue;
+
+        projectPointSetOntoAxis(v1.data(), n1, axis, min1, max1);
+        projectPointSetOntoAxis(v2.data(), n2, axis, min2, max2);
+
+        if (!intervalsOverlap(min1, max1, min2, max2))
+            return false;
+    }
+
+    // No separating axis -> intersection
+    return true;
+}
+
+bool intersectPolygonWithPolygon(const ConvexPolygon2D& polygon1, const ConvexPolygon2D& polygon2)
+{
+    return intersectConvexPolygonWithConvexPolygon(polygon1.m_vertices, polygon2.m_vertices);
+}
+
+bool intersectPolygonWithCircle(const ConvexPolygon2D& polygon, const Circle2D& circle)
+{
+    if (polygon.contains(circle.centroid()))
+        return true;
+
+    //Todo: Optimize with r^2
+    //real_t r2 = circle.m_radius * circle.m_radius;
+    real_t r = circle.m_radius;
+
+    for (int i = 0; i < polygon.vertexCount(); ++i)
+    {
+        const Vector2D& a = polygon.wrappedVertexAt(i);
+        const Vector2D& b = polygon.wrappedVertexAt(i+1);
+
+        if (distancePointToLine(circle.m_center, a, b) <= r)
+            return true;
+    }
+    return false;
+}
+
+// --- Circles ---
+
+bool intersectCircleWithCircle(const Circle2D& circle1, const Circle2D& circle2)
+{
+    return circle1.intersects(circle2);
+}
 
 } // namespace Math
 

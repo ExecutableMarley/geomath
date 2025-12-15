@@ -19,7 +19,6 @@ namespace Math
 class Ray2D;
 class Line2D;
 class BBox2D;
-//class IShape2D;
 class IBaseShape2D;
 class IFiniteShape2D;
 class Circle2D;
@@ -102,11 +101,33 @@ bool intersectBBoxWithCircle(const BBox2D& bbox, const Circle2D& circle);
 
 // --- Triangles ---
 
+bool intersectTriangleWithTriangle(const Triangle2D& triangle1, const Triangle2D& triangle2);
+
+bool intersectTriangleWithRectangle(const Triangle2D& triangle, const Rectangle2D& rectangle);
+
+bool intersectTriangleWithPolygon(const Triangle2D& triangle, const ConvexPolygon2D& polygon);
+
+bool intersectTriangleWithCircle(const Triangle2D& triangle, const Circle2D& circle);
+
 // --- Rectangles ---
+
+bool intersectRectangleWithRectangle(const Rectangle2D& rectangle1, const Rectangle2D& rectangle2);
+
+bool intersectRectangleWithPolygon(const Rectangle2D& rectangle, const ConvexPolygon2D& polygon);
+
+bool intersectRectangleWithCircle(const Rectangle2D& rectangle, const Circle2D& circle);
 
 // --- Polygons --- 
 
+bool intersectConvexPolygonWithConvexPolygon(const std::vector<Vector2D>& p1, const std::vector<Vector2D>& p2);
+
+bool intersectPolygonWithPolygon(const ConvexPolygon2D& polygon1, const ConvexPolygon2D& polygon2);
+
+bool intersectPolygonWithCircle(const ConvexPolygon2D& polygon, const Circle2D& circle);
+
 // --- Circles ---
+
+bool intersectCircleWithCircle(const Circle2D& circle1, const Circle2D& circle2);
 
 } // namespace Math
 
