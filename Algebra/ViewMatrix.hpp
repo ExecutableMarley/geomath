@@ -11,6 +11,7 @@
 #include "Geometry/Vector3D.hpp"
 #include "Geometry/Vector4D.hpp"
 
+#include "Matrices/Matrix3x3.hpp"
 #include "Matrices/Matrix4x4.hpp"
 
 namespace Utility
