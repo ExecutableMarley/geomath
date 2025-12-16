@@ -114,6 +114,8 @@ float distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* clo
 
 // Intersection calculation algorithms
 
+//    --- Rays ---
+
 bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, float t_min, float t_max, HitInfo2D* hitInfo)
 {
     for (int i = 0; i < 2; i++)
@@ -820,6 +822,92 @@ bool intersectPolygonWithCircle(const ConvexPolygon2D& polygon, const Circle2D& 
 bool intersectCircleWithCircle(const Circle2D& circle1, const Circle2D& circle2)
 {
     return circle1.intersects(circle2);
+}
+
+// --- Generic ---
+
+bool intersect(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2)
+{
+    ShapeType2D type1 = shape1.type();
+    ShapeType2D type2 = shape2.type();
+
+    if (type1 > type2)
+        return intersect(shape2, shape1);
+
+    switch (type1)
+    {
+        case SHAPE2D_TRIANGLE:
+            if (type2 == SHAPE2D_TRIANGLE)
+            {
+                const Triangle2D* s1 = shape1.shape_cast<Triangle2D>();
+                const Triangle2D* s2 = shape2.shape_cast<Triangle2D>();
+                return intersectTriangleWithTriangle(*s1, *s2);
+            }
+            else if (type2 == SHAPE2D_RECTANGLE)
+            {
+                const Triangle2D*  s1 = shape1.shape_cast<Triangle2D>();
+                const Rectangle2D* s2 = shape2.shape_cast<Rectangle2D>();
+                return intersectTriangleWithRectangle(*s1, *s2);
+            }
+            else if (type2 == SHAPE2D_CONVEX_POLYGON)
+            {
+                const Triangle2D*      s1 = shape1.shape_cast<Triangle2D>();
+                const ConvexPolygon2D* s2 = shape2.shape_cast<ConvexPolygon2D>();
+                return intersectTriangleWithPolygon(*s1, *s2);
+            }
+            else if (type2 == SHAPE2D_CIRCLE)
+            {
+                const Triangle2D*  s1 = shape1.shape_cast<Triangle2D>();
+                const Circle2D*    s2 = shape2.shape_cast<Circle2D>();
+                return intersectTriangleWithCircle(*s1, *s2);
+            }
+            break;
+        case SHAPE2D_RECTANGLE:
+            if (type2 == SHAPE2D_RECTANGLE)
+            {
+                const Rectangle2D* s1 = shape1.shape_cast<Rectangle2D>();
+                const Rectangle2D* s2 = shape2.shape_cast<Rectangle2D>();
+                return intersectRectangleWithRectangle(*s1, *s2);
+            }
+            else if (type2 == SHAPE2D_CONVEX_POLYGON)
+            {
+                const Rectangle2D*     s1 = shape1.shape_cast<Rectangle2D>();
+                const ConvexPolygon2D* s2 = shape2.shape_cast<ConvexPolygon2D>();
+                return intersectRectangleWithPolygon(*s1, *s2);
+            }
+            else if (type2 == SHAPE2D_CIRCLE)
+            {
+                const Rectangle2D* s1 = shape1.shape_cast<Rectangle2D>();
+                const Circle2D*    s2 = shape2.shape_cast<Circle2D>();
+                return intersectRectangleWithCircle(*s1, *s2);
+            }
+            break;
+        case SHAPE2D_CONVEX_POLYGON:
+            if (type2 == SHAPE2D_CONVEX_POLYGON)
+            {
+                const ConvexPolygon2D* s1 = shape1.shape_cast<ConvexPolygon2D>();
+                const ConvexPolygon2D* s2 = shape2.shape_cast<ConvexPolygon2D>();
+                return intersectPolygonWithPolygon(*s1, *s2);
+            }
+            else if (type2 == SHAPE2D_CIRCLE)
+            {
+                const ConvexPolygon2D* s1 = shape1.shape_cast<ConvexPolygon2D>();
+                const Circle2D*        s2 = shape2.shape_cast<Circle2D>();
+                return intersectPolygonWithCircle(*s1, *s2);
+            }
+            break;
+        case SHAPE2D_POLYGON:
+            break;
+        case SHAPE2D_CIRCLE:
+            if (type2 == SHAPE2D_CIRCLE)
+            {
+                const Circle2D* s1 = shape1.shape_cast<Circle2D>();
+                const Circle2D* s2 = shape2.shape_cast<Circle2D>();
+                return intersectCircleWithCircle(*s1, *s2);
+            }
+            break;
+    }
+    return false;
 }
 
 } // namespace Math

@@ -6,6 +6,7 @@
 #pragma once
 
 #include <math.h>
+#include <vector>
 
 #include "Geometry/Vector2D.hpp"
 
@@ -31,9 +32,13 @@ struct HitInfo2D
 {
     float t;
     Vector2D intersectionPoint;
+    //Todo: Collect more information
     //Vector2D normal;
     //IShape2D* shape;
 };
+
+
+//Todo: Containment functions
 
 //
 
@@ -51,7 +56,11 @@ float distanceLineToLine(const Vector2D& s1, const Vector2D& s2, const Vector2D&
 
 float distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 
+//Todo: Distance to shapes
+
 // Intersection calculation algorithms
+
+//    --- Rays ---
 
 bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, float t_min = 0, float t_max = std::numeric_limits<float>::max(), HitInfo2D* hitInfo = nullptr);
 
@@ -128,6 +137,10 @@ bool intersectPolygonWithCircle(const ConvexPolygon2D& polygon, const Circle2D& 
 // --- Circles ---
 
 bool intersectCircleWithCircle(const Circle2D& circle1, const Circle2D& circle2);
+
+// --- Generic ---
+
+
 
 } // namespace Math
 
