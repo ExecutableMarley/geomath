@@ -57,7 +57,7 @@ public:
     virtual bool contains(const Vector2D &point) const = 0;
 
     template <class T>
-    const T* shape_cast()
+    const T* shape_cast() const
     {
         return (this->type() == T::shapeType) ? dynamic_cast<const T*>(this) : nullptr;
     }

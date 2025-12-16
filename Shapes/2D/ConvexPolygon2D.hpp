@@ -29,6 +29,13 @@ public:
         this->m_vertices = convex_hull(points);
     }
 
+    ShapeType2D type() const
+    {
+        return SHAPE2D_CONVEX_POLYGON;
+    }
+
+    static constexpr ShapeType2D shapeType = SHAPE2D_CONVEX_POLYGON;
+
 private:
     //Todo: Consider moving this to Vector2D file
     static float cross(const Vector2D& a, const Vector2D& b, const Vector2D& c)

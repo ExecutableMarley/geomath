@@ -37,6 +37,8 @@ public:
         return SHAPE2D_POLYGON;
     }
 
+    static constexpr ShapeType2D shapeType = SHAPE2D_POLYGON;
+
     size_t vertexCount() const
     {
         return m_vertices.size();

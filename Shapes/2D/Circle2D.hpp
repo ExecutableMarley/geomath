@@ -36,6 +36,8 @@ public:
         return SHAPE2D_CIRCLE;
     }
 
+    static constexpr ShapeType2D shapeType = SHAPE2D_CIRCLE;
+
     std::vector<Vector2D> getVertices(int resolution = 32) const
     {
         std::vector<Vector2D> vertices;

@@ -39,6 +39,8 @@ public:
         return SHAPE2D_RECTANGLE;
     }
 
+    static constexpr ShapeType2D shapeType = SHAPE2D_RECTANGLE;
+
     size_t vertexCount() const
     {
         return 4;

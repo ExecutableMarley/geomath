@@ -37,6 +37,8 @@ public:
         return SHAPE2D_TRIANGLE;
     }
 
+    static constexpr ShapeType2D shapeType = SHAPE2D_TRIANGLE;
+
     size_t vertexCount() const
     {
         return 3;
