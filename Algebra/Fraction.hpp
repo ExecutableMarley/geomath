@@ -4,9 +4,7 @@
 #include <cstdint>
 #include <stdexcept>
 
-#define DefaultPrecision 5
-
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -155,4 +153,4 @@ public:
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

@@ -11,7 +11,7 @@
 #include "BBox3D.hpp"
 #include "Ray3D.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math

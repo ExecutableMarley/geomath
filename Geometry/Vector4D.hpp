@@ -9,7 +9,7 @@
 
 #include "../CommonMath.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -166,4 +166,4 @@ struct Vector4D
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

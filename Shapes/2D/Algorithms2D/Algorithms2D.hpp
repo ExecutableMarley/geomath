@@ -10,7 +10,7 @@
 
 #include "Geometry/Vector2D.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -144,4 +144,4 @@ bool intersectCircleWithCircle(const Circle2D& circle1, const Circle2D& circle2)
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

@@ -9,7 +9,7 @@
 #include <cmath>
 #include <algorithm>
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -219,4 +219,4 @@ inline void sinCosDeg(float degrees, float &sine, float &cosine)
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

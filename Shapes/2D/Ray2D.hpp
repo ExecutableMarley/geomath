@@ -9,7 +9,7 @@
 
 #include "Geometry/Vector2D.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -48,4 +48,4 @@ public:
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

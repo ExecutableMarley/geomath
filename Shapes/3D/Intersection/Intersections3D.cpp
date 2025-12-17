@@ -6,7 +6,7 @@
 #include "Intersections3D.hpp"
 #include "../Algorithms3D/Algorithms3D.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -196,4 +196,4 @@ bool intersects(const Line3D &line, const Triangle3D &triangle, Vector3D *inters
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

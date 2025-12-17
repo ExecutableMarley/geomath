@@ -12,13 +12,13 @@
 #include "BBox3D.hpp"
 #include "IShape3D.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
 {
 
-class Cylinder : public IShape3D
+class Cylinder : public IFiniteShape3D
 {
 public:
     Vector3D m_startPoint;
@@ -90,4 +90,4 @@ public:
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

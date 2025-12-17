@@ -14,7 +14,7 @@
 #include "Matrices/Matrix3x3.hpp"
 #include "Matrices/Matrix4x4.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -82,4 +82,4 @@ public:
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

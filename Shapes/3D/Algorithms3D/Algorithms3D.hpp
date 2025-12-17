@@ -9,7 +9,7 @@
 
 #include "Geometry/Vector3D.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -63,4 +63,4 @@ bool intersectRayWithCapsule(const Ray3D& ray, const Capsule& capsule, float t_m
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

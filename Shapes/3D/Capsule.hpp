@@ -13,13 +13,13 @@
 #include "IShape3D.hpp"
 #include "Algorithms3D/Algorithms3D.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
 {
 
-class Capsule : public IShape3D
+class Capsule : public IFiniteShape3D
 {
 public:
     Vector3D m_startPoint;
@@ -98,4 +98,4 @@ public:
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

@@ -11,7 +11,7 @@
 #include "Geometry/Vector2D.hpp"
 #include "BBox2D.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -87,4 +87,4 @@ const T* shape_cast(const IBaseShape2D* shape)
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

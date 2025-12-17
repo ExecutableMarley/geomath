@@ -16,7 +16,7 @@
 #include "../Polygon2D.hpp"
 #include "../ConvexPolygon2D.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -912,4 +912,4 @@ bool intersect(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2)
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

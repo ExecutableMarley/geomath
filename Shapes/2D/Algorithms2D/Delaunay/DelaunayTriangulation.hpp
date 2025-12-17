@@ -5,7 +5,7 @@
 #include "Geometry/Vector2D.hpp"
 #include "Shapes/2D/TriangleMesh2D.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -22,4 +22,4 @@ TriangleMesh2D fastDelaunayTriangulation(const std::vector<Vector2D>& points);
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

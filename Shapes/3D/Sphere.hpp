@@ -12,13 +12,13 @@
 #include "BBox3D.hpp"
 #include "IShape3D.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
 {
 
-class Sphere : public IShape3D
+class Sphere : public IFiniteShape3D
 {
 public:
     Vector3D m_center;
@@ -83,4 +83,4 @@ public:
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

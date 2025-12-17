@@ -16,7 +16,7 @@
 #include "../Circle2D.hpp"
 #include "../Polygon2D.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -53,4 +53,4 @@ bool intersects(const Line2D& line, const Polygon2D& polygon, Vector2D* intersec
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

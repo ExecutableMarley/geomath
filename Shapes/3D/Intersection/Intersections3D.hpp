@@ -15,7 +15,7 @@
 #include "../Capsule.hpp"
 #include "../Triangle3D.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math

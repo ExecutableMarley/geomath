@@ -17,7 +17,7 @@
 
 #include "Intersections3D.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -207,7 +207,7 @@ public:
             const Vector3D &b = m_vertices[m_indices[i + 1]];
             const Vector3D &c = m_vertices[m_indices[i + 2]];
 
-            if (Utility::Math::intersects(line, Triangle3D(a, b, c)))
+            if (Arns::Math::intersects(line, Triangle3D(a, b, c)))
                 return true;
         }
         return false;
@@ -216,4 +216,4 @@ public:
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

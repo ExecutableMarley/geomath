@@ -3,7 +3,7 @@
 #include <numeric>
 #include <assert.h>
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -636,4 +636,4 @@ TriangleMesh2D fastDelaunayTriangulation(const std::vector<Vector2D>& points)
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

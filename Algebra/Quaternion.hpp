@@ -10,7 +10,7 @@
 #include "CommonMath.hpp"
 #include "Geometry/Vector3D.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -151,4 +151,4 @@ struct Quaternion
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

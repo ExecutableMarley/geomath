@@ -6,7 +6,7 @@
 #include "Intersections2D.hpp"
 #include "CommonMath.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -176,4 +176,4 @@ Consider renaming intersection functions
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

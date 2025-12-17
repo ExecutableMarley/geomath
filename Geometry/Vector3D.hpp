@@ -9,7 +9,7 @@
 
 #include "../CommonMath.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -87,9 +87,9 @@ struct Vector3D
 
     Vector3D& clamp(const Vector3D& min, const Vector3D& max)
     {
-        x = Utility::Math::clamp(x, min.x, max.x);
-        y = Utility::Math::clamp(y, min.y, max.y);
-        z = Utility::Math::clamp(z, min.z, max.z);
+        x = Arns::Math::clamp(x, min.x, max.x);
+        y = Arns::Math::clamp(y, min.y, max.y);
+        z = Arns::Math::clamp(z, min.z, max.z);
         return *this;
     }
 
@@ -277,4 +277,4 @@ inline Vector3D operator *(float scalar, const Vector3D& vector)
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

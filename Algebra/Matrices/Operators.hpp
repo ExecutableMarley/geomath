@@ -12,7 +12,7 @@
 #include "IMatrix.hpp"
 #include "Matrix.hpp"
 
-namespace Utility
+namespace Arns
 {
 
 namespace Math
@@ -138,4 +138,4 @@ inline Matrix operator-(const IMatrix& lhs, float scalar)
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns
