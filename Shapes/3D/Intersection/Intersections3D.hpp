@@ -35,4 +35,4 @@ bool intersects(const Line3D &line, const Triangle3D &triangle, Vector3D *inters
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns

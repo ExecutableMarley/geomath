@@ -73,4 +73,4 @@ class IFiniteShape3D : IBaseShape3D
 
 } // namespace Math
 
-} // namespace Utility
+} // namespace Arns
