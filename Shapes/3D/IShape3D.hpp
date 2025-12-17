@@ -59,7 +59,7 @@ class IBaseShape3D
     virtual bool contains(const Vector3D &point) const = 0;
 };
 
-class IFiniteShape3D : IBaseShape3D
+class IFiniteShape3D : public IBaseShape3D
 {
     virtual float volume() const = 0;
 
