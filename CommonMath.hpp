@@ -25,9 +25,14 @@ constexpr double DoubleAbsEpsilon = 1e-12;
 
 using real_t = float;
 
-inline bool approximatelyZero(float value, float epsilon = FloatAbsEpsilon)
+inline bool approximatelyZero(float value, float absEpsilon = FloatAbsEpsilon)
 {
-    return fabs(value) < epsilon;
+    return fabs(value) < absEpsilon;
+}
+
+inline bool approximatelyZero(double value, double absEpsilon = DoubleAbsEpsilon)
+{
+    return fabs(value) < absEpsilon;
 }
 
 inline bool approximatelyEqual(float a, float b, 
@@ -41,9 +46,31 @@ inline bool approximatelyEqual(float a, float b,
     return diff <= relEpsilon * std::max(std::fabs(a), std::fabs(b));
 }
 
+inline bool approximatelyEqual(double a, double b, 
+                                double absEpsilon = DoubleAbsEpsilon,
+                                double relEpsilon = DoubleRelEpsilon)
+{
+    double diff = std::fabs(a - b);
+    if (diff <= absEpsilon)
+        return true;
+
+    return diff <= relEpsilon * std::max(std::fabs(a), std::fabs(b));
+}
+
 inline bool approximatelyGreater(float a, float b,
                                  float relEpsilon = FloatRelEpsilon,
                                  float absEpsilon = FloatAbsEpsilon)
+{
+    if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
+    {
+        return false;
+    }
+    return a > b;
+}
+
+inline bool approximatelyGreater(double a, double b,
+                                 double relEpsilon = DoubleAbsEpsilon,
+                                 double absEpsilon = DoubleRelEpsilon)
 {
     if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
     {
@@ -63,7 +90,23 @@ inline bool approximatelyLess(float a, float b,
     return a < b;
 }
 
+inline bool approximatelyLess(double a, double b,
+                              double relEpsilon = DoubleAbsEpsilon,
+                              double absEpsilon = DoubleRelEpsilon)
+{
+    if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
+    {
+        return false;
+    }
+    return a < b;
+}
+
 inline bool approximatelyZeroAbs(float value, float absEpsilon = FloatAbsEpsilon)
+{
+    return fabs(value) < absEpsilon;
+}
+
+inline bool approximatelyZeroAbs(double value, double absEpsilon = DoubleAbsEpsilon)
 {
     return fabs(value) < absEpsilon;
 }
@@ -73,7 +116,17 @@ inline bool approximatelyEqualAbs(float a, float b, float absEpsilon = FloatAbsE
     return approximatelyZero(a - b, absEpsilon);
 }
 
+inline bool approximatelyEqualAbs(double a, double b, double absEpsilon = DoubleAbsEpsilon)
+{
+    return approximatelyZero(a - b, absEpsilon);
+}
+
 inline bool approximatelyGreaterAbs(float a, float b, float absEpsilon = FloatAbsEpsilon)
+{
+    return (a - b) > absEpsilon;
+}
+
+inline bool approximatelyGreaterAbs(double a, double b, double absEpsilon = DoubleAbsEpsilon)
 {
     return (a - b) > absEpsilon;
 }
@@ -83,6 +136,10 @@ inline bool approximatelyLessAbs(float a, float b, float epsilon = FloatAbsEpsil
     return (b - a) > epsilon;
 }
 
+inline bool approximatelyLessAbs(double a, double b, double epsilon = DoubleAbsEpsilon)
+{
+    return (b - a) > epsilon;
+}
 
 // Included in C++17
 inline float clamp(float value, float minVal, float maxVal)
