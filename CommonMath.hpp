@@ -58,8 +58,8 @@ inline bool approximatelyEqual(double a, double b,
 }
 
 inline bool approximatelyGreater(float a, float b,
-                                 float relEpsilon = FloatRelEpsilon,
-                                 float absEpsilon = FloatAbsEpsilon)
+                                    float absEpsilon = FloatAbsEpsilon,
+                                    float relEpsilon = FloatRelEpsilon)
 {
     if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
     {
@@ -69,8 +69,8 @@ inline bool approximatelyGreater(float a, float b,
 }
 
 inline bool approximatelyGreater(double a, double b,
-                                 double relEpsilon = DoubleAbsEpsilon,
-                                 double absEpsilon = DoubleRelEpsilon)
+                                    double absEpsilon = DoubleRelEpsilon,
+                                    double relEpsilon = DoubleAbsEpsilon)
 {
     if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
     {
@@ -80,8 +80,8 @@ inline bool approximatelyGreater(double a, double b,
 }
 
 inline bool approximatelyLess(float a, float b,
-                              float relEpsilon = FloatRelEpsilon,
-                              float absEpsilon = FloatAbsEpsilon)
+                                float absEpsilon = FloatAbsEpsilon,
+                                float relEpsilon = FloatRelEpsilon)
 {
     if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
     {
@@ -91,8 +91,8 @@ inline bool approximatelyLess(float a, float b,
 }
 
 inline bool approximatelyLess(double a, double b,
-                              double relEpsilon = DoubleAbsEpsilon,
-                              double absEpsilon = DoubleRelEpsilon)
+                                double absEpsilon = DoubleRelEpsilon,
+                                double relEpsilon = DoubleAbsEpsilon)
 {
     if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
     {
