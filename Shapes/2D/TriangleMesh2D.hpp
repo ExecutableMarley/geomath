@@ -4,10 +4,11 @@
 #include <stdexcept>
 #include <vector>
 
+#include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "BBox2D.hpp"
-#include "Triangle2D.hpp"
 #include "IShape2D.hpp"
+#include "Triangle2D.hpp"
 
 namespace Arns
 {
@@ -33,6 +34,8 @@ struct TriangleIndices
         }
     }
 };
+
+// Todo: Should have the same structure as TriangleMesh3D
 
 class TriangleMesh2D
 {

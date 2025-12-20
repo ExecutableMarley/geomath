@@ -25,9 +25,9 @@ public:
 
     Line3D(const Vector3D &start, const Vector3D &end) : m_start(start), m_end(end) {}
 
-    Line3D(const Vector3D &start, const Vector3D &direction, float length) : m_start(start), m_end(start + direction.createNormalized() * length) {}
+    Line3D(const Vector3D &start, const Vector3D &direction, real_t length) : m_start(start), m_end(start + direction.createNormalized() * length) {}
 
-    float length() const
+    real_t length() const
     {
         return (m_end - m_start).length();
     }
@@ -42,12 +42,12 @@ public:
         return m_end - m_start;
     }
 
-    Vector3D pointAt(float t) const
+    Vector3D pointAt(real_t t) const
     {
         return m_start + (m_end - m_start) * t;
     }
 
-    float closestParameter(const Vector3D &point) const
+    real_t closestParameter(const Vector3D &point) const
     {
         Vector3D deltaVector = m_end - m_start;
         return (point - m_start).dot(deltaVector) / (deltaVector).lengthSquared();

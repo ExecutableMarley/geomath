@@ -17,20 +17,20 @@ namespace Math
 
 struct Vector2D
 {
-    float x;
-    float y;
+    real_t x;
+    real_t y;
 
     Vector2D() : x(0), y(0) {}
 
-    Vector2D(float x, float y) : x(x), y(y) {}
+    Vector2D(real_t x, real_t y) : x(x), y(y) {}
 
 
-    float length() const
+    real_t length() const
     {
         return sqrt(x * x + y * y);
     }
 
-    float lengthSquared() const
+    real_t lengthSquared() const
     {
         return x * x + y * y;
     }
@@ -42,7 +42,7 @@ struct Vector2D
 
     Vector2D& normalize()
     {
-        const float len = length();
+        const real_t len = length();
         if (len != 0)
         {
             x /= len;
@@ -53,7 +53,7 @@ struct Vector2D
 
     Vector2D createNormalized() const
     {
-        const float len = length();
+        const real_t len = length();
         if (len != 0)
         {
             return Vector2D(x / len, y / len);
@@ -61,9 +61,9 @@ struct Vector2D
         return Vector2D();
     }
 
-    Vector2D& resize(float newLength)
+    Vector2D& resize(real_t newLength)
     {
-        const float len = length();
+        const real_t len = length();
         if (len != 0)
         {
             x *= newLength / len;
@@ -72,9 +72,9 @@ struct Vector2D
         return *this;
     }
 
-    Vector2D createResized(float newLength) const
+    Vector2D createResized(real_t newLength) const
     {
-        const float len = length();
+        const real_t len = length();
         if (len != 0)
         {
             return Vector2D(x * newLength / len, y * newLength / len);
@@ -99,22 +99,22 @@ struct Vector2D
         return createPerpendicular().normalize();
     }
 
-    float distance(const Vector2D& other) const
+    real_t distance(const Vector2D& other) const
     {
         return (*this - other).length();
     }
 
-    float distanceSquared(const Vector2D& other) const
+    real_t distanceSquared(const Vector2D& other) const
     {
         return (*this - other).lengthSquared();
     }
 
-    float dot(const Vector2D& other) const
+    real_t dot(const Vector2D& other) const
     {
         return x * other.x + y * other.y;
     }
 
-    float cross(const Vector2D& other) const
+    real_t cross(const Vector2D& other) const
     {
         return x * other.y - y * other.x;
     }
@@ -139,29 +139,29 @@ struct Vector2D
         return isOrthogonal(other);
     }
 
-    Vector2D& rotate(float degree)
+    Vector2D& rotate(real_t degree)
     {
-        float cosAngle, sinAngle;
+        real_t cosAngle, sinAngle;
         sinCosDeg(degree, sinAngle, cosAngle);
 
-        const float tempX = x;
+        const real_t tempX = x;
         x = x * cosAngle - y * sinAngle;
         y = tempX * sinAngle + y * cosAngle;
 
         return *this;
     }
 
-    Vector2D& rotateAround(float degree, const Vector2D& point)
+    Vector2D& rotateAround(real_t degree, const Vector2D& point)
     {
         return (*this -= point).rotate(degree) += point;
     }
 
-    operator float*()
+    operator real_t*()
     {
         return &x;
     }
 
-    operator const float*() const
+    operator const real_t*() const
     {
         return &x;
     }
@@ -176,12 +176,12 @@ struct Vector2D
         return Vector2D(x - other.x, y - other.y);
     }
 
-    Vector2D operator*(float scalar) const
+    Vector2D operator*(real_t scalar) const
     {
         return Vector2D(x * scalar, y * scalar);
     }
 
-    Vector2D operator/(float scalar) const
+    Vector2D operator/(real_t scalar) const
     {
         return Vector2D(x / scalar, y / scalar);
     }
@@ -200,14 +200,14 @@ struct Vector2D
         return *this;
     }
 
-    Vector2D& operator*=(float scalar)
+    Vector2D& operator*=(real_t scalar)
     {
         x *= scalar;
         y *= scalar;
         return *this;
     }
 
-    Vector2D& operator/=(float scalar)
+    Vector2D& operator/=(real_t scalar)
     {
         x /= scalar;
         y /= scalar;
@@ -254,7 +254,7 @@ struct Vector2D
     }
 };
 
-inline Vector2D operator *(float scalar, const Vector2D& vector)
+inline Vector2D operator *(real_t scalar, const Vector2D& vector)
 {
     return vector * scalar;
 }

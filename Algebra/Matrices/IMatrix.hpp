@@ -8,6 +8,8 @@
 #include <math.h>
 #include <stdexcept>
 
+#include "CommonMath.hpp"
+
 namespace Arns
 {
 
@@ -22,8 +24,8 @@ public:
     virtual size_t rows() const = 0;
     virtual size_t columns() const = 0;
 
-    virtual float& operator()(size_t row, size_t column) = 0;
-    virtual const float& operator()(size_t row, size_t column) const = 0;
+    virtual real_t& operator()(size_t row, size_t column) = 0;
+    virtual const real_t& operator()(size_t row, size_t column) const = 0;
 
 
     IMatrix& operator+=(const IMatrix& other)
@@ -37,7 +39,7 @@ public:
         return *this;
     }
 
-    IMatrix& operator+=(float scalar)
+    IMatrix& operator+=(real_t scalar)
     {
         for (int i = 0; i < rows(); i++)
             for (int j = 0; j < columns(); j++)
@@ -56,7 +58,7 @@ public:
         return *this;
     }
 
-    IMatrix& operator-=(float scalar)
+    IMatrix& operator-=(real_t scalar)
     {
         for (int i = 0; i < rows(); i++)
             for (int j = 0; j < columns(); j++)
@@ -64,7 +66,7 @@ public:
         return *this;
     }
 
-    IMatrix& operator*=(float scalar)
+    IMatrix& operator*=(real_t scalar)
     {
         for (int i = 0; i < rows(); i++)
             for (int j = 0; j < columns(); j++)
@@ -72,7 +74,7 @@ public:
         return *this;
     }
 
-    IMatrix& operator/=(float scalar)
+    IMatrix& operator/=(real_t scalar)
     {
         for (int i = 0; i < rows(); i++)
             for (int j = 0; j < columns(); j++)

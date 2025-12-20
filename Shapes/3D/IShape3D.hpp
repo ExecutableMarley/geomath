@@ -33,9 +33,9 @@ class IShape3D
 public:
     virtual ShapeType3D type() const = 0;
 
-    virtual float volume() const = 0;
+    virtual real_t volume() const = 0;
 
-    virtual float surfaceArea() const = 0;
+    virtual real_t surfaceArea() const = 0;
 
     virtual Vector3D centroid() const = 0;
 
@@ -61,9 +61,9 @@ class IBaseShape3D
 
 class IFiniteShape3D : public IBaseShape3D
 {
-    virtual float volume() const = 0;
+    virtual real_t volume() const = 0;
 
-    virtual float surfaceArea() const = 0;
+    virtual real_t surfaceArea() const = 0;
 
     virtual Vector3D centroid() const = 0;
 

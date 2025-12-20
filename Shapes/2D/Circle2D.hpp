@@ -25,11 +25,11 @@ class Circle2D : public IFiniteShape2D
 {
 public:
     Vector2D m_center;
-    float m_radius;
+    real_t m_radius;
 
     Circle2D() : m_center(), m_radius(0) {}
 
-    Circle2D(const Vector2D &center, float radius) : m_center(center), m_radius(radius) {}
+    Circle2D(const Vector2D &center, real_t radius) : m_center(center), m_radius(radius) {}
 
     ShapeType2D type() const override
     {
@@ -43,29 +43,29 @@ public:
         std::vector<Vector2D> vertices;
         vertices.reserve(resolution);
 
-        const float step = 2.0f * static_cast<float>(PI) / resolution;
+        const real_t step = 2.0f * static_cast<real_t>(PI) / resolution;
         for (int i = 0; i < resolution; ++i)
         {
-            float angle = i * step;
-            float x = m_center.x + m_radius * std::cos(angle);
-            float y = m_center.y + m_radius * std::sin(angle);
+            real_t angle = i * step;
+            real_t x = m_center.x + m_radius * std::cos(angle);
+            real_t y = m_center.y + m_radius * std::sin(angle);
             vertices.emplace_back(x, y);
         }
 
         return vertices;
     }
 
-    float area() const override
+    real_t area() const override
     {
         return PI * m_radius * m_radius;
     }
 
-    float circumference() const
+    real_t circumference() const
     {
         return 2.0f * PI * m_radius;
     }
 
-    float perimeter() const override
+    real_t perimeter() const override
     {
         return circumference();
     }
@@ -81,18 +81,18 @@ public:
         return *this;
     }
 
-    Circle2D& rotate(float angle)
+    Circle2D& rotate(real_t angle)
     {
         return *this;
     }
 
-    Circle2D& rotate(float angle, const Vector2D& point)
+    Circle2D& rotate(real_t angle, const Vector2D& point)
     {
         this->m_center.rotateAround(angle, point);
         return *this;
     }
 
-    Circle2D& scale(float factor)
+    Circle2D& scale(real_t factor)
     {
         m_radius *= factor;
         return *this;
@@ -103,7 +103,7 @@ public:
         return *this;
     }
 
-    std::unique_ptr<IFiniteShape2D>clone() const
+    std::unique_ptr<IFiniteShape2D> clone() const
     {
         return std::make_unique<Circle2D>(*this);        
     }

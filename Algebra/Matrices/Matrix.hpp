@@ -9,6 +9,7 @@
 #include <vector>
 #include <stdexcept>
 
+#include "CommonMath.hpp"
 #include "IMatrix.hpp"
 
 namespace Arns
@@ -20,20 +21,20 @@ namespace Math
 class Matrix : public IMatrix
 {
 protected:
-    std::vector<std::vector<float>> m_data;
+    std::vector<std::vector<real_t>> m_data;
     size_t m_rows;
     size_t m_columns;
 public:
 
     Matrix() : m_data(), m_rows(0), m_columns(0) {}
 
-    Matrix(size_t rows, size_t columns, float initValue = 0.f) : m_data(rows, std::vector<float>(columns, initValue)) 
+    Matrix(size_t rows, size_t columns, real_t initValue = 0.f) : m_data(rows, std::vector<real_t>(columns, initValue)) 
     {
         this->m_rows = rows;
         this->m_columns = columns;
     }
 
-    Matrix(size_t rows, size_t columns, const std::vector<float> &data) : m_data(rows, std::vector<float>(columns))
+    Matrix(size_t rows, size_t columns, const std::vector<real_t> &data) : m_data(rows, std::vector<real_t>(columns))
     {
         if (data.size() != rows * columns)
         {
@@ -58,7 +59,7 @@ public:
     {
         m_rows = other.rows();
         m_columns = other.columns();
-        m_data = std::vector<std::vector<float>>(m_rows, std::vector<float>(m_columns, 0));
+        m_data = std::vector<std::vector<real_t>>(m_rows, std::vector<real_t>(m_columns, 0));
         for (int i = 0; i < m_rows; i++)
             for (int j = 0; j < m_columns; j++)
                 m_data[i][j] = other(i, j);
@@ -70,12 +71,12 @@ public:
 
     size_t columns() const override { return m_columns;}
 
-    float& operator()(size_t row, size_t column) override
+    real_t& operator()(size_t row, size_t column) override
     {
         return m_data[row][column];
     }
 
-    const float& operator()(size_t row, size_t column) const override
+    const real_t& operator()(size_t row, size_t column) const override
     {
         return m_data[row][column];
     }

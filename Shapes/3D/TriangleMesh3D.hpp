@@ -23,6 +23,8 @@ namespace Arns
 namespace Math
 {
 
+// Todo: Should have the same structure as TriangleMesh2D
+
 class TriangleMesh3D
 {
 public:

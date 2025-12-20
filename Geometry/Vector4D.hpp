@@ -17,28 +17,28 @@ namespace Math
 
 struct Vector4D
 {
-    float x;
-    float y;
-    float z;
-    float w;
+    real_t x;
+    real_t y;
+    real_t z;
+    real_t w;
 
     Vector4D() : x(0), y(0), z(0), w(0) {}
 
-    Vector4D(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+    Vector4D(real_t x, real_t y, real_t z, real_t w) : x(x), y(y), z(z), w(w) {}
 
-    float length() const
+    real_t length() const
     {
         return sqrt(x * x + y * y + z * z + w * w);
     }
 
-    float lengthSquared() const
+    real_t lengthSquared() const
     {
         return x * x + y * y + z * z + w * w;
     }
 
     Vector4D& normalize()
     {
-        const float len = length();
+        const real_t len = length();
         if (len != 0)
         {
             x /= len;
@@ -51,7 +51,7 @@ struct Vector4D
 
     Vector4D createNormalized() const
     {
-        const float len = length();
+        const real_t len = length();
         if (len != 0)
         {
             return Vector4D(x / len, y / len, z / len, w / len);
@@ -59,9 +59,9 @@ struct Vector4D
         return Vector4D();
     }
 
-    Vector4D& resize(float newLength)
+    Vector4D& resize(real_t newLength)
     {
-        const float len = length();
+        const real_t len = length();
         if (len != 0)
         {
             x *= newLength / len;
@@ -72,9 +72,9 @@ struct Vector4D
         return *this;
     }
 
-    Vector4D createResized(float newLength) const
+    Vector4D createResized(real_t newLength) const
     {
-        const float len = length();
+        const real_t len = length();
         if (len != 0)
         {
             return Vector4D(x * newLength / len, y * newLength / len, z * newLength / len, w * newLength / len);
@@ -82,12 +82,12 @@ struct Vector4D
         return Vector4D();
     }
 
-    operator float*()
+    operator real_t*()
     {
         return &x;
     }
 
-    operator const float*() const
+    operator const real_t*() const
     {
         return &x;
     }
@@ -102,12 +102,12 @@ struct Vector4D
         return Vector4D(x - other.x, y - other.y, z - other.z, w - other.w);
     }
 
-    Vector4D operator*(float scalar) const
+    Vector4D operator*(real_t scalar) const
     {
         return Vector4D(x * scalar, y * scalar, z * scalar, w * scalar);
     }
 
-    Vector4D operator/(float scalar) const
+    Vector4D operator/(real_t scalar) const
     {
         return Vector4D(x / scalar, y / scalar, z / scalar, w / scalar);
     }
@@ -130,7 +130,7 @@ struct Vector4D
         return *this;
     }
 
-    Vector4D& operator*=(float scalar)
+    Vector4D& operator*=(real_t scalar)
     {
         x *= scalar;
         y *= scalar;
@@ -139,7 +139,7 @@ struct Vector4D
         return *this;
     }
 
-    Vector4D& operator/=(float scalar)
+    Vector4D& operator/=(real_t scalar)
     {
         x /= scalar;
         y /= scalar;

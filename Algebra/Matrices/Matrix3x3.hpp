@@ -8,8 +8,8 @@
 #include <math.h>
 #include <stdexcept>
 
-#include "IMatrix.hpp"
 #include "CommonMath.hpp"
+#include "IMatrix.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "Geometry/Vector3D.hpp"
 
@@ -22,19 +22,19 @@ namespace Math
 class Matrix3x3 : public IMatrix
 {
 protected:
-    float m_data[3][3];
+    real_t m_data[3][3];
 public:
 
-    Matrix3x3(float initValue = 0.0f)
+    Matrix3x3(real_t initValue = 0.0f)
     {
         for (int i = 0; i < 3; i++)
             for (int j = 0; j < 3; j++)
                 m_data[i][j] = initValue;
     }
 
-    Matrix3x3(float m00, float m01, float m02,
-              float m10, float m11, float m12,
-              float m20, float m21, float m22)
+    Matrix3x3(real_t m00, real_t m01, real_t m02,
+              real_t m10, real_t m11, real_t m12,
+              real_t m20, real_t m21, real_t m22)
     {
         m_data[0][0] = m00;
         m_data[0][1] = m01;
@@ -71,12 +71,12 @@ public:
     size_t rows()    const override { return 3; }
     size_t columns() const override { return 3; }
 
-    float& operator()(size_t row, size_t column) override
+    real_t& operator()(size_t row, size_t column) override
     {
         return m_data[row][column];
     }
 
-    const float& operator()(size_t row, size_t column) const override
+    const real_t& operator()(size_t row, size_t column) const override
     {
         return m_data[row][column];
     }
@@ -148,7 +148,7 @@ public:
             m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2] * 1);
     }
 
-    float* operator[](size_t row)
+    real_t* operator[](size_t row)
     {
         return m_data[row];
     }
@@ -178,7 +178,7 @@ public:
         return result;
     }
 
-    Matrix3x3 operator+(float scalar) const
+    Matrix3x3 operator+(real_t scalar) const
     {
         Matrix3x3 result;
         for (int i = 0; i < 3; i++)
@@ -201,7 +201,7 @@ public:
         return result;
     }
 
-    Matrix3x3 operator-(float scalar) const
+    Matrix3x3 operator-(real_t scalar) const
     {
         Matrix3x3 result;
         for (int i = 0; i < 3; i++)
@@ -249,7 +249,7 @@ public:
         return Vector2D(resultX, resultY);
     }
 
-    Matrix3x3 operator*(float scalar) const
+    Matrix3x3 operator*(real_t scalar) const
     {
         Matrix3x3 result;
         for (int i = 0; i < 3; i++)
@@ -260,7 +260,7 @@ public:
 
     //[/]
 
-    Matrix3x3 operator/(float scalar) const
+    Matrix3x3 operator/(real_t scalar) const
     {
         Matrix3x3 result;
         for (int i = 0; i < 3; i++)
@@ -290,7 +290,7 @@ public:
 
     static Matrix3x3 createRotationRads(real_t angle)
     {
-        float sin, cos;
+        real_t sin, cos;
         sinCos(angle, sin, cos);
         
         return Matrix3x3(
@@ -301,7 +301,7 @@ public:
 
     static Matrix3x3 createRotationDegs(real_t angle)
     {
-        float sin, cos;
+        real_t sin, cos;
         sinCosDeg(angle, sin, cos);
         
         return Matrix3x3(

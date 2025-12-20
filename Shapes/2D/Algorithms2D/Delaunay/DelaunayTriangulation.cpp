@@ -3,6 +3,8 @@
 #include <numeric>
 #include <assert.h>
 
+#include "../../CommonMath.hpp"
+
 namespace Arns
 {
 
@@ -13,28 +15,28 @@ namespace Math
 
 bool isPointInCircumcircle(const Vector2D& p, const Vector2D& a, const Vector2D& b, const Vector2D& c)
 {
-    float ax = a.x - p.x;
-    float ay = a.y - p.y;
-    float bx = b.x - p.x;
-    float by = b.y - p.y;
-    float cx = c.x - p.x;
-    float cy = c.y - p.y;
+    real_t ax = a.x - p.x;
+    real_t ay = a.y - p.y;
+    real_t bx = b.x - p.x;
+    real_t by = b.y - p.y;
+    real_t cx = c.x - p.x;
+    real_t cy = c.y - p.y;
 
-    float det = (ax * ax + ay * ay) * (bx * cy - cx * by)
+    real_t det = (ax * ax + ay * ay) * (bx * cy - cx * by)
         - (bx * bx + by * by) * (ax * cy - cx * ay)
         + (cx * cx + cy * cy) * (ax * by - bx * ay);
 
     return det > 0; // det < 0 for CW
 }
 
-bool circumcircleSquared(const Vector2D& a, const Vector2D& b, const Vector2D& c, Vector2D& center, float& radius2)
+bool circumcircleSquared(const Vector2D& a, const Vector2D& b, const Vector2D& c, Vector2D& center, real_t& radius2)
 {
     const Vector2D d = b - a;
     const Vector2D e = c - a;
 
-    const float bl = d.lengthSquared();
-    const float cl = e.lengthSquared();
-    const float det = d.cross(e);
+    const real_t bl = d.lengthSquared();
+    const real_t cl = e.lengthSquared();
+    const real_t det = d.cross(e);
 
     if (approximatelyZero(det))
     {
@@ -53,18 +55,18 @@ bool circumcircleSquared(const Vector2D& a, const Vector2D& b, const Vector2D& c
     return true;
 }
 
-float circumradiusSquared(const Vector2D& a, const Vector2D& b, const Vector2D& c)
+real_t circumradiusSquared(const Vector2D& a, const Vector2D& b, const Vector2D& c)
 {
     const Vector2D d = b - a;
     const Vector2D e = c - a;
 
-    const float bl = d.lengthSquared();
-    const float cl = e.lengthSquared();
-    const float det = d.cross(e);
+    const real_t bl = d.lengthSquared();
+    const real_t cl = e.lengthSquared();
+    const real_t det = d.cross(e);
 
     if (approximatelyZero(det))
     {
-        return (std::numeric_limits<float>::max)();
+        return (std::numeric_limits<real_t>::max)();
     }
 
     const Vector2D radius(
@@ -81,17 +83,18 @@ T orient2D(T aX, T aY, T bX, T bY, T cX, T cY)
     return (bX - aX) * (cY - aY) - (bY - aY) * (cX - aX);
 }
 
-float orient2D(const Vector2D& a, const Vector2D& b, const Vector2D& c)
+real_t orient2D(const Vector2D& a, const Vector2D& b, const Vector2D& c)
 {
     return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
+//Todo: Use approx Helper functions
 bool isCCW(const Vector2D& a, const Vector2D& b, const Vector2D& c)
 {
     return orient2D(a, b, c) > FloatAbsEpsilon;
 }
 
-bool isCCW(float aX, float aY, float bX, float bY, float cX, float cY)
+bool isCCW(real_t aX, real_t aY, real_t bX, real_t bY, real_t cX, real_t cY)
 {
     return orient2D(aX, aY, bX, bY, cX, cY) > FloatAbsEpsilon;
 }
@@ -101,7 +104,7 @@ bool isCW(const Vector2D& a, const Vector2D& b, const Vector2D& c)
     return orient2D(a, b, c) < -FloatAbsEpsilon;
 }
 
-bool isCW(float aX, float aY, float bX, float bY, float cX, float cY)
+bool isCW(real_t aX, real_t aY, real_t bX, real_t bY, real_t cX, real_t cY)
 {
     return orient2D(aX, aY, bX, bY, cX, cY) < -FloatAbsEpsilon;
 }
@@ -126,7 +129,7 @@ bool isDelaunay(const TriangleMesh2D& mesh)
         const Vector2D& C = verts[tri.v2];
 
         Vector2D center;
-        float radius2;
+        real_t radius2;
         circumcircleSquared(A, B, C, center, radius2);
 
         // Skip degenerate triangles
@@ -139,7 +142,7 @@ bool isDelaunay(const TriangleMesh2D& mesh)
             if (i == tri.v0 || i == tri.v1 || i == tri.v2)
                 continue;
 
-            float d2 = center.distanceSquared(verts[i]);
+            real_t d2 = center.distanceSquared(verts[i]);
 
             if (approximatelyLess(d2, radius2))
                 return false;
@@ -237,7 +240,7 @@ private:
     std::vector<std::size_t> m_hash;
     std::vector<std::size_t> m_edge_stack;
 
-    [[nodiscard]] static float pseudo_angle(float dx, float dy) noexcept;
+    [[nodiscard]] static real_t pseudo_angle(real_t dx, real_t dy) noexcept;
     [[nodiscard]] std::size_t hash_key(const Vector2D& point) const noexcept;
 
     [[nodiscard]] std::size_t find_hull_start(const Vector2D& point) const noexcept;
@@ -250,14 +253,14 @@ private:
 
 //DBL
 // --- Monotonic mapping of vector direction to [0, 1) without atan2
-float Delaunator::pseudo_angle(float dx, float dy) noexcept
+real_t Delaunator::pseudo_angle(real_t dx, real_t dy) noexcept
 {
-    const float adx = std::abs(dx);
-    const float ady = std::abs(dy);
+    const real_t adx = std::abs(dx);
+    const real_t ady = std::abs(dy);
 
     if (adx + ady == 0.0) return 0.0;
 
-    const float p = dx / (adx + ady);
+    const real_t p = dx / (adx + ady);
     return (dy > 0.0 ? 3.0 - p : 1.0 + p) / 4.0;
 }
 
@@ -265,12 +268,12 @@ float Delaunator::pseudo_angle(float dx, float dy) noexcept
 // --- Converts point direction to hash bucket index
 std::size_t Delaunator::hash_key(const Vector2D& point) const noexcept
 {
-    const float dx = point.x - m_center.x;
-    const float dy = point.y - m_center.y;
+    const real_t dx = point.x - m_center.x;
+    const real_t dy = point.y - m_center.y;
 
-    const float angle_fraction = pseudo_angle(dx, dy);
+    const real_t angle_fraction = pseudo_angle(dx, dy);
     const std::size_t bucket = static_cast<std::size_t>(
-        std::floor(angle_fraction * static_cast<float>(m_hash_size)));
+        std::floor(angle_fraction * static_cast<real_t>(m_hash_size)));
 
     return bucket % m_hash_size;
 }
@@ -300,14 +303,14 @@ Delaunator::find_seed_triangle(const std::vector<Vector2D>& points)
     m_center = bbox.centroid();
 
     // --- Find Seed Triangle ---
-    constexpr float maxDist = std::numeric_limits<float>::max();
+    constexpr real_t maxDist = std::numeric_limits<real_t>::max();
     std::size_t i0 = INVALID_INDEX, i1 = INVALID_INDEX, i2 = INVALID_INDEX;
 
     // Find i0: closest to center
-    float min_dist = maxDist;
+    real_t min_dist = maxDist;
     for (std::size_t i = 0; i < n; ++i)
     {
-        float d = m_center.distanceSquared(points[i]);
+        real_t d = m_center.distanceSquared(points[i]);
         if (d < min_dist) { i0 = i; min_dist = d; }
     }
     Vector2D p0 = points[i0];
@@ -317,18 +320,18 @@ Delaunator::find_seed_triangle(const std::vector<Vector2D>& points)
     for (std::size_t i = 0; i < n; ++i)
     {
         if (i == i0) continue;
-        float d = p0.distanceSquared(points[i]);
+        real_t d = p0.distanceSquared(points[i]);
         if (d < min_dist && d > 0.0f) { i1 = i; min_dist = d; }
     }
     if (i1 == INVALID_INDEX) throw std::runtime_error("All points are duplicates.");
     Vector2D p1 = points[i1];
 
     // Find i2: smallest circumcircle with p0 and p1
-    float min_radius = maxDist;
+    real_t min_radius = maxDist;
     for (std::size_t i = 0; i < n; ++i)
     {
         if (i == i0 || i == i1) continue;
-        float r = circumradiusSquared(p0, p1, points[i]);
+        real_t r = circumradiusSquared(p0, p1, points[i]);
         if (r < min_radius) { i2 = i; min_radius = r; }
     }
     if (i2 == INVALID_INDEX) throw std::runtime_error("All points are collinear.");
@@ -344,7 +347,7 @@ void Delaunator::init_hull(const std::vector<Vector2D>& points,
     std::size_t i0, std::size_t i1, std::size_t i2)
 {
     const std::size_t n = points.size();
-    constexpr float GOLDEN_RATIO = 1.618f;
+    constexpr real_t GOLDEN_RATIO = 1.618f;
     m_hash_size = static_cast<std::size_t>(GOLDEN_RATIO * std::ceil(std::sqrt(n)));
     m_hash.assign(m_hash_size, INVALID_INDEX);
 
@@ -436,8 +439,8 @@ void Delaunator::insert_points(const std::vector<Vector2D>& points,
     const std::vector<std::size_t>& sorted_ids,
     std::size_t i0, std::size_t i1, std::size_t i2)
 {
-    Vector2D prevPoint(std::numeric_limits<float>::quiet_NaN(),
-                       std::numeric_limits<float>::quiet_NaN());
+    Vector2D prevPoint(std::numeric_limits<real_t>::quiet_NaN(),
+                       std::numeric_limits<real_t>::quiet_NaN());
 
     for (size_t k = 0; k < points.size(); k++)
     {
@@ -467,11 +470,11 @@ Delaunator::Delaunator(const std::vector<Vector2D>& inputPoints)
 
     auto [i0, i1, i2] = find_seed_triangle(inputPoints);
 
-    float circumRadius;
+    real_t circumRadius;
     circumcircleSquared(inputPoints[i0], inputPoints[i1], inputPoints[i2], m_center, circumRadius);
 
     // --- Sort dists ---
-    std::vector<float> m_dists;
+    std::vector<real_t> m_dists;
     m_dists.reserve(inputPoints.size());
     for (const Vector2D& p : inputPoints)
     {

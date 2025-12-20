@@ -7,6 +7,7 @@
 
 #include <math.h>
 
+#include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "BBox2D.hpp"
 #include "IShape2D.hpp"
@@ -38,7 +39,7 @@ public:
 
 private:
     //Todo: Consider moving this to Vector2D file
-    static float cross(const Vector2D& a, const Vector2D& b, const Vector2D& c)
+    static real_t cross(const Vector2D& a, const Vector2D& b, const Vector2D& c)
     {
         return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
     }

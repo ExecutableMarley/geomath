@@ -7,6 +7,7 @@
 
 #include <math.h>
 
+#include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
 
 namespace Arns
@@ -35,12 +36,12 @@ public:
         return m_direction;
     }
 
-    Vector2D pointAt(float t) const
+    Vector2D pointAt(real_t t) const
     {
         return m_origin + m_direction * t;
     }
 
-    float closestParameter(const Vector2D &point) const
+    real_t closestParameter(const Vector2D &point) const
     {
         return (point - m_origin).dot(m_direction) / m_direction.lengthSquared();
     }

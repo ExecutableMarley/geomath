@@ -48,7 +48,7 @@ inline Matrix operator*(const IMatrix& lhs, const IMatrix& rhs)
     return result;
 }
 
-inline Matrix operator*(const IMatrix& lhs, float scalar)
+inline Matrix operator*(const IMatrix& lhs, real_t scalar)
 {
     Matrix result(lhs.rows(), lhs.columns());
 
@@ -59,14 +59,14 @@ inline Matrix operator*(const IMatrix& lhs, float scalar)
     return result;
 }
 
-inline Matrix operator*(float scalar, const IMatrix& rhs)
+inline Matrix operator*(real_t scalar, const IMatrix& rhs)
 {
     return rhs * scalar;
 }
 
 // [/]
 
-inline Matrix operator/(const IMatrix& lhs, float scalar)
+inline Matrix operator/(const IMatrix& lhs, real_t scalar)
 {
     Matrix result(lhs.rows(), lhs.columns());
 
@@ -92,7 +92,7 @@ inline Matrix operator+(const IMatrix& lhs, const IMatrix& rhs)
     return result;
 }
 
-inline Matrix operator+(const IMatrix& lhs, float scalar)
+inline Matrix operator+(const IMatrix& lhs, real_t scalar)
 {
     Matrix result(lhs.rows(), lhs.columns());
 
@@ -103,7 +103,7 @@ inline Matrix operator+(const IMatrix& lhs, float scalar)
     return result;
 }
 
-inline Matrix operator+(float scalar, const IMatrix& rhs)
+inline Matrix operator+(real_t scalar, const IMatrix& rhs)
 {
     return rhs + scalar;
     
@@ -124,7 +124,7 @@ inline Matrix operator-(const IMatrix& lhs, const IMatrix& rhs)
     return result;
 }
 
-inline Matrix operator-(const IMatrix& lhs, float scalar)
+inline Matrix operator-(const IMatrix& lhs, real_t scalar)
 {
     Matrix result(lhs.rows(), lhs.columns());
 

@@ -8,6 +8,7 @@
 #include <math.h>
 #include <algorithm>
 
+#include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
 
 namespace Arns
@@ -26,24 +27,24 @@ public:
     
     BBox2D(const Vector2D &min, const Vector2D &max) : m_min(min), m_max(max) {}
 
-    BBox2D(const Vector2D &point, float width = 0.f, float height = 0.f) : m_min(point), m_max(point.x + width, point.y + height) {}
+    BBox2D(const Vector2D &point, real_t width = 0.f, real_t height = 0.f) : m_min(point), m_max(point.x + width, point.y + height) {}
 
-    float width() const
+    real_t width() const
     {
         return m_max.x - m_min.x;
     }
 
-    float height() const
+    real_t height() const
     {
         return m_max.y - m_min.y;
     }
 
-    float area() const
+    real_t area() const
     {
         return width() * height();
     }
 
-    float perimeter() const
+    real_t perimeter() const
     {
         return 2.0f * (width() + height());
     }
@@ -60,7 +61,7 @@ public:
         return *this;
     }
 
-    BBox2D& scale(float factor)
+    BBox2D& scale(real_t factor)
     {
         Vector2D center = centroid();
         Vector2D halfSize = (m_max - m_min) * 0.5f;
@@ -69,7 +70,7 @@ public:
         return *this;
     }
 
-    BBox2D& pad(float amount)
+    BBox2D& pad(real_t amount)
     {
         m_min = m_min - Vector2D(amount, amount);
         m_max = m_max + Vector2D(amount, amount);
@@ -98,14 +99,14 @@ public:
     );
     }
 
-    float minDistanceSquared(const Vector2D& point) const
+    real_t minDistanceSquared(const Vector2D& point) const
     {
-        float dx = std::max(0.0f, std::max(m_min.x - point.x, point.x - m_max.x));
-        float dy = std::max(0.0f, std::max(m_min.y - point.y, point.y - m_max.y));
+        real_t dx = std::max(0.0f, std::max(m_min.x - point.x, point.x - m_max.x));
+        real_t dy = std::max(0.0f, std::max(m_min.y - point.y, point.y - m_max.y));
         return dx * dx + dy * dy;
     }
 
-    float maxDistanceSquared(const Vector2D& point) const
+    real_t maxDistanceSquared(const Vector2D& point) const
     {
         double dx1 = point.x - m_min.x;
         double dx2 = point.x - m_max.x;

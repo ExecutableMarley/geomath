@@ -26,11 +26,11 @@ bool isPointOnSegment(const Vector2D& point, const Vector2D& segmentStart, const
 {
     Vector2D r = segmentEnd - segmentStart;
     Vector2D s = point - segmentStart;
-    float cross = r.cross(s);
+    real_t cross = r.cross(s);
     if (!approximatelyZero(cross))
         return false;
 
-    float dot = r.dot(s);
+    real_t dot = r.dot(s);
     if (dot < 0.0 || dot > r.lengthSquared())
         return false;
 
@@ -44,34 +44,34 @@ bool isPointOnSegment(const Vector2D& point, const Line2D& line)
 
 // Distance calculation algorithms
 
-float distancePointToLine(const Vector2D& point, const Vector2D& lineStart, const Vector2D& lineEnd, Vector2D* closestPoint)
+real_t distancePointToLine(const Vector2D& point, const Vector2D& lineStart, const Vector2D& lineEnd, Vector2D* closestPoint)
 {
     const Vector2D r = lineEnd - lineStart;
     const Vector2D s = point - lineStart;
-    const float rDotR = r.dot(r);
+    const real_t rDotR = r.dot(r);
     if (rDotR == 0.0f)
     {
         if (closestPoint) *closestPoint = lineStart;
         return (point - lineStart).length();
     }
-    float t = std::clamp(s.dot(r) / rDotR, 0.0f, 1.0f);
+    real_t t = std::clamp(s.dot(r) / rDotR, 0.0f, 1.0f);
     const Vector2D projection = lineStart + r * t;
     if (closestPoint)
         *closestPoint = projection;
     return (point - projection).length();
 }
 
-float distancePointToLine(const Vector2D& point, const Line2D& line, Vector2D* closestPoint)
+real_t distancePointToLine(const Vector2D& point, const Line2D& line, Vector2D* closestPoint)
 {
     return distancePointToLine(point, line.m_start, line.m_end, closestPoint);
 }
 
-float distanceLineToLine(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t distanceLineToLine(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     const Vector2D delta1 = s2 - s1;
     const Vector2D delta2 = k2 - k1;
-    float lengthSquared1 = delta1.lengthSquared();
-    float lengthSquared2 = delta2.lengthSquared();
+    real_t lengthSquared1 = delta1.lengthSquared();
+    real_t lengthSquared2 = delta2.lengthSquared();
 
     if (lengthSquared1 == 0 || lengthSquared2 == 0)
     {
@@ -84,14 +84,14 @@ float distanceLineToLine(const Vector2D& s1, const Vector2D& s2, const Vector2D&
 
     const Vector2D startDelta = s1 - k1;
     
-    const float a = delta1.dot(startDelta);
-    const float b = delta2.dot(startDelta);
-    const float c = delta1.dot(delta2);
+    const real_t a = delta1.dot(startDelta);
+    const real_t b = delta2.dot(startDelta);
+    const real_t c = delta1.dot(delta2);
 
-    const float d = lengthSquared1 * lengthSquared2 - c * c;
+    const real_t d = lengthSquared1 * lengthSquared2 - c * c;
 
-    float t = d != 0 ? (b * c - a * lengthSquared2) / d : 0.0f; 
-    float u = d != 0 ? (lengthSquared1 * b - c * a) / d : 0.0f;
+    real_t t = d != 0 ? (b * c - a * lengthSquared2) / d : 0.0f; 
+    real_t u = d != 0 ? (lengthSquared1 * b - c * a) / d : 0.0f;
 
     t = clamp(t, 0.0f, 1.0f);
     u = clamp(u, 0.0f, 1.0f);
@@ -107,7 +107,7 @@ float distanceLineToLine(const Vector2D& s1, const Vector2D& s2, const Vector2D&
     return (closestPointOnLine1 - closestPointOnLine2).length();
 }
 
-float distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     return distanceLineToLine(line1.m_start, line1.m_end, line2.m_start, line2.m_end, closestPoint1, closestPoint2);
 }
@@ -116,7 +116,7 @@ float distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* clo
 
 //    --- Rays ---
 
-bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, float t_min, float t_max, HitInfo2D* hitInfo)
+bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     for (int i = 0; i < 2; i++)
     {
@@ -127,9 +127,9 @@ bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, float t_min, flo
             continue;
         }
 
-        float invD = 1.0f / ray.m_direction[i];
-        float t0 = (bbox.m_min[i] - ray.m_origin[i]) * invD;
-        float t1 = (bbox.m_max[i] - ray.m_origin[i]) * invD;
+        real_t invD = 1.0f / ray.m_direction[i];
+        real_t t0 = (bbox.m_min[i] - ray.m_origin[i]) * invD;
+        real_t t1 = (bbox.m_max[i] - ray.m_origin[i]) * invD;
 
         if (invD < 0.0f)
             std::swap(t0, t1);
@@ -150,19 +150,19 @@ bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, float t_min, flo
     return true;
 }
 
-bool intersectRayWithCircle(const Ray2D& ray, const Circle2D& circle, float t_min, float t_max, HitInfo2D* hitInfo)
+bool intersectRayWithCircle(const Ray2D& ray, const Circle2D& circle, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     const Vector2D oc = ray.m_origin - circle.m_center;
-    const float a = ray.m_direction.dot(ray.m_direction);
-    const float b = 2.0f * oc.dot(ray.m_direction);
-    const float c = oc.dot(oc) - circle.m_radius * circle.m_radius;
-    const float discriminant = b * b - 4 * a * c;
+    const real_t a = ray.m_direction.dot(ray.m_direction);
+    const real_t b = 2.0f * oc.dot(ray.m_direction);
+    const real_t c = oc.dot(oc) - circle.m_radius * circle.m_radius;
+    const real_t discriminant = b * b - 4 * a * c;
 
     if (discriminant < 0)
         return false;
 
-    const float sqrtDiscriminant = sqrt(discriminant);
-    float t = (-b - sqrtDiscriminant) / (2.0f * a);
+    const real_t sqrtDiscriminant = sqrt(discriminant);
+    real_t t = (-b - sqrtDiscriminant) / (2.0f * a);
     if (t < t_min || t > t_max)
     {
         t = (-b + sqrtDiscriminant) / (2.0f * a);
@@ -180,33 +180,33 @@ bool intersectRayWithCircle(const Ray2D& ray, const Circle2D& circle, float t_mi
     return true;
 }
 
-bool intersectRayWithTriangle(const Ray2D& ray, const Triangle2D& triangle, float t_min, float t_max, HitInfo2D* hitInfo)
+bool intersectRayWithTriangle(const Ray2D& ray, const Triangle2D& triangle, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     const Vector2D edge1 = triangle.m_b - triangle.m_a;
     const Vector2D edge2 = triangle.m_c - triangle.m_a;
 
     // Calculate determinant
     const Vector2D h = { -ray.m_direction.y, ray.m_direction.x };
-    const float det = edge1.dot(h);
+    const real_t det = edge1.dot(h);
 
     if (approximatelyZero(det))
         return false;
 
-    const float invDet = 1.0f / det;
+    const real_t invDet = 1.0f / det;
 
     const Vector2D s = ray.m_origin - triangle.m_a;
-    const float u = s.dot(h) * invDet;
+    const real_t u = s.dot(h) * invDet;
 
     if (u < 0.0f || u > 1.0f)
         return false;
 
     const Vector2D q = { -s.y, s.x };
-    const float v = ray.m_direction.dot(q) * invDet;
+    const real_t v = ray.m_direction.dot(q) * invDet;
 
     if (v < 0.0f || u + v > 1.0f)
         return false;
 
-    const float t = edge2.dot(q) * invDet;
+    const real_t t = edge2.dot(q) * invDet;
 
     if (t < t_min || t > t_max)
         return false;
@@ -220,19 +220,19 @@ bool intersectRayWithTriangle(const Ray2D& ray, const Triangle2D& triangle, floa
     return true;
 }
 
-bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2D& p2, float t_min, float t_max, HitInfo2D* hitInfo)
+bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2D& p2, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     Vector2D v1 = ray.m_origin - p1;
     Vector2D v2 = p2 - p1;
     Vector2D v3(-ray.m_direction.y, ray.m_direction.x);
 
-    float dot = v2.dot(v3);
+    real_t dot = v2.dot(v3);
     
     if (approximatelyZero(dot))
         return false; // Parallel
 
-    float t1 = v2.cross(v1) / dot;
-    float t2 = v1.dot(v3) / dot;
+    real_t t1 = v2.cross(v1) / dot;
+    real_t t2 = v1.dot(v3) / dot;
 
     if (t1 < 0 || t2 < 0 || t2 > 1)
         return false;
@@ -250,7 +250,7 @@ bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2
     return false;
 }
 
-bool intersectRayWithRectangleOptimized(const Ray2D& ray, const Rectangle2D& rectangle, float t_min, float t_max)
+bool intersectRayWithRectangleOptimized(const Ray2D& ray, const Rectangle2D& rectangle, real_t t_min, real_t t_max)
 {
     for (int i = 0; i < 4; i++)
     {
@@ -265,13 +265,13 @@ bool intersectRayWithRectangleOptimized(const Ray2D& ray, const Rectangle2D& rec
     return false;
 }
 
-bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle2D& rectangle, float t_min, float t_max, HitInfo2D* hitInfo)
+bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle2D& rectangle, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     if (hitInfo == nullptr)
         return intersectRayWithRectangleOptimized(ray, rectangle, t_min, t_max);
 
     bool hit = false;
-    float t = t_max;
+    real_t t = t_max;
 
     for (int i = 0; i < 4; i++)
     {
@@ -287,7 +287,7 @@ bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle2D& rectangle, f
     return hit;
 }
 
-bool intersectRayWithPolygonOptimized(const Ray2D& ray, const Polygon2D& polygon, float t_min, float t_max)
+bool intersectRayWithPolygonOptimized(const Ray2D& ray, const Polygon2D& polygon, real_t t_min, real_t t_max)
 {
     for (int i = 0; i < polygon.vertexCount(); i++)
     {
@@ -302,13 +302,13 @@ bool intersectRayWithPolygonOptimized(const Ray2D& ray, const Polygon2D& polygon
     return false;
 }
 
-bool intersectRayWithPolygon(const Ray2D& ray, const Polygon2D& polygon, float t_min, float t_max, HitInfo2D* hitInfo)
+bool intersectRayWithPolygon(const Ray2D& ray, const Polygon2D& polygon, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     if (hitInfo == nullptr)
         return intersectRayWithPolygonOptimized(ray, polygon, t_min, t_max);
 
     bool hit = false;
-    float t = t_max;
+    real_t t = t_max;
 
     for (int i = 0; i < polygon.vertexCount(); i++)
     {
@@ -324,7 +324,7 @@ bool intersectRayWithPolygon(const Ray2D& ray, const Polygon2D& polygon, float t
     return hit;
 }
 
-bool intersectRayWithShape(const Ray2D& ray, const IBaseShape2D& shape, float t_min, float t_max, HitInfo2D* hitInfo)
+bool intersectRayWithShape(const Ray2D& ray, const IBaseShape2D& shape, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     switch(shape.type())
     {
@@ -358,14 +358,14 @@ bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, c
     Vector2D s = q2 - q1;
     Vector2D qp = q1 - p1;
 
-    float rxs = r.cross(s);
-    float qpxr = qp.cross(r);
+    real_t rxs = r.cross(s);
+    real_t qpxr = qp.cross(r);
 
     if (approximatelyZero(rxs))
         return false; // Parallel/collinear
 
-    float t = qp.cross(s) / rxs;
-    float u = qp.cross(r) / rxs;
+    real_t t = qp.cross(s) / rxs;
+    real_t u = qp.cross(r) / rxs;
 
     if (t <= 0.0f || t >= 1.0f || u <= 0.0f || u >= 1.0f)
         return false;
@@ -414,10 +414,10 @@ bool intersectSegmentWithPolygon(const Line2D& line, const Polygon2D& polygon, H
 //Todo: Specialize for direct use on BBox2D and other shapes
 inline void projectPointSetOntoAxis(const Vector2D* pts, int count,
                                     const Vector2D& axis,
-                                    float& outMin, float& outMax)
+                                    real_t& outMin, real_t& outMax)
 {
-    //float v = dot(pts[0], axis);
-    float v = pts[0].dot(axis);
+    //real_t v = dot(pts[0], axis);
+    real_t v = pts[0].dot(axis);
     outMin = outMax = v;
     for (int i = 1; i < count; ++i)
     {

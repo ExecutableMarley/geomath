@@ -22,23 +22,23 @@ class Sphere : public IFiniteShape3D
 {
 public:
     Vector3D m_center;
-    float m_radius;
+    real_t m_radius;
 
     Sphere() : m_center(), m_radius(0) {}
 
-    Sphere(const Vector3D &center, float radius) : m_center(center), m_radius(radius) {}
+    Sphere(const Vector3D &center, real_t radius) : m_center(center), m_radius(radius) {}
 
     ShapeType3D type() const override
     {
         return ShapeType3D::SPHERE;
     }
 
-    float volume() const override
+    real_t volume() const override
     {
         return 4.0f / 3.0f * PI * m_radius * m_radius * m_radius;
     }
 
-    float surfaceArea() const override
+    real_t surfaceArea() const override
     {
         return 4.0f * PI * m_radius * m_radius;
     }
@@ -64,7 +64,7 @@ public:
         return *this;
     }
 
-    Sphere& scale(float scaleFactor)
+    Sphere& scale(real_t scaleFactor)
     {
         m_radius *= scaleFactor;
         return *this;

@@ -18,20 +18,20 @@ namespace Math
 class EulerAngles
 {
 public:
-    float m_pitch;
-    float m_yaw;
-    float m_roll;
+    real_t m_pitch;
+    real_t m_yaw;
+    real_t m_roll;
 
     EulerAngles() : m_pitch(0), m_yaw(0), m_roll(0) {}
 
-    EulerAngles(float pitch, float yaw, float roll) : m_pitch(pitch), m_yaw(yaw), m_roll(roll) {}
+    EulerAngles(real_t pitch, real_t yaw, real_t roll) : m_pitch(pitch), m_yaw(yaw), m_roll(roll) {}
 
-    float length() const
+    real_t length() const
     {
         return sqrt(m_pitch * m_pitch + m_yaw * m_yaw + m_roll * m_roll);
     }
 
-    float lengthSquared() const
+    real_t lengthSquared() const
     {
         return m_pitch * m_pitch + m_yaw * m_yaw + m_roll * m_roll;
     }
@@ -49,30 +49,30 @@ public:
         return m_pitch >= -180 && m_pitch <= 180 && m_yaw >= -180 && m_yaw <= 180 && m_roll >= -180 && m_roll <= 180;
     }
 
-    EulerAngles& clampPitch(float min, float max)
+    EulerAngles& clampPitch(real_t min, real_t max)
     {
         m_pitch = fmin(max, fmax(min, m_pitch));
         return *this;
     }
 
-    EulerAngles& clampYaw(float min, float max)
+    EulerAngles& clampYaw(real_t min, real_t max)
     {
         m_yaw = fmin(max, fmax(min, m_yaw));
         return *this;
     }
 
-    EulerAngles& clampRoll(float min, float max)
+    EulerAngles& clampRoll(real_t min, real_t max)
     {
         m_roll = fmin(max, fmax(min, m_roll));
         return *this;
     }
 
-    EulerAngles lerp(const EulerAngles &other, float t) const
+    EulerAngles lerp(const EulerAngles &other, real_t t) const
     {
         return EulerAngles(m_pitch + (other.m_pitch - m_pitch) * t, m_yaw + (other.m_yaw - m_yaw) * t, m_roll + (other.m_roll - m_roll) * t).normalize();
     }
 
-    float distance(const EulerAngles &other) const
+    real_t distance(const EulerAngles &other) const
     {
         return (*this - other).length();
     }
@@ -87,12 +87,12 @@ public:
         return EulerAngles(m_pitch - other.m_pitch, m_yaw - other.m_yaw, m_roll - other.m_roll).normalize();
     }
 
-    EulerAngles operator*(float scalar) const
+    EulerAngles operator*(real_t scalar) const
     {
         return EulerAngles(m_pitch * scalar, m_yaw * scalar, m_roll * scalar).normalize();
     }
 
-    EulerAngles operator/(float scalar) const
+    EulerAngles operator/(real_t scalar) const
     {
         return EulerAngles(m_pitch / scalar, m_yaw / scalar, m_roll / scalar).normalize();
     }
@@ -113,7 +113,7 @@ public:
         return this->normalize();
     }
 
-    EulerAngles& operator*=(float scalar)
+    EulerAngles& operator*=(real_t scalar)
     {
         m_pitch *= scalar;
         m_yaw *= scalar;
@@ -121,7 +121,7 @@ public:
         return this->normalize();
     }
 
-    EulerAngles& operator/=(float scalar)
+    EulerAngles& operator/=(real_t scalar)
     {
         m_pitch /= scalar;
         m_yaw /= scalar;

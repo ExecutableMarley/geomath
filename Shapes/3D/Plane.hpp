@@ -34,7 +34,7 @@ public:
         m_planePoint = point1;
     }
 
-    float distance(const Vector3D &point) const
+    real_t distance(const Vector3D &point) const
     {
         return m_normal.dot(point - m_planePoint);
     }

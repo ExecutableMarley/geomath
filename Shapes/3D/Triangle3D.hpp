@@ -26,12 +26,12 @@ public:
 
     Triangle3D(const Vector3D &a, const Vector3D &b, const Vector3D &c) : m_a(a), m_b(b), m_c(c) {}
 
-    float volume() const
+    real_t volume() const
     {
         return 0.f;
     }
 
-    float surfaceArea() const
+    real_t surfaceArea() const
     {
         return 0.5f * (m_b - m_a).cross(m_c - m_a).length();
     }
@@ -49,7 +49,7 @@ public:
         return *this;
     }
 
-    Triangle3D& scale(float scaleFactor)
+    Triangle3D& scale(real_t scaleFactor)
     {
         Vector3D centroid = this->centroid();
         m_a = centroid + scaleFactor * (m_a - centroid);
@@ -77,9 +77,9 @@ public:
         Vector3D crossBC_BP = bc.cross(bp);
         Vector3D crossCA_CP = ca.cross(cp);
 
-        float cross1 = crossAB_AP.dot(crossBC_BP);
-        float cross2 = crossBC_BP.dot(crossCA_CP);
-        float cross3 = crossCA_CP.dot(crossAB_AP);
+        real_t cross1 = crossAB_AP.dot(crossBC_BP);
+        real_t cross2 = crossBC_BP.dot(crossCA_CP);
+        real_t cross3 = crossCA_CP.dot(crossAB_AP);
 
         if ((cross1 >= 0 && cross2 >= 0 && cross3 >= 0) 
             || (cross1 <= 0 && cross2 <= 0 && cross3 <= 0))

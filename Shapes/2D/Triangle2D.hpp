@@ -64,12 +64,12 @@ public:
         return {m_a, m_b, m_c};
     }
 
-    float area() const override
+    real_t area() const override
     {
         return 0.5f * fabs((m_a.x - m_c.x) * (m_b.y - m_c.y) - (m_b.x - m_c.x) * (m_a.y - m_c.y));
     }
 
-    float perimeter() const override
+    real_t perimeter() const override
     {
         return (m_a - m_b).length() + (m_b - m_c).length() + (m_c - m_a).length();
     }
@@ -87,7 +87,7 @@ public:
         return *this;
     }
 
-    Triangle2D& rotate(float angle)
+    Triangle2D& rotate(real_t angle)
     {
         const Vector2D centroid = this->centroid();
         m_a.rotateAround(angle, centroid);
@@ -96,7 +96,7 @@ public:
         return *this;
     }
 
-    Triangle2D& rotate(float angle, const Vector2D& point)
+    Triangle2D& rotate(real_t angle, const Vector2D& point)
     {
         m_a.rotateAround(angle, point);
         m_b.rotateAround(angle, point);
@@ -104,7 +104,7 @@ public:
         return *this;
     }
 
-    Triangle2D& scale(float factor)
+    Triangle2D& scale(real_t factor)
     {
         const Vector2D centroid = this->centroid();
         m_a = centroid + (m_a - centroid) * factor;
@@ -125,10 +125,10 @@ public:
 
     bool contains(const Vector2D &point) const override
     {
-        const float areaABC = area();
-        const float areaPBC = 0.5f * fabs((m_b.x - point.x) * (m_c.y - point.y) - (m_c.x - point.x) * (m_b.y - point.y));
-        const float areaPCA = 0.5f * fabs((m_c.x - point.x) * (m_a.y - point.y) - (m_a.x - point.x) * (m_c.y - point.y));
-        const float areaPAB = 0.5f * fabs((m_a.x - point.x) * (m_b.y - point.y) - (m_b.x - point.x) * (m_a.y - point.y));
+        const real_t areaABC = area();
+        const real_t areaPBC = 0.5f * fabs((m_b.x - point.x) * (m_c.y - point.y) - (m_c.x - point.x) * (m_b.y - point.y));
+        const real_t areaPCA = 0.5f * fabs((m_c.x - point.x) * (m_a.y - point.y) - (m_a.x - point.x) * (m_c.y - point.y));
+        const real_t areaPAB = 0.5f * fabs((m_a.x - point.x) * (m_b.y - point.y) - (m_b.x - point.x) * (m_a.y - point.y));
         return approximatelyEqual(areaABC, areaPBC + areaPCA + areaPAB);
     }
 

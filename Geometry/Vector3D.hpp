@@ -17,21 +17,21 @@ namespace Math
 
 struct Vector3D
 {
-    float x;
-    float y;
-    float z;
+    real_t x;
+    real_t y;
+    real_t z;
 
     Vector3D() : x(0), y(0), z(0) {}
 
-    Vector3D(float x, float y, float z) : x(x), y(y), z(z) {}
+    Vector3D(real_t x, real_t y, real_t z) : x(x), y(y), z(z) {}
 
 
-    float length() const
+    real_t length() const
     {
         return sqrt(x * x + y * y + z * z);
     }
 
-    float lengthSquared() const
+    real_t lengthSquared() const
     {
         return x * x + y * y + z * z;
     }
@@ -43,7 +43,7 @@ struct Vector3D
 
     Vector3D& normalize()
     {
-        const float len = length();
+        const real_t len = length();
         if (len != 0)
         {
             x /= len;
@@ -55,7 +55,7 @@ struct Vector3D
 
     Vector3D createNormalized() const
     {
-        const float len = length();
+        const real_t len = length();
         if (len != 0)
         {
             return Vector3D(x / len, y / len, z / len);
@@ -63,9 +63,9 @@ struct Vector3D
         return Vector3D();
     }
 
-    Vector3D& resize(float newLength)
+    Vector3D& resize(real_t newLength)
     {
-        const float len = length();
+        const real_t len = length();
         if (len != 0)
         {
             x *= newLength / len;
@@ -75,9 +75,9 @@ struct Vector3D
         return *this;
     }
 
-    Vector3D createResized(float newLength) const
+    Vector3D createResized(real_t newLength) const
     {
-        const float len = length();
+        const real_t len = length();
         if (len != 0)
         {
             return Vector3D(x * newLength / len, y * newLength / len, z * newLength / len);
@@ -93,7 +93,7 @@ struct Vector3D
         return *this;
     }
 
-    float dot(const Vector3D& other) const
+    real_t dot(const Vector3D& other) const
     {
         return x * other.x + y * other.y + z * other.z;
     }
@@ -116,37 +116,37 @@ struct Vector3D
         return approximatelyZero(dot(other));
     }
 
-    Vector3D& rotateAroundX(float angle)
+    Vector3D& rotateAroundX(real_t angle)
     {
-        const float cosAngle = cos(angle);
-        const float sinAngle = sin(angle);
-        const float newY = y * cosAngle - z * sinAngle;
+        const real_t cosAngle = cos(angle);
+        const real_t sinAngle = sin(angle);
+        const real_t newY = y * cosAngle - z * sinAngle;
         z = y * sinAngle + z * cosAngle;
         y = newY;
         return *this;
     }
 
-    Vector3D& rotateAroundY(float angle)
+    Vector3D& rotateAroundY(real_t angle)
     {
-        const float cosAngle = cos(angle);
-        const float sinAngle = sin(angle);
-        const float newZ = z * cosAngle - x * sinAngle;
+        const real_t cosAngle = cos(angle);
+        const real_t sinAngle = sin(angle);
+        const real_t newZ = z * cosAngle - x * sinAngle;
         x = z * sinAngle + x * cosAngle;
         z = newZ;
         return *this;
     }
 
-    Vector3D& rotateAroundZ(float angle)
+    Vector3D& rotateAroundZ(real_t angle)
     {
-        const float cosAngle = cos(angle);
-        const float sinAngle = sin(angle);
-        const float newX = x * cosAngle - y * sinAngle;
+        const real_t cosAngle = cos(angle);
+        const real_t sinAngle = sin(angle);
+        const real_t newX = x * cosAngle - y * sinAngle;
         y = x * sinAngle + y * cosAngle;
         x = newX;
         return *this;
     }
 
-    Vector3D& rotate(float xAngle = 0.f, float yAngle = 0.f, float zAngle = 0.f)
+    Vector3D& rotate(real_t xAngle = 0.f, real_t yAngle = 0.f, real_t zAngle = 0.f)
     {
         if (xAngle != 0.f)
             rotateAroundX(xAngle);
@@ -157,17 +157,17 @@ struct Vector3D
         return *this;
     }
 
-    Vector3D& rotateAround(float xAngle, float yAngle, float zAngle, const Vector3D& point)
+    Vector3D& rotateAround(real_t xAngle, real_t yAngle, real_t zAngle, const Vector3D& point)
     {
         return (*this -= point).rotate(xAngle, yAngle, zAngle) += point;
     }
 
-    operator float*()
+    operator real_t*()
     {
         return &x;
     }
 
-    operator const float*() const
+    operator const real_t*() const
     {
         return &x;
     }
@@ -182,12 +182,12 @@ struct Vector3D
         return Vector3D(x - other.x, y - other.y, z - other.z);
     }
 
-    Vector3D operator*(float scalar) const
+    Vector3D operator*(real_t scalar) const
     {
         return Vector3D(x * scalar, y * scalar, z * scalar);
     }
 
-    Vector3D operator/(float scalar) const
+    Vector3D operator/(real_t scalar) const
     {
         return Vector3D(x / scalar, y / scalar, z / scalar);
     }
@@ -208,7 +208,7 @@ struct Vector3D
         return *this;
     }
 
-    Vector3D& operator*=(float scalar)
+    Vector3D& operator*=(real_t scalar)
     {
         x *= scalar;
         y *= scalar;
@@ -216,7 +216,7 @@ struct Vector3D
         return *this;
     }
 
-    Vector3D& operator/=(float scalar)
+    Vector3D& operator/=(real_t scalar)
     {
         x /= scalar;
         y /= scalar;
@@ -270,7 +270,7 @@ struct Vector3D
     }
 };
 
-inline Vector3D operator *(float scalar, const Vector3D& vector)
+inline Vector3D operator *(real_t scalar, const Vector3D& vector)
 {
     return vector * scalar;
 }

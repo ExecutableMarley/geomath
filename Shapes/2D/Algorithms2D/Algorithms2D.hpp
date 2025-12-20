@@ -8,6 +8,7 @@
 #include <math.h>
 #include <vector>
 
+#include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
 
 namespace Arns
@@ -30,7 +31,7 @@ class ConvexPolygon2D;
 
 struct HitInfo2D
 {
-    float t;
+    real_t t;
     Vector2D intersectionPoint;
     //Todo: Collect more information
     //Vector2D normal;
@@ -48,13 +49,13 @@ bool isPointOnSegment(const Vector2D& point, const Line2D& line);
 
 // Distance calculation algorithms
 
-float distancePointToLine(const Vector2D& point, const Vector2D& lineStart, const Vector2D& lineEnd, Vector2D* closestPoint = nullptr);
+real_t distancePointToLine(const Vector2D& point, const Vector2D& lineStart, const Vector2D& lineEnd, Vector2D* closestPoint = nullptr);
 
-float distancePointToLine(const Vector2D& point, const Line2D& line, Vector2D* closestPoint = nullptr);
+real_t distancePointToLine(const Vector2D& point, const Line2D& line, Vector2D* closestPoint = nullptr);
 
-float distanceLineToLine(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
+real_t distanceLineToLine(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 
-float distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
+real_t distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 
 //Todo: Distance to shapes
 
@@ -62,19 +63,19 @@ float distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* clo
 
 //    --- Rays ---
 
-bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, float t_min = 0, float t_max = std::numeric_limits<float>::max(), HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithCircle(const Ray2D& ray, const Circle2D& circle, float t_min = 0, float t_max = std::numeric_limits<float>::max(), HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithCircle(const Ray2D& ray, const Circle2D& circle, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithTriangle(const Ray2D& ray, const Triangle2D& triangle, float t_min = 0, float t_max = std::numeric_limits<float>::max(), HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithTriangle(const Ray2D& ray, const Triangle2D& triangle, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2D& p2, float t_min = 0, float t_max = std::numeric_limits<float>::max(), HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2D& p2, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle2D& rectangle, float t_min = 0, float t_max = std::numeric_limits<float>::max(), HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle2D& rectangle, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithPolygon(const Ray2D& ray, const Polygon2D& polygon, float t_min = 0, float t_max = std::numeric_limits<float>::max(), HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithPolygon(const Ray2D& ray, const Polygon2D& polygon, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
 
-bool intersectRayWithShape(const Ray2D& ray, const IBaseShape2D& shape, float t_min = 0, float t_max = std::numeric_limits<float>::max(), HitInfo2D* hitInfo = nullptr);
+bool intersectRayWithShape(const Ray2D& ray, const IBaseShape2D& shape, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
 
 //    --- Segments ---
 

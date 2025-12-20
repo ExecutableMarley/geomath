@@ -18,28 +18,28 @@ namespace Math
 
 struct Quaternion
 {
-    float x;
-    float y;
-    float z;
-    float w;
+    real_t x;
+    real_t y;
+    real_t z;
+    real_t w;
 
     Quaternion() : x(0), y(0), z(0), w(1) {}
 
-    Quaternion(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+    Quaternion(real_t x, real_t y, real_t z, real_t w) : x(x), y(y), z(z), w(w) {}
 
-    float length() const
+    real_t length() const
     {
         return sqrt(x * x + y * y + z * z + w * w);
     }
 
-    float lengthSquared() const
+    real_t lengthSquared() const
     {
         return x * x + y * y + z * z + w * w;
     }
 
     Quaternion& normalize()
     {
-        const float len = length();
+        const real_t len = length();
         if (len != 0)
         {
             x /= len;
@@ -52,7 +52,7 @@ struct Quaternion
 
     Quaternion createNormalized() const
     {
-        const float len = length();
+        const real_t len = length();
         if (len != 0)
         {
             return Quaternion(x / len, y / len, z / len, w / len);
@@ -60,9 +60,9 @@ struct Quaternion
         return Quaternion(0,0,0,0);
     }
 
-    Quaternion& resize(float newLength)
+    Quaternion& resize(real_t newLength)
     {
-        const float len = length();
+        const real_t len = length();
         if (len != 0)
         {
             x *= newLength / len;
@@ -80,7 +80,7 @@ struct Quaternion
 
     Quaternion inverse() const
     {
-        float len_sq = lengthSquared();
+        real_t len_sq = lengthSquared();
         if (len_sq != 0)
         {
             return conjugate() / len_sq;
@@ -110,17 +110,17 @@ struct Quaternion
         return *this;
     }
 
-    Quaternion operator*(float scalar) const
+    Quaternion operator*(real_t scalar) const
     {
         return Quaternion(x * scalar, y * scalar, z * scalar, w * scalar);
     }
 
-    Quaternion operator/(float scalar) const
+    Quaternion operator/(real_t scalar) const
     {
         return Quaternion(x / scalar, y / scalar, z / scalar, w / scalar);
     }
 
-    Quaternion& operator*=(float scalar)
+    Quaternion& operator*=(real_t scalar)
     {
         x *= scalar;
         y *= scalar;
@@ -129,7 +129,7 @@ struct Quaternion
         return *this;
     }
 
-    Quaternion& operator/=(float scalar)
+    Quaternion& operator/=(real_t scalar)
     {
         x /= scalar;
         y /= scalar;

@@ -8,6 +8,7 @@
 #include <math.h>
 #include <memory>
 
+#include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "BBox2D.hpp"
 
@@ -31,9 +32,9 @@ enum ShapeType2D
 public:
     virtual ShapeType2D type() const = 0;
 
-    virtual float area() const = 0;
+    virtual real_t area() const = 0;
 
-    virtual float perimeter() const = 0;
+    virtual real_t perimeter() const = 0;
 
     virtual Vector2D centroid() const = 0;
 
@@ -68,9 +69,9 @@ public:
 class IFiniteShape2D : public IBaseShape2D
 {
 public:
-    virtual float area() const = 0;
+    virtual real_t area() const = 0;
 
-    virtual float perimeter() const = 0;
+    virtual real_t perimeter() const = 0;
 
     virtual Vector2D centroid() const = 0;
 

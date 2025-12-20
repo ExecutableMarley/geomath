@@ -10,6 +10,7 @@
 #include <memory>
 #include <stdexcept>
 
+#include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
 #include "BBox2D.hpp"
@@ -84,7 +85,7 @@ public:
             const Vector2D ab = b - a;
             const Vector2D bc = c - b;
 
-            float cross = ab.cross(bc);
+            real_t cross = ab.cross(bc);
 
             if (approximatelyZero(cross))
             {
@@ -108,7 +109,7 @@ public:
         return true;
     }
 
-    float area() const
+    real_t area() const
     {
         double area = 0;
         for (int i = 0; i < m_vertices.size(); i++)
@@ -122,9 +123,9 @@ public:
         return area / 2.0f;
     }
 
-    float perimeter() const
+    real_t perimeter() const
     {
-        float perimeter = 0;
+        real_t perimeter = 0;
 
         for (int i = 0; i < m_vertices.size(); i++)
         {
@@ -153,7 +154,7 @@ public:
         return *this;
     }
 
-    Polygon2D& rotate(float angle)
+    Polygon2D& rotate(real_t angle)
     {
         const Vector2D centroid = this->centroid();
         for (int i = 0; i < m_vertices.size(); i++)
@@ -161,14 +162,14 @@ public:
         return *this;
     }
 
-    Polygon2D& rotate(float angle, const Vector2D& point)
+    Polygon2D& rotate(real_t angle, const Vector2D& point)
     {
         for (int i = 0; i < m_vertices.size(); i++)
             m_vertices[i].rotateAround(angle, point);
         return *this;
     }
 
-    Polygon2D& scale(float factor)
+    Polygon2D& scale(real_t factor)
     {
         const Vector2D centroid = this->centroid();
         for (int i = 0; i < m_vertices.size(); i++)

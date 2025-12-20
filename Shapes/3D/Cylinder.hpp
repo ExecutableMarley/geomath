@@ -23,23 +23,23 @@ class Cylinder : public IFiniteShape3D
 public:
     Vector3D m_startPoint;
     Vector3D m_endPoint;
-    float m_radius;
+    real_t m_radius;
 
     Cylinder() : m_startPoint(), m_endPoint(), m_radius(0) {}
 
-    Cylinder(const Vector3D &startPoint, const Vector3D &endPoint, float radius) : m_startPoint(startPoint), m_endPoint(endPoint), m_radius(radius) {}
+    Cylinder(const Vector3D &startPoint, const Vector3D &endPoint, real_t radius) : m_startPoint(startPoint), m_endPoint(endPoint), m_radius(radius) {}
 
     ShapeType3D type() const override
     {
         return ShapeType3D::CYLINDER;
     }
 
-    float volume() const override
+    real_t volume() const override
     {
         return PI * m_radius * m_radius * (m_endPoint - m_startPoint).length();
     }
 
-    float surfaceArea() const override
+    real_t surfaceArea() const override
     {
         return 2.0f * PI * m_radius * (m_endPoint - m_startPoint).length() + 2.0f * PI * m_radius * m_radius;
     }
@@ -53,7 +53,7 @@ public:
     {
         // Todo: Calculating the closest parameter t should be done in a separate function
         const Vector3D delta = m_endPoint - m_startPoint;
-        float t = (point - m_startPoint).dot(delta) / (delta).lengthSquared();
+        real_t t = (point - m_startPoint).dot(delta) / (delta).lengthSquared();
 
         Vector3D closestPoint = m_startPoint + delta * t;
         if (t >= 0.0f && t <= 1.0f && (point - closestPoint).lengthSquared() <= m_radius * m_radius)
@@ -70,7 +70,7 @@ public:
         return *this;
     }
 
-    Cylinder& scale(float scaleFactor)
+    Cylinder& scale(real_t scaleFactor)
     {
         Vector3D centroid = this->centroid();
         m_startPoint = centroid + scaleFactor * (m_startPoint - centroid);

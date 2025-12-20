@@ -24,23 +24,23 @@ class Capsule : public IFiniteShape3D
 public:
     Vector3D m_startPoint;
     Vector3D m_endPoint;
-    float m_radius;
+    real_t m_radius;
 
     Capsule() : m_startPoint(), m_endPoint(), m_radius(0) {}
     
-    Capsule(const Vector3D &startPoint, const Vector3D &endPoint, float radius) : m_startPoint(startPoint), m_endPoint(endPoint), m_radius(radius) {}
+    Capsule(const Vector3D &startPoint, const Vector3D &endPoint, real_t radius) : m_startPoint(startPoint), m_endPoint(endPoint), m_radius(radius) {}
 
     ShapeType3D type() const override
     {
         return ShapeType3D::CAPSULE;
     }
 
-    float volume() const override
+    real_t volume() const override
     {
         return PI * m_radius * m_radius * (4.0f / 3.0f * m_radius + (m_endPoint - m_startPoint).length());
     }
 
-    float surfaceArea() const override
+    real_t surfaceArea() const override
     {
         return 2.0f * PI * m_radius * (2.0f * m_radius + (m_endPoint - m_startPoint).length());
     }
@@ -57,7 +57,7 @@ public:
         return *this;
     }
 
-    Capsule& scale(float scaleFactor)
+    Capsule& scale(real_t scaleFactor)
     {
         Vector3D centroid = this->centroid();
         m_startPoint = centroid + scaleFactor * (m_startPoint - centroid);
@@ -66,7 +66,7 @@ public:
         return *this;
     }
 
-    Capsule& rotate(float xAngle, float yAngle, float zAngle)
+    Capsule& rotate(real_t xAngle, real_t yAngle, real_t zAngle)
     {
         Vector3D centroid = this->centroid();
         m_startPoint = m_startPoint.rotateAround(xAngle, yAngle, zAngle, centroid);
@@ -75,7 +75,7 @@ public:
     }
 
     /*
-    Capsule& rotate(float angle, const Vector3D &axis)
+    Capsule& rotate(real_t angle, const Vector3D &axis)
     {
         m_startPoint = m_startPoint.rotate(angle, axis);
         m_endPoint   = m_endPoint.rotate(angle, axis);

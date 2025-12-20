@@ -10,6 +10,7 @@
 #include <memory>
 #include <stdexcept>
 
+#include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "BBox2D.hpp"
 #include "IShape2D.hpp"
@@ -32,7 +33,7 @@ public:
 
     Rectangle2D(const Vector2D &a, const Vector2D &b, const Vector2D &c, const Vector2D &d) : m_a(a), m_b(b), m_c(c), m_d(d) {}
 
-    Rectangle2D(const Vector2D &pos, float width, float height) : m_a(pos), m_b(pos + Vector2D(width, 0)), m_c(pos + Vector2D(width, height)), m_d(pos + Vector2D(0, height)) {}
+    Rectangle2D(const Vector2D &pos, real_t width, real_t height) : m_a(pos), m_b(pos + Vector2D(width, 0)), m_c(pos + Vector2D(width, height)), m_d(pos + Vector2D(0, height)) {}
 
     ShapeType2D type() const override
     {
@@ -66,22 +67,22 @@ public:
         return {m_a, m_b, m_c, m_d};
     }
 
-    float width() const
+    real_t width() const
     {
         return (m_b - m_a).length();
     }
 
-    float height() const
+    real_t height() const
     {
         return (m_d - m_a).length();
     }
 
-    float area() const override
+    real_t area() const override
     {
         return width() * height();
     }
 
-    float perimeter() const override
+    real_t perimeter() const override
     {
         return 2.0f * (width() + height());
     }
@@ -100,7 +101,7 @@ public:
         return *this;
     }
 
-    Rectangle2D& rotate(float angle)
+    Rectangle2D& rotate(real_t angle)
     {
         const Vector2D centroid = this->centroid();
         m_a.rotateAround(angle, centroid);
@@ -110,7 +111,7 @@ public:
         return *this;
     }
 
-    Rectangle2D& rotate(float angle, const Vector2D& point)
+    Rectangle2D& rotate(real_t angle, const Vector2D& point)
     {
         m_a.rotateAround(angle, point);
         m_b.rotateAround(angle, point);
@@ -119,7 +120,7 @@ public:
         return *this;
     }
 
-    Rectangle2D& scale(float factor)
+    Rectangle2D& scale(real_t factor)
     {
         const Vector2D centroid = this->centroid();
         m_a = centroid + (m_a - centroid) * factor;

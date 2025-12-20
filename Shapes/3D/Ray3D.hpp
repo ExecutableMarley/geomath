@@ -35,12 +35,12 @@ public:
         return m_direction;
     }
 
-    Vector3D pointAt(float t) const
+    Vector3D pointAt(real_t t) const
     {
         return m_origin + m_direction * t;
     }
 
-    float closestParameter(const Vector3D &point) const
+    real_t closestParameter(const Vector3D &point) const
     {
         return (point - m_origin).dot(m_direction) / m_direction.lengthSquared();
     }

@@ -25,7 +25,7 @@ public:
 
     BBox3D(const Vector3D &min, const Vector3D &max) : m_min(min), m_max(max) {}
 
-    BBox3D(const Vector3D &center, float halfSize) : m_min(center - Vector3D(halfSize, halfSize, halfSize)), m_max(center + Vector3D(halfSize, halfSize, halfSize)) {}
+    BBox3D(const Vector3D &center, real_t halfSize) : m_min(center - Vector3D(halfSize, halfSize, halfSize)), m_max(center + Vector3D(halfSize, halfSize, halfSize)) {}
 
     Vector3D halfSize() const
     {
@@ -37,13 +37,13 @@ public:
         return m_max - m_min;
     }
 
-    float volume() const
+    real_t volume() const
     {
         const Vector3D s = size();
         return s.x * s.y * s.z;
     }
 
-    float surfaceArea() const
+    real_t surfaceArea() const
     {
         const Vector3D s = size();
         return 2.0f * (s.x * s.y + s.x * s.z + s.y * s.z);
@@ -61,7 +61,7 @@ public:
         return *this;
     }
 
-    BBox3D& scale(float scaleFactor)
+    BBox3D& scale(real_t scaleFactor)
     {
         Vector3D center = centroid();
         Vector3D vHalfSize = this->halfSize();
