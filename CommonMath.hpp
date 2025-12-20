@@ -142,31 +142,36 @@ inline bool approximatelyLessAbs(double a, double b, double epsilon = DoubleAbsE
 }
 
 // Included in C++17
-inline float clamp(float value, float minVal, float maxVal)
+template <class T>
+inline T clamp(T value, T minVal, T maxVal)
 {
     return value < minVal ? minVal : (value > maxVal ? maxVal : value);
     return std::max(minVal, std::min(value, maxVal));
 }
 
 // Included in C++20
-inline float lerp(float a, float b, float t)
+template <class T>
+inline T lerp(T a, T b, T t)
 {
     return a + (b - a) * t;
 }
 
-inline float inverseLerp(float a, float b, float value)
+template <class T>
+inline T inverseLerp(T a, T b, T value)
 {
     return (value - a) / (b - a);
 }
 
-inline float remap(float value, float min1, float max1, float min2, float max2)
+template <class T>
+inline T remap(T value, T min1, T max1, T min2, T max2)
 {
     return lerp(min2, max2, inverseLerp(min1, max1, value));
 }
 
-inline int sign(float value)
+template <class T>
+inline int sign(T value)
 {
-    return (value > 0) - (value < 0);
+    return (value > T(0)) - (value < T(0));
 }
 
 inline int wrapValue(int value, int min, int max)
@@ -237,38 +242,45 @@ inline bool intervalsOverlap(const T& minA, const T& maxA, const T& minB, const 
     return !(maxA < minB || maxB < minA);
 }
 
-inline float degToRad(float degrees)
+template <typename T>
+inline T degToRad(T degrees)
 {
     return degrees * (PI / 180.0f);
 }
 
-inline float radToDeg(float radians)
+template <typename T>
+inline T radToDeg(T radians)
 {
     return radians * (180.0f / PI);
 }
 
-inline float sinDeg(float degrees)
+template <typename T>
+inline T sinDeg(T degrees)
 {
     return sin(degToRad(degrees));
 }
 
-inline float cosDeg(float degrees)
+template <typename T>
+inline T cosDeg(T degrees)
 {
     return cos(degToRad(degrees));
 }
 
-inline float tanDeg(float degrees)
+template <typename T>
+inline T tanDeg(T degrees)
 {
     return tan(degToRad(degrees));
 }
 
-inline void sinCos(float radians, float &sine, float &cosine)
+template <typename T>
+inline void sinCos(T radians, T &sine, T &cosine)
 {
     sine = sin(radians);
     cosine = cos(radians);
 }
 
-inline void sinCosDeg(float degrees, float &sine, float &cosine)
+template <typename T>
+inline void sinCosDeg(T degrees, T &sine, T &cosine)
 {
     sinCos(degToRad(degrees), sine, cosine);
 }
