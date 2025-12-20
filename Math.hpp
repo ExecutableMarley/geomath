@@ -58,8 +58,6 @@
 #include "Shapes/2D/ConvexPolygon2D.hpp"
 #include "Shapes/2D/TriangleMesh2D.hpp"
 
-#include "Shapes/2D/Intersections2D/Intersections2D.hpp"
-
 #include "Shapes/2D/Algorithms2D/Delaunay/DelaunayTriangulation.hpp"
 #include "Shapes/2D/Structures/ShapeStore2D.hpp"
 #include "Shapes/2D/Structures/ISpatialIndex2D.hpp"
@@ -75,5 +73,3 @@
 #include "Shapes/3D/Cylinder.hpp"
 #include "Shapes/3D/Capsule.hpp"
 #include "Shapes/3D/Triangle3D.hpp"
-
-#include "Shapes/3D/Intersection/Intersections3D.hpp"
