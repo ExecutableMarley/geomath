@@ -19,6 +19,7 @@ namespace Math
 
 class Matrix : public IMatrix
 {
+protected:
     std::vector<std::vector<float>> m_data;
     size_t m_rows;
     size_t m_columns;
