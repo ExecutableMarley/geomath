@@ -734,6 +734,7 @@ bool intersectRectangleWithCircle(const Rectangle2D& rectangle, const Circle2D& 
         if (distancePointToLine(circle.m_center, a, b) <= r)
             return true;
     }
+    return false;
 }
 
 // --- Polygons --- 
