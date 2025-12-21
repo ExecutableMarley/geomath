@@ -3,7 +3,7 @@
 #include <numeric>
 #include <assert.h>
 
-#include "../../CommonMath.hpp"
+#include "CommonMath.hpp"
 
 namespace Arns
 {
