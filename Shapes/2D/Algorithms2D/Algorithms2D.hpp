@@ -141,7 +141,7 @@ bool intersectCircleWithCircle(const Circle2D& circle1, const Circle2D& circle2)
 
 // --- Generic ---
 
-
+bool intersect(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2);
 
 } // namespace Math
 
