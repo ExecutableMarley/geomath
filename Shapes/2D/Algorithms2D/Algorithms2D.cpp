@@ -112,6 +112,109 @@ real_t distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* cl
     return distanceLineToLine(line1.m_start, line1.m_end, line2.m_start, line2.m_end, closestPoint1, closestPoint2);
 }
 
+//Todo: Distance to shapes
+
+real_t distancePointToBBox(const Vector2D& point, const BBox2D& bbox, Vector2D* closestPoint)
+{
+    Vector2D c = bbox.closestPoint(point);
+    if (closestPoint) *closestPoint = c;
+    return point.distance(c);
+}
+
+//Todo: Consider renaming slightly
+
+//Helper
+real_t distancePointToConvexVertices(const Vector2D& point, const std::vector<Vector2D>& polygon, Vector2D* closestPoint)
+{
+    real_t minDist = std::numeric_limits<real_t>::max();
+    Vector2D best;
+
+    for (size_t i = 0; i < polygon.size(); ++i)
+    {
+        const Vector2D& a = polygon[i];
+        const Vector2D& b = polygon[(i + 1) % polygon.size()];
+
+        Vector2D q;
+        real_t dist = distancePointToLine(point, a, b, &q);
+
+        if (dist < minDist)
+        {
+            minDist = dist;
+            best = q;
+        }
+    }
+
+    if (closestPoint) *closestPoint = best;
+    return std::sqrt(minDist);
+}
+
+//Consider unrolling loops for better performance. For now this is fine
+
+real_t distancePointToTriangle(const Vector2D& point, const Triangle2D& triangle, Vector2D* closestPoint)
+{
+    if (triangle.contains(point))
+    {
+        if (closestPoint) *closestPoint = point;
+        return real_t{0};
+    }
+
+    return distancePointToConvexVertices(point, triangle.getVertices(), closestPoint);
+}
+
+real_t distancePointToRectangle(const Vector2D& point, const Rectangle2D& rectangle, Vector2D* closestPoint)
+{
+    if (rectangle.contains(point))
+    {
+        if (closestPoint) *closestPoint = point;
+        return real_t{0};
+    }
+
+    return distancePointToConvexVertices(point, rectangle.getVertices(), closestPoint);
+}
+
+real_t distancePointToPolygon(const Vector2D& point, const ConvexPolygon2D& polygon, Vector2D* closestPoint)
+{
+    if (polygon.contains(point))
+    {
+        if (closestPoint) *closestPoint = point;
+        return real_t{0};
+    }
+
+    return distancePointToConvexVertices(point, polygon.getVertices(), closestPoint);
+}
+
+real_t distancePointToPolygon(const Vector2D& point, const Polygon2D& polygon, Vector2D* closestPoint)
+{
+    if (polygon.contains(point))
+    {
+        if (closestPoint) *closestPoint = point;
+        return real_t{0};
+    }
+
+    return distancePointToConvexVertices(point, polygon.getVertices(), closestPoint);
+}
+
+real_t distancePointToCircle(const Vector2D& point, const Circle2D& circle, Vector2D* closestPoint)
+{
+    Vector2D delta = point - circle.m_center;
+    real_t dist = delta.length();
+
+    if (dist <= circle.m_radius)
+    {
+        if (closestPoint) *closestPoint = point;
+        return real_t{0};
+    }
+
+    //real_t dist = std::sqrt(distSq);
+    Vector2D dir = delta / dist;
+
+    if (closestPoint)
+        *closestPoint = circle.m_center + dir * circle.m_radius;
+
+    return std::abs(dist - circle.m_radius);
+}
+
+
 // Intersection calculation algorithms
 
 //    --- Rays ---

@@ -59,6 +59,19 @@ real_t distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* cl
 
 //Todo: Distance to shapes
 
+real_t distancePointToBBox(const Vector2D& point, const BBox2D& bbox, Vector2D* closestPoint = nullptr);
+
+real_t distancePointToTriangle(const Vector2D& point, const Triangle2D& triangle, Vector2D* closestPoint = nullptr);
+
+real_t distancePointToRectangle(const Vector2D& point, const Rectangle2D& rectangle, Vector2D* closestPoint = nullptr);
+
+real_t distancePointToPolygon(const Vector2D& point, const ConvexPolygon2D& polygon, Vector2D* closestPoint = nullptr);
+
+real_t distancePointToPolygon(const Vector2D& point, const Polygon2D& polygon, Vector2D* closestPoint = nullptr);
+
+real_t distancePointToCircle(const Vector2D& point, const Circle2D& circle, Vector2D* closestPoint = nullptr);
+
+
 // Intersection calculation algorithms
 
 //    --- Rays ---
