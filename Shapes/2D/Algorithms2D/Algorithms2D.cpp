@@ -42,6 +42,12 @@ bool isPointOnSegment(const Vector2D& point, const Line2D& line)
     return isPointOnSegment(point, line.m_start, line.m_end);
 }
 
+
+bool containsBBoxWithPoint(const BBox2D& bbox, const Vector2D& point);
+
+
+
+
 // Distance calculation algorithms
 
 real_t distancePointToLine(const Vector2D& point, const Vector2D& lineStart, const Vector2D& lineEnd, Vector2D* closestPoint)
@@ -213,6 +219,62 @@ real_t distancePointToCircle(const Vector2D& point, const Circle2D& circle, Vect
 
     return std::abs(dist - circle.m_radius);
 }
+
+//Todo: Implement
+real_t distanceSegmentToBBox(const Vector2D& segmentStart, Vector2D& segmentEnd, const BBox2D& bbox, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceSegmentToBBox(const Line2D& segment, const BBox2D& bbox, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceSegmentToTriangle(const Line2D& segment, const Triangle2D& triangle, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceSegmentToRectangle2D(const Line2D& segment, const Rectangle2D& rectangle, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceSegmentToPolygon(const Line2D& segment, const ConvexPolygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceSegmentToPolygon(const Line2D& segment, const Polygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceSegmentToCircle(const Line2D& segment, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+
+real_t distanceBBoxToBBox(const BBox2D& bbox1, const BBox2D& bbox2, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceBBoxToTriangle(const BBox2D& bbox1, const Triangle2D& triangle, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceBBoxToRectangle(const BBox2D& bbox1, const Rectangle2D& rectangle, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceBBoxToPolygon(const BBox2D& bbox1, const ConvexPolygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceBBoxToPolygon(const BBox2D& bbox1, const Polygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceBBoxToCircle(const BBox2D& bbox1, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+
+real_t distanceTriangleToTriangle(const Triangle2D& triangle1, const Triangle2D& triangle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceTriangleToRectangle(const Triangle2D& triangle, const Rectangle2D& rectangle, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceTriangleToPolygon(const Triangle2D& triangle, const ConvexPolygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceTriangleToPolygon(const Triangle2D& triangle, const Polygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceTriangleToCircle(const Triangle2D& triangle, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+
+real_t distanceRectangleToRectangle(const Rectangle2D& rectangle1, const Rectangle2D& rectangle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceRectangleToPolygon(const Rectangle2D& rectangle, const ConvexPolygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceRectangleToPolygon(const Rectangle2D& rectangle, const Polygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distanceRectangleToCircle(const Rectangle2D& rectangle, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+
+real_t distancePolygonToPolygon(const Polygon2D& polygon1, const Polygon2D& polygon2, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distancePolygonToPolygon(const Polygon2D& polygon, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+
+real_t distanceCircleToCircle(const Circle2D& circle1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
 
 
 // Intersection calculation algorithms
