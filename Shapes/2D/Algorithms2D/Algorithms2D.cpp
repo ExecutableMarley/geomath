@@ -22,6 +22,10 @@ namespace Arns
 namespace Math
 {
 
+//Consider renaming Line2D in the future
+//Segment2D is better
+using Segment2D = Line2D;
+
 bool isPointOnSegment(const Vector2D& point, const Vector2D& segmentStart, const Vector2D& segmentEnd)
 {
     Vector2D r = segmentEnd - segmentStart;
@@ -43,8 +47,185 @@ bool isPointOnSegment(const Vector2D& point, const Line2D& line)
 }
 
 
-bool containsBBoxWithPoint(const BBox2D& bbox, const Vector2D& point);
+bool isPointInsideBBox(const Vector2D& point, const BBox2D& bbox)
+{
+    return bbox.contains(point);
+}
 
+bool isPointInsideTriangle(const Vector2D& point, const Triangle2D& triangle)
+{
+    return triangle.contains(point);
+}
+
+bool isPointInsideRectangle(const Vector2D& point, const Rectangle2D& rectangle)
+{
+    return rectangle.contains(point);
+}
+
+//Todo: Consider the O(log n) method
+bool isPointInsideConvexPolygon(const Vector2D& point, const std::vector<Vector2D>& vertices)
+{
+    const size_t n = vertices.size();
+    if (n < 3) return false;
+
+    bool hasPositive = false;
+    bool hasNegative = false;
+
+    for (size_t i = 0; i < n; ++i)
+    {
+        const auto& A = vertices[i];
+        const auto& B = vertices[(i + 1) % n];
+
+        real_t val = orient2D(A, B, point);
+
+        if (approximatelyGreaterAbs(val, real_t{0}))   hasPositive = true;
+        else if (approximatelyLessAbs(val, real_t{0})) hasNegative = true;
+
+        if (hasPositive && hasNegative) return false;
+    }
+
+    return true; 
+}
+
+bool isPointInsideConvexPolygon(const Vector2D& point, const ConvexPolygon2D& polygon)
+{
+    return isPointInsideConvexPolygon(point, polygon.m_vertices);
+}
+
+bool isPointInsidePolygon(const Vector2D& point, const Polygon2D& polygon)
+{
+    return polygon.contains(point);
+}
+
+bool isPointInsideCircle(const Vector2D& point, const Circle2D& circle)
+{
+    return circle.contains(point);
+}
+
+
+bool isSegmentInsideBBox(const Segment2D& segment, const BBox2D& bbox)
+{
+    return isPointInsideBBox(segment.m_start, bbox) && isPointInsideBBox(segment.m_end, bbox);
+}
+
+bool isSegmentInsideTriangle(const Segment2D& segment, const Triangle2D& triangle)
+{
+    return isPointInsideTriangle(segment.m_start, triangle) && isPointInsideTriangle(segment.m_end, triangle);
+}
+
+bool isSegmentInsideRectangle(const Segment2D& segment, const Rectangle2D& rectangle)
+{
+    return isPointInsideRectangle(segment.m_start, rectangle) && isPointInsideRectangle(segment.m_end, rectangle);
+}
+
+bool isSegmentInsideConvexPolygon(const Segment2D& segment, const ConvexPolygon2D& polygon)
+{
+    return isPointInsideConvexPolygon(segment.m_start, polygon) && isPointInsidePolygon(segment.m_end, polygon);
+}
+
+bool isSegmentInsidePolygon(const Segment2D& segment, const Polygon2D polygon);
+
+bool isSegmentInsideCircle(const Segment2D& segment, const Circle2D& circle)
+{
+    return isPointInsideCircle(segment.m_start, circle) && isPointInsideCircle(segment.m_end, circle);
+}
+
+
+//Todo: Unfinished stuff:
+
+bool isBBoxInsideBBox(const BBox2D& bbox1, const BBox2D& bbox2)
+{
+    return bbox2.contains(bbox1);
+}
+
+bool isConvexPolygonInsideConvexPolygon(const std::vector<Vector2D>& vertices1, const std::vector<Vector2D>& vertices2)
+{
+    for (const auto point : vertices1)
+    {
+        if (!isPointInsideConvexPolygon(point, vertices2))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isConvexPolygonInsideConvexPolygon(const ConvexPolygon2D& polygon1, const ConvexPolygon2D& polygon2)
+{
+    for (const auto point : polygon1)
+    {
+        if (!isPointInsideConvexPolygon(point, polygon2))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isShapeInsideShape(const Triangle2D& shape1, const Triangle2D& shape2)
+{
+    return isConvexPolygonInsideConvexPolygon(shape1.getVertices(), shape2.getVertices());
+}
+
+bool isPolygonInsideConvexPolygon(const Polygon2D& polygon1, const ConvexPolygon2D& polygon2)
+{
+    for (const auto point : polygon1)
+    {
+        if (!isPointInsideConvexPolygon(point, polygon2))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool edgeIntersectionPolygonWithPolygon(const std::vector<Vector2D>& vertices1, const std::vector<Vector2D>& vertices2, HitInfo2D* hitInfo = nullptr)
+{
+    const size_t countA = vertices1.size();
+    const size_t countB = vertices2.size();
+
+    if (countA < 3 || countB < 3)
+        return false;
+
+    for (size_t i = 0; i < countA; ++i)
+    {
+        const Vector2D& a1 = vertices1[i];
+        const Vector2D& a2 = vertices1[(i + 1) % countA];
+
+        for (size_t j = 0; j < countB; ++j)
+        {
+            const Vector2D& b1 = vertices2[j];
+            const Vector2D& b2 = vertices2[(j + 1) % countB];
+
+            if (intersectSegmentWithSegment(a1, a2, b1, b2, hitInfo))
+                return true;
+        }
+    }
+    return false;
+}
+
+bool isPolygonInsidePolygon(const std::vector<Vector2D>& vertices1, const std::vector<Vector2D>& vertices2)
+{
+    for (const auto& point : vertices1)
+    {
+        if (!isPointInsidePolygon(point, vertices2))
+        {
+            return false;
+        }
+    }
+
+    if (edgeIntersectionPolygonWithPolygon(vertices1, vertices2))
+        return false;
+
+    return true;
+}
+
+bool isPolygonInsidePolygon(const Polygon2D& polygon1, const Polygon2D& polygon2)
+{
+    return isPolygonInsidePolygon(polygon1.getVertices(), polygon2.getVertices());
+}
+
+// -----------------
 
 
 
