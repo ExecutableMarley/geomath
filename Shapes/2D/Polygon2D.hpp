@@ -67,6 +67,15 @@ public:
         return m_vertices;
     }
 
+    using iterator = std::vector<Vector2D>::iterator;
+    using const_iterator = std::vector<Vector2D>::const_iterator;
+
+    iterator begin() { return m_vertices.begin(); }
+    iterator end() { return m_vertices.end(); }
+
+    const_iterator begin() const { return m_vertices.begin(); }
+    const_iterator end() const { return m_vertices.end(); }
+
     bool isConvex() const
     {
         const size_t n = m_vertices.size();
