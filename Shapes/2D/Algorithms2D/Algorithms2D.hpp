@@ -29,6 +29,10 @@ class Rectangle2D;
 class Polygon2D;
 class ConvexPolygon2D;
 
+//Consider renaming Line2D in the future
+//Segment2D is better
+using Segment2D = Line2D;
+
 struct HitInfo2D
 {
     real_t t;
@@ -46,6 +50,10 @@ struct HitInfo2D
 bool isPointOnSegment(const Vector2D& point, const Vector2D& segmentStart, const Vector2D& segmentEnd);
 
 bool isPointOnSegment(const Vector2D& point, const Line2D& line);
+
+bool isSegmentOnSegment(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2);
+
+bool isSegmentOnSegment(const Segment2D& segment1, const Segment2D& segment2);
 
 // Distance calculation algorithms
 

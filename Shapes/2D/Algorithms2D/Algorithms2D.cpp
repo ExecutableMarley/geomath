@@ -22,10 +22,6 @@ namespace Arns
 namespace Math
 {
 
-//Consider renaming Line2D in the future
-//Segment2D is better
-using Segment2D = Line2D;
-
 bool isPointOnSegment(const Vector2D& point, const Vector2D& segmentStart, const Vector2D& segmentEnd)
 {
     Vector2D r = segmentEnd - segmentStart;
@@ -46,6 +42,17 @@ bool isPointOnSegment(const Vector2D& point, const Line2D& line)
     return isPointOnSegment(point, line.m_start, line.m_end);
 }
 
+bool isSegmentOnSegment(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2)
+{
+    return isPointOnSegment(s1, k1, k2) && isPointOnSegment(s2, k1, k2);
+}
+
+bool isSegmentOnSegment(const Segment2D& segment1, const Segment2D& segment2)
+{
+    return isSegmentOnSegment(segment1.m_start, segment1.m_end, segment2.m_start, segment2.m_end);
+}
+
+// Point inside shape
 
 bool isPointInsideBBox(const Vector2D& point, const BBox2D& bbox)
 {
@@ -120,10 +127,19 @@ bool isSegmentInsideRectangle(const Segment2D& segment, const Rectangle2D& recta
 
 bool isSegmentInsideConvexPolygon(const Segment2D& segment, const ConvexPolygon2D& polygon)
 {
-    return isPointInsideConvexPolygon(segment.m_start, polygon) && isPointInsidePolygon(segment.m_end, polygon);
+    return isPointInsideConvexPolygon(segment.m_start, polygon) && isPointInsideConvexPolygon(segment.m_end, polygon);
 }
 
-bool isSegmentInsidePolygon(const Segment2D& segment, const Polygon2D polygon);
+bool isSegmentInsidePolygon(const Segment2D& segment, const Polygon2D polygon)
+{
+    if (isPointInsidePolygon(segment.m_start, polygon) && isPointInsidePolygon(segment.m_end, polygon))
+    {
+        if (intersectSegmentWithPolygon(segment, polygon))
+            return false;
+        return true;
+    }
+    return false;
+}
 
 bool isSegmentInsideCircle(const Segment2D& segment, const Circle2D& circle)
 {
