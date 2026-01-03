@@ -83,11 +83,6 @@ T orient2D(T aX, T aY, T bX, T bY, T cX, T cY)
     return (bX - aX) * (cY - aY) - (bY - aY) * (cX - aX);
 }
 
-real_t orient2D(const Vector2D& a, const Vector2D& b, const Vector2D& c)
-{
-    return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-}
-
 //Todo: Use approx Helper functions
 bool isCCW(const Vector2D& a, const Vector2D& b, const Vector2D& c)
 {
