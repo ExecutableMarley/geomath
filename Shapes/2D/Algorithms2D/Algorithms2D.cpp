@@ -147,12 +147,50 @@ bool isSegmentInsideCircle(const Segment2D& segment, const Circle2D& circle)
 }
 
 
-//Todo: Unfinished stuff:
+//Shape inside BBox
 
 bool isBBoxInsideBBox(const BBox2D& bbox1, const BBox2D& bbox2)
 {
     return bbox2.contains(bbox1);
 }
+
+bool isTriangleInsideBBox(const Triangle2D& triangle, const BBox2D& bbox)
+{
+    return bbox.contains(triangle.m_a) && bbox.contains(triangle.m_b) && bbox.contains(triangle.m_c);
+}
+
+bool isRectangleInsideBBox(const Rectangle2D& rectangle, const BBox2D& bbox)
+{
+    return bbox.contains(rectangle.m_a) && bbox.contains(rectangle.m_b) &&
+        bbox.contains(rectangle.m_c) && bbox.contains(rectangle.m_d);
+}
+
+bool isConvexPolygonInsideBBox(const ConvexPolygon2D& polygon, const BBox2D& bbox)
+{
+    for (const auto& point : polygon)
+    {
+        if (!bbox.contains(point))
+            return false;
+    }
+    return true;
+}
+
+bool isPolygonInsideBBox(const Polygon2D polygon, const BBox2D& bbox)
+{
+    for (const auto& point : polygon)
+    {
+        if (!bbox.contains(point))
+            return false;
+    }
+    return true;
+}
+
+bool isCircleInsideBBox(const Circle2D& circle, const BBox2D& bbox)
+{
+    return bbox.contains(circle.m_center) && bbox.minDistanceSquared(circle.m_center) < circle.m_radius * circle.m_radius;
+}
+
+//Todo: Unfinished stuff:
 
 bool isConvexPolygonInsideConvexPolygon(const std::vector<Vector2D>& vertices1, const std::vector<Vector2D>& vertices2)
 {
