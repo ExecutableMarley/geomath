@@ -109,6 +109,7 @@ bool isPointInsideCircle(const Vector2D& point, const Circle2D& circle)
     return circle.contains(point);
 }
 
+// Segment inside shape
 
 bool isSegmentInsideBBox(const Segment2D& segment, const BBox2D& bbox)
 {
@@ -190,49 +191,9 @@ bool isCircleInsideBBox(const Circle2D& circle, const BBox2D& bbox)
     return bbox.contains(circle.m_center) && bbox.minDistanceSquared(circle.m_center) < circle.m_radius * circle.m_radius;
 }
 
-//Todo: Unfinished stuff:
+//
 
-bool isConvexPolygonInsideConvexPolygon(const std::vector<Vector2D>& vertices1, const std::vector<Vector2D>& vertices2)
-{
-    for (const auto point : vertices1)
-    {
-        if (!isPointInsideConvexPolygon(point, vertices2))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool isConvexPolygonInsideConvexPolygon(const ConvexPolygon2D& polygon1, const ConvexPolygon2D& polygon2)
-{
-    for (const auto point : polygon1)
-    {
-        if (!isPointInsideConvexPolygon(point, polygon2))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool isShapeInsideShape(const Triangle2D& shape1, const Triangle2D& shape2)
-{
-    return isConvexPolygonInsideConvexPolygon(shape1.getVertices(), shape2.getVertices());
-}
-
-bool isPolygonInsideConvexPolygon(const Polygon2D& polygon1, const ConvexPolygon2D& polygon2)
-{
-    for (const auto point : polygon1)
-    {
-        if (!isPointInsideConvexPolygon(point, polygon2))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
+//Helper function
 bool edgeIntersectionPolygonWithPolygon(const std::vector<Vector2D>& vertices1, const std::vector<Vector2D>& vertices2, HitInfo2D* hitInfo = nullptr)
 {
     const size_t countA = vertices1.size();
@@ -258,28 +219,143 @@ bool edgeIntersectionPolygonWithPolygon(const std::vector<Vector2D>& vertices1, 
     return false;
 }
 
-bool isPolygonInsidePolygon(const std::vector<Vector2D>& vertices1, const std::vector<Vector2D>& vertices2)
+//
+
+bool isBBoxInsideConvexPolygon(const BBox2D& bbox, const std::vector<Vector2D>& convexPoly)
 {
-    for (const auto& point : vertices1)
+    return isPointInsideConvexPolygon(bbox.bottomLeft(), convexPoly) && isPointInsideConvexPolygon(bbox.topLeft(), convexPoly) && 
+        isPointInsideConvexPolygon(bbox.topRight(), convexPoly) && isPointInsideConvexPolygon(bbox.bottomRight(), convexPoly);
+}
+
+bool isPolygonInsideConvexPolygon(const std::vector<Vector2D>& poly, const std::vector<Vector2D>& convexPoly)
+{
+    for (const auto& point : poly)
     {
-        if (!isPointInsidePolygon(point, vertices2))
+        if (!isPointInsideConvexPolygon(point, convexPoly))
+            return false;
+    }
+    return true;
+}
+
+bool isCircleInsideConvexPolygon(const Circle2D& circle, const std::vector<Vector2D>& convexPoly)
+{
+    if (!isPointInsideConvexPolygon(circle.m_center, convexPoly))
+    {
+        return false;
+    }
+
+    const size_t n = convexPoly.size();
+    for (size_t i = 0; i < n; ++i)
+    {
+        const Vector2D& v1 = convexPoly[i];
+        const Vector2D& v2 = convexPoly[(i + 1) % n];
+
+        real_t dist = distancePointToLine(circle.m_center, v1, v2);
+        if (dist < circle.m_radius)
         {
             return false;
         }
     }
+    return true;
+}
 
-    if (edgeIntersectionPolygonWithPolygon(vertices1, vertices2))
+bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::vector<Vector2D>& convexPoly);
+
+bool isBBoxInsidePolygon(const BBox2D& bbox, const std::vector<Vector2D>& poly)
+{
+    std::vector<Vector2D> bboxPoly = {bbox.bottomLeft(), bbox.bottomRight(), bbox.topRight(), bbox.topLeft()};
+
+    if (!isPointInsidePolygon(bbox.bottomLeft(), poly) || !isPointInsidePolygon(bbox.bottomRight(), poly) ||
+        !isPointInsidePolygon(bbox.topRight(), poly)   || !isPointInsidePolygon(bbox.topLeft(), poly))
+            return false;
+
+    if (edgeIntersectionPolygonWithPolygon(bboxPoly, poly))
         return false;
 
     return true;
 }
 
-bool isPolygonInsidePolygon(const Polygon2D& polygon1, const Polygon2D& polygon2)
+bool isPolygonInsidePolygon(const std::vector<Vector2D>& poly1, const std::vector<Vector2D>& poly2)
 {
-    return isPolygonInsidePolygon(polygon1.getVertices(), polygon2.getVertices());
+    for (const auto& point : poly2)
+    {
+        if (!isPointInsidePolygon(point, poly2))
+        {
+            return false;
+        }
+    }
+
+    if (edgeIntersectionPolygonWithPolygon(poly1, poly2))
+        return false;
+
+    return true;
 }
 
-// -----------------
+bool isCircleInsidePolygon( const Circle2D& circle, const std::vector<Vector2D>& poly)
+{
+    if (!isPointInsideConvexPolygon(circle.m_center, poly))
+    {
+        return false;
+    }
+
+    const size_t n = poly.size();
+    for (size_t i = 0; i < n; ++i)
+    {
+        const Vector2D& v1 = poly[i];
+        const Vector2D& v2 = poly[(i + 1) % n];
+
+        real_t dist = distancePointToLine(circle.m_center, v1, v2);
+        if (dist < circle.m_radius)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isShapeInsidePolygon(const IFiniteShape2D& shape, const std::vector<Vector2D>& poly);
+
+bool isBBoxInsideCircle(const BBox2D& bbox, const Circle2D& circle)
+{
+    return bbox.maxDistanceSquared(circle.m_center) <= circle.m_radius * circle.m_radius;
+}
+
+bool isPolygonInsideCircle(const std::vector<Vector2D>& poly, const Circle2D& circle)
+{
+    for (const auto& point : poly)
+    {
+        if (!isPointInsideCircle(point, circle))
+            return false;
+    }
+    return true;
+}
+
+bool isCircleInsideCircle(const Circle2D& circle1, const Circle2D& circle2)
+{
+    return circle1.contains(circle2);
+}
+
+bool isShapeInsideCircle(const IFiniteShape2D& shape, const Circle2D& circle);
+
+
+bool isShapeInsideShape(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2)
+{
+    if (shape2.type() == SHAPE2D_POLYGON)
+    {
+
+    }
+    if (shape2.type() == SHAPE2D_CONVEX_POLYGON) //Or Triangle2D, Rectangle2D
+    {
+
+    }
+    else if (shape2.type() == SHAPE2D_CIRCLE)
+    {
+        return false;
+    }
+
+    return false;
+}
+
 
 
 
