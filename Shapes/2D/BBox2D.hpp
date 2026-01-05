@@ -29,6 +29,8 @@ public:
 
     BBox2D(const Vector2D &point, real_t width = 0.f, real_t height = 0.f) : m_min(point), m_max(point.x + width, point.y + height) {}
 
+    // --- Derived geometry ---
+
     real_t width() const
     {
         return m_max.x - m_min.x;
@@ -53,6 +55,28 @@ public:
     {
         return (m_min + m_max) * 0.5f;
     }
+
+    Vector2D bottomLeft() const
+    {
+        return { m_min.x, m_min.y };
+    }
+
+    Vector2D bottomRight() const
+    {
+        return { m_max.x, m_min.y };
+    }
+
+    Vector2D topRight() const
+    {
+        return { m_max.x, m_max.y };
+    }
+
+    Vector2D topLeft() const
+    {
+        return { m_min.x, m_max.y };
+    }
+
+    // --- Transform / modification ---
 
     BBox2D& translate(const Vector2D &translation)
     {
@@ -91,6 +115,8 @@ public:
         return *this;
     }
 
+    // --- ---
+
     Vector2D closestPoint(const Vector2D& p) const
     {
     return Vector2D(
@@ -115,6 +141,8 @@ public:
         return std::max(dx1*dx1, dx2*dx2) + std::max(dy1*dy1, dy2*dy2);
     }
 
+    // --- ---
+
     bool contains(const Vector2D &point) const
     {
         return point.x >= m_min.x && point.x <= m_max.x && point.y >= m_min.y && point.y <= m_max.y;
@@ -130,7 +158,7 @@ public:
         return m_min.x <= rectangle.m_max.x && m_max.x >= rectangle.m_min.x && m_min.y <= rectangle.m_max.y && m_max.y >= rectangle.m_min.y;
     }
 
-    // Static functions
+    // --- Static factory Functions ---
 
     template <typename Iter>
     static BBox2D fromRange(Iter begin, Iter end)
