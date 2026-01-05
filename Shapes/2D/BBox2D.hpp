@@ -134,10 +134,10 @@ public:
 
     real_t maxDistanceSquared(const Vector2D& point) const
     {
-        double dx1 = point.x - m_min.x;
-        double dx2 = point.x - m_max.x;
-        double dy1 = point.y - m_min.y;
-        double dy2 = point.y - m_max.y;
+        real_t dx1 = point.x - m_min.x;
+        real_t dx2 = point.x - m_max.x;
+        real_t dy1 = point.y - m_min.y;
+        real_t dy2 = point.y - m_max.y;
         return std::max(dx1*dx1, dx2*dx2) + std::max(dy1*dy1, dy2*dy2);
     }
 
