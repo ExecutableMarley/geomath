@@ -129,7 +129,7 @@ public:
               - static_cast<double>(b.x) * static_cast<double>(a.y);
         }
 
-        return area / 2.0f;
+        return (real_t)area / real_t{2};
     }
 
     real_t perimeter() const
@@ -200,7 +200,7 @@ public:
     bool contains(const Vector2D &point) const
     {
         bool contains = false;
-        for (int i = 0, j = m_vertices.size() - 1; i < m_vertices.size(); j = i++)
+        for (size_t i = 0, j = m_vertices.size() - 1; i < m_vertices.size(); j = i++)
         {
             if (isPointOnSegment(point, m_vertices[i], m_vertices[j]))
                 return true;

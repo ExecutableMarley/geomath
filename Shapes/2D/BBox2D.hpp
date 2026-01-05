@@ -122,7 +122,7 @@ public:
         return Vector2D(
             std::max(m_min.x, std::min(p.x, m_max.x)),
             std::max(m_min.y, std::min(p.y, m_max.y))
-    );
+        );
     }
 
     real_t minDistanceSquared(const Vector2D& point) const
