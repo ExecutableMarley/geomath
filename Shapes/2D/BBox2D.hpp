@@ -119,9 +119,9 @@ public:
 
     Vector2D closestPoint(const Vector2D& p) const
     {
-    return Vector2D(
-        std::max(m_min.x, std::min(p.x, m_max.x)),
-        std::max(m_min.y, std::min(p.y, m_max.y))
+        return Vector2D(
+            std::max(m_min.x, std::min(p.x, m_max.x)),
+            std::max(m_min.y, std::min(p.y, m_max.y))
     );
     }
 
