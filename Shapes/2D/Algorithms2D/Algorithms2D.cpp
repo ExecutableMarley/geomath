@@ -835,7 +835,6 @@ bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, c
     Vector2D qp = q1 - p1;
 
     real_t rxs = r.cross(s);
-    real_t qpxr = qp.cross(r);
 
     if (approximatelyZero(rxs))
         return false; // Parallel/collinear
@@ -843,7 +842,8 @@ bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, c
     real_t t = qp.cross(s) / rxs;
     real_t u = qp.cross(r) / rxs;
 
-    if (t <= 0.0f || t >= 1.0f || u <= 0.0f || u >= 1.0f)
+    if (!approximatelyGreater(t, 0.f) || !approximatelyLess(t, 1.f) ||
+        !approximatelyGreater(u, 0.f) || !approximatelyLess(u, 1.f))
         return false;
 
     if (hitInfo)
