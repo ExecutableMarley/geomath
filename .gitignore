@@ -1,4 +1,13 @@
-tools/
+# IDE
+.vscode
+
+# Build executables and temporary files
 build/
-dist/
 Testing/
+
+# 
+tools/
+
+# Amalgamated files
+dist/
+
