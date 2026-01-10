@@ -76,40 +76,6 @@ real_t circumradiusSquared(const Vector2D& a, const Vector2D& b, const Vector2D&
     return radius.lengthSquared();
 }
 
-//Todo: Move this somewhere else
-template <class T>
-T orient2D(T aX, T aY, T bX, T bY, T cX, T cY)
-{
-    return (bX - aX) * (cY - aY) - (bY - aY) * (cX - aX);
-}
-
-//Todo: Use approx Helper functions
-bool isCCW(const Vector2D& a, const Vector2D& b, const Vector2D& c)
-{
-    return orient2D(a, b, c) > FloatAbsEpsilon;
-}
-
-bool isCCW(real_t aX, real_t aY, real_t bX, real_t bY, real_t cX, real_t cY)
-{
-    return orient2D(aX, aY, bX, bY, cX, cY) > FloatAbsEpsilon;
-}
-
-bool isCW(const Vector2D& a, const Vector2D& b, const Vector2D& c)
-{
-    return orient2D(a, b, c) < -FloatAbsEpsilon;
-}
-
-bool isCW(real_t aX, real_t aY, real_t bX, real_t bY, real_t cX, real_t cY)
-{
-    return orient2D(aX, aY, bX, bY, cX, cY) < -FloatAbsEpsilon;
-}
-
-bool isColinear(const Vector2D& a, const Vector2D& b, const Vector2D& c)
-{
-    return approximatelyZero(orient2D(a,b,c));
-}
-
-
 //[]
 
 bool isDelaunay(const TriangleMesh2D& mesh)

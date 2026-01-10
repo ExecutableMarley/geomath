@@ -264,6 +264,21 @@ inline real_t orient2D(const Vector2D& a, const Vector2D& b, const Vector2D& c)
     return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
+inline bool isCCW(const Vector2D& a, const Vector2D& b, const Vector2D& c)
+{
+    return approximatelyGreaterAbs(orient2D(a, b, c), 0);
+}
+
+inline bool isCW(const Vector2D& a, const Vector2D& b, const Vector2D& c)
+{
+    return approximatelyLessAbs(orient2D(a, b, c), 0);
+}
+
+inline bool isColinear(const Vector2D& a, const Vector2D& b, const Vector2D& c)
+{
+    return approximatelyZero(orient2D(a,b,c));
+}
+
 } // namespace Math
 
 } // namespace Arns
