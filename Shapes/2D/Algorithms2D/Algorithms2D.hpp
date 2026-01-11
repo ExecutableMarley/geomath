@@ -83,6 +83,30 @@ bool isSegmentInsidePolygon(const Segment2D& segment, const Polygon2D polygon);
 
 bool isSegmentInsideCircle(const Segment2D& segment, const Circle2D& circle);
 
+//
+
+bool isBBoxInsideBBox(const BBox2D& bbox1, const BBox2D& bbox2);
+
+bool isTriangleInsideBBox(const Triangle2D& triangle, const BBox2D& bbox);
+
+bool isRectangleInsideBBox(const Rectangle2D& rectangle, const BBox2D& bbox);
+
+bool isConvexPolygonInsideBBox(const ConvexPolygon2D& polygon, const BBox2D& bbox);
+
+bool isPolygonInsideBBox(const Polygon2D polygon, const BBox2D& bbox);
+
+bool isCircleInsideBBox(const Circle2D& circle, const BBox2D& bbox);
+
+//
+
+bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::vector<Vector2D>& convexPoly);
+
+bool isShapeInsidePolygon(const IFiniteShape2D& shape, const std::vector<Vector2D>& poly);
+
+bool isShapeInsideCircle(const IFiniteShape2D& shape, const Circle2D& circle);
+
+bool isShapeInsideShape(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2);
+
 
 // Distance calculation algorithms
 

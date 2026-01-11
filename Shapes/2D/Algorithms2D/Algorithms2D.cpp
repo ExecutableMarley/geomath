@@ -16,6 +16,8 @@
 #include "../Polygon2D.hpp"
 #include "../ConvexPolygon2D.hpp"
 
+#include <cassert>
+
 namespace Arns
 {
 
@@ -259,7 +261,19 @@ bool isCircleInsideConvexPolygon(const Circle2D& circle, const std::vector<Vecto
     return true;
 }
 
-bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::vector<Vector2D>& convexPoly);
+bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::vector<Vector2D>& convexPoly)
+{
+    if (isPolygonalShape(shape.type()))
+    {
+        return isPolygonInsideConvexPolygon(shape.polygonal()->getVertices(), convexPoly);
+    }
+    else if (shape.type() == SHAPE2D_CONVEX_POLYGON)
+    {
+        return isCircleInsideConvexPolygon(*shape.shape_cast<Circle2D>(), convexPoly);
+    }
+    assert(false && "Unreachable code reached!");
+    return false;
+}
 
 bool isBBoxInsidePolygon(const BBox2D& bbox, const std::vector<Vector2D>& poly)
 {
@@ -291,7 +305,8 @@ bool isPolygonInsidePolygon(const std::vector<Vector2D>& poly1, const std::vecto
     return true;
 }
 
-bool isCircleInsidePolygon( const Circle2D& circle, const std::vector<Vector2D>& poly)
+//Same as isCircleInsideConvexPolygon. Should be merged to one function
+bool isCircleInsidePolygon(const Circle2D& circle, const std::vector<Vector2D>& poly)
 {
     if (!isPointInsideConvexPolygon(circle.m_center, poly))
     {
@@ -313,7 +328,19 @@ bool isCircleInsidePolygon( const Circle2D& circle, const std::vector<Vector2D>&
     return true;
 }
 
-bool isShapeInsidePolygon(const IFiniteShape2D& shape, const std::vector<Vector2D>& poly);
+bool isShapeInsidePolygon(const IFiniteShape2D& shape, const std::vector<Vector2D>& poly)
+{
+    if (isPolygonalShape(shape.type()))
+    {
+        return isPolygonInsidePolygon(shape.polygonal()->getVertices(), poly);
+    }
+    else if (shape.type() == SHAPE2D_CONVEX_POLYGON)
+    {
+        return isCircleInsidePolygon(*shape.shape_cast<Circle2D>(), poly);
+    }
+    assert(false && "Unreachable code reached!");
+    return false;
+}
 
 bool isBBoxInsideCircle(const BBox2D& bbox, const Circle2D& circle)
 {
@@ -335,26 +362,40 @@ bool isCircleInsideCircle(const Circle2D& circle1, const Circle2D& circle2)
     return circle1.contains(circle2);
 }
 
-bool isShapeInsideCircle(const IFiniteShape2D& shape, const Circle2D& circle);
+bool isShapeInsideCircle(const IFiniteShape2D& shape, const Circle2D& circle)
+{
+    if (isPolygonalShape(shape.type()))
+    {
+        return isPolygonInsideCircle(shape.polygonal()->getVertices(), circle);
+    }
+    else if (shape.type() == SHAPE2D_CONVEX_POLYGON)
+    {
+        return isCircleInsideCircle(*shape.shape_cast<Circle2D>(), circle);
+    }
+    assert(false && "Unreachable code reached!");
+    return false;
+}
 
 
 bool isShapeInsideShape(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2)
 {
-    if (shape2.type() == SHAPE2D_POLYGON)
+    if (isConvexPolygonal(shape2.type()))
     {
-
+        return isShapeInsideConvexPolygon(shape1, shape2.polygonal()->getVertices());
     }
-    if (shape2.type() == SHAPE2D_CONVEX_POLYGON) //Or Triangle2D, Rectangle2D
+    else if (isPolygonalShape(shape2.type()))
     {
-
+        return isShapeInsidePolygon(shape1, shape2.polygonal()->getVertices());
     }
     else if (shape2.type() == SHAPE2D_CIRCLE)
     {
-        return false;
+        return isShapeInsideCircle(shape1, *shape2.shape_cast<Circle2D>());
     }
-
+    assert(false && "Unreachable code reached!");
     return false;
 }
+
+//Consider throwing an exception after unreachable code asserts
 
 
 
