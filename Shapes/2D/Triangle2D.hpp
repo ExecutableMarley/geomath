@@ -21,7 +21,7 @@ namespace Arns
 namespace Math
 {
 
-class Triangle2D : public IFiniteShape2D
+class Triangle2D : public IFiniteShape2D, IPolygonalShape2D
 {
 public:
     Vector2D m_a;
