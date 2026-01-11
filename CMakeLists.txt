@@ -6,12 +6,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 enable_testing()
 
-add_executable(geomath_tests
-    tests/main.cpp
-    tests/test_vector2d.cpp
+add_executable(geomath_tests)
+
+target_sources(geomath_tests PRIVATE
     Shapes/2D/Algorithms2D/Algorithms2D.cpp
     Shapes/2D/Algorithms2D/Delaunay/DelaunayTriangulation.cpp
     Shapes/3D/Algorithms3D/Algorithms3D.cpp
+)
+
+file(GLOB TEST_SOURCES CONFIGURE_DEPENDS "tests/test_*.cpp")
+
+target_sources(geomath_tests PRIVATE
+    tests/main.cpp
+    ${TEST_SOURCES}
 )
 
 target_include_directories(geomath_tests PRIVATE .)
