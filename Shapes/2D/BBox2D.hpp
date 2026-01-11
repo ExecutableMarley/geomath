@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <algorithm>
+#include <vector>
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
@@ -74,6 +75,11 @@ public:
     Vector2D topLeft() const
     {
         return { m_min.x, m_max.y };
+    }
+
+    std::vector<Vector2D> corners() const
+    {
+        return { topLeft(), bottomLeft(), bottomRight(), topRight() };
     }
 
     // --- Transform / modification ---
