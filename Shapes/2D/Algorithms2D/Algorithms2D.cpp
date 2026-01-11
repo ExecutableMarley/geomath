@@ -17,6 +17,7 @@
 #include "../ConvexPolygon2D.hpp"
 
 #include <cassert>
+#include <span>
 
 namespace Arns
 {
@@ -572,24 +573,155 @@ real_t distancePointToCircle(const Vector2D& point, const Circle2D& circle, Vect
     return std::abs(dist - circle.m_radius);
 }
 
+//Todo: Use span for everything else too. We are use c++20 anyways
+
+real_t distanceSegmentToEdgeList(const Line2D& seg, std::span<const Vector2D> vertices, bool closed, Vector2D* closestSeg, Vector2D* closestEdge)
+{
+    const size_t n = vertices.size();
+    if (n < 2)
+        return std::numeric_limits<real_t>::max();
+
+    real_t minDist = std::numeric_limits<real_t>::max();
+    Vector2D bestSeg;
+    Vector2D bestEdge;
+
+    const size_t edgeCount = closed ? n : n - 1;
+
+    for (size_t i = 0; i < edgeCount; ++i)
+    {
+        const Vector2D& a = vertices[i];
+        const Vector2D& b = vertices[(i + 1) % n];
+
+        Vector2D cs, ce;
+        real_t d = distanceLineToLine(seg.m_start, seg.m_end, a, b, &cs, &ce);
+
+        if (d < minDist)
+        {
+            minDist  = d;
+            bestSeg  = cs;
+            bestEdge = ce;
+
+            // => Intersection
+            if (minDist == real_t(0))
+                break;
+        }
+    }
+
+    if (closestSeg)  *closestSeg  = bestSeg;
+    if (closestEdge) *closestEdge = bestEdge;
+
+    return minDist;
+}
+
+real_t distanceSegmentToBBox(const Segment2D& segment, const BBox2D& bbox, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    return distanceSegmentToEdgeList(segment, bbox.corners(), true, closestPoint1, closestPoint2);
+}
+
+real_t distanceSegmentToTriangle(const Segment2D& segment, const Triangle2D& triangle, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    return distanceSegmentToEdgeList(segment, triangle.getVertices(), true, closestPoint1, closestPoint2);
+}
+
+real_t distanceSegmentToRectangle2D(const Segment2D& segment, const Rectangle2D& rectangle, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    return distanceSegmentToEdgeList(segment, rectangle.getVertices(), true, closestPoint1, closestPoint2);
+}
+
+real_t distanceSegmentToPolygon(const Segment2D& segment, const ConvexPolygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    return distanceSegmentToEdgeList(segment, polygon.getVertices(), true, closestPoint1, closestPoint2);
+}
+
+real_t distanceSegmentToPolygon(const Segment2D& segment, const Polygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    return distanceSegmentToEdgeList(segment, polygon.getVertices(), true, closestPoint1, closestPoint2);
+}
+
+real_t distanceSegmentToCircle(const Segment2D& segment, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    Vector2D p;
+    real_t dist = distancePointToLine(circle.m_center, segment.m_start, segment.m_end, &p);
+
+    //Trivial case
+    if (dist <= circle.m_radius)
+    {
+        if (closestPoint1) *closestPoint1 = p;
+        if (closestPoint2) *closestPoint2 = p;
+        return real_t(0);
+    }
+
+    //Not intersecting case
+    Vector2D dir = p - circle.m_center;
+    real_t len = dir.length();
+
+    if (len > real_t{0})
+        dir /= len;
+
+    Vector2D q = circle.m_center + dir * circle.m_radius;
+
+    if (closestPoint1) *closestPoint1 = p;
+    if (closestPoint2) *closestPoint2 = q;
+
+    return len - circle.m_radius;
+}
+
+
+real_t distanceBBoxToBBox(const BBox2D& a, const BBox2D& b, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    real_t dx = 0;
+    real_t dy = 0;
+
+    Vector2D pa;
+    Vector2D pb;
+
+    // --- X axis ---
+    if (a.m_max.x < b.m_min.x)
+    {
+        dx = b.m_min.x - a.m_max.x;
+        pa.x = a.m_max.x;
+        pb.x = b.m_min.x;
+    }
+    else if (b.m_max.x < a.m_min.x)
+    {
+        dx = a.m_min.x - b.m_max.x;
+        pa.x = a.m_min.x;
+        pb.x = b.m_max.x;
+    }
+    else
+    {
+        // overlap
+        real_t x = std::max(a.m_min.x, b.m_min.x);
+        pa.x = pb.x = x;
+    }
+
+    // --- Y axis ---
+    if (a.m_max.y < b.m_min.y)
+    {
+        dy = b.m_min.y - a.m_max.y;
+        pa.y = a.m_max.y;
+        pb.y = b.m_min.y;
+    }
+    else if (b.m_max.y < a.m_min.y)
+    {
+        dy = a.m_min.y - b.m_max.y;
+        pa.y = a.m_min.y;
+        pb.y = b.m_max.y;
+    }
+    else
+    {
+        // overlap
+        real_t y = std::max(a.m_min.y, b.m_min.y);
+        pa.y = pb.y = y;
+    }
+
+    if (closestPoint1) *closestPoint1 = pa;
+    if (closestPoint2) *closestPoint2 = pb;
+
+    return std::sqrt(dx * dx + dy * dy);
+}
+
 //Todo: Implement
-real_t distanceSegmentToBBox(const Vector2D& segmentStart, Vector2D& segmentEnd, const BBox2D& bbox, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceSegmentToBBox(const Line2D& segment, const BBox2D& bbox, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceSegmentToTriangle(const Line2D& segment, const Triangle2D& triangle, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceSegmentToRectangle2D(const Line2D& segment, const Rectangle2D& rectangle, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceSegmentToPolygon(const Line2D& segment, const ConvexPolygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceSegmentToPolygon(const Line2D& segment, const Polygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceSegmentToCircle(const Line2D& segment, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-
-real_t distanceBBoxToBBox(const BBox2D& bbox1, const BBox2D& bbox2, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
 real_t distanceBBoxToTriangle(const BBox2D& bbox1, const Triangle2D& triangle, Vector2D* closestPoint1, Vector2D* closestPoint2);
 
 real_t distanceBBoxToRectangle(const BBox2D& bbox1, const Rectangle2D& rectangle, Vector2D* closestPoint1, Vector2D* closestPoint2);
