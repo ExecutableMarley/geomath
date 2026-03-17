@@ -30,11 +30,7 @@ public:
         this->m_vertices = convex_hull(points);
     }
 
-    ShapeType2D type() const
-    {
-        return SHAPE2D_CONVEX_POLYGON;
-    }
-
+    ShapeType2D type() const { return SHAPE2D_CONVEX_POLYGON; }
     static constexpr ShapeType2D shapeType = SHAPE2D_CONVEX_POLYGON;
 
 private:

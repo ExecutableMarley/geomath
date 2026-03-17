@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <vector>
+#include <span>
 #include <memory>
 
 #include "CommonMath.hpp"
@@ -68,7 +69,9 @@ public:
     virtual size_t vertexCount() const = 0;
 
     /// Read-only access to all vertices
-    virtual std::vector<Vector2D> getVertices() const = 0;
+    //virtual std::vector<Vector2D> getVertices() const = 0;
+
+    virtual const std::span<const Vector2D> vertices() const = 0;
 
     /// Indexed vertex access
     virtual const Vector2D& operator[](size_t index) const = 0;

@@ -6,6 +6,7 @@
 #pragma once
 
 #include <math.h>
+#include <array>
 #include <vector>
 #include <memory>
 #include <stdexcept>
@@ -24,96 +25,94 @@ namespace Math
 class Triangle2D : public IFiniteShape2D, IPolygonalShape2D
 {
 public:
+    std::array<Vector2D, 3> m_vertices;
+    /*
     Vector2D m_a;
     Vector2D m_b;
     Vector2D m_c;
+    */
 
-    Triangle2D() : m_a(), m_b(), m_c() {}
+    Triangle2D() :  m_vertices{ Vector2D{}, Vector2D{}, Vector2D{} } {}
 
-    Triangle2D(const Vector2D &a, const Vector2D &b, const Vector2D &c) : m_a(a), m_b(b), m_c(c) {}
+    Triangle2D(const Vector2D &a, const Vector2D &b, const Vector2D &c) : m_vertices{ a, b, c } {}
 
-    ShapeType2D type() const override
-    {
-        return SHAPE2D_TRIANGLE;
-    }
-
+    ShapeType2D type() const override { return SHAPE2D_TRIANGLE; }
     static constexpr ShapeType2D shapeType = SHAPE2D_TRIANGLE;
 
-    size_t vertexCount() const
+    Vector2D& a() { return m_vertices[0]; }
+    Vector2D& b() { return m_vertices[1]; }
+    Vector2D& c() { return m_vertices[2]; }
+
+    const Vector2D& a() const { return m_vertices[0]; }
+    const Vector2D& b() const { return m_vertices[1]; }
+    const Vector2D& c() const { return m_vertices[2]; }
+
+    size_t vertexCount() const override
     {
         return 3;
     }
 
     const Vector2D& vertexAt(size_t index) const
     {
-        if (index > 2)
-            throw std::out_of_range("Index out of range");
-
-        return (&m_a)[index];
+        return m_vertices[index];
     }
 
     Vector2D& vertexAt(size_t index)
     {
-        if (index > 2)
-            throw std::out_of_range("Index out of range");
-        return (&m_a)[index];
+        return m_vertices[index];
     }
 
-    std::vector<Vector2D> getVertices() const
+    const std::span<const Vector2D> vertices() const override
     {
-        return {m_a, m_b, m_c};
+        return m_vertices;
     }
 
     real_t area() const override
     {
-        return 0.5f * fabs((m_a.x - m_c.x) * (m_b.y - m_c.y) - (m_b.x - m_c.x) * (m_a.y - m_c.y));
+        return 0.5f * fabs((a().x - c().x) * (b().y - c().y) - (b().x - c().x) * (a().y - c().y));
     }
 
     real_t perimeter() const override
     {
-        return (m_a - m_b).length() + (m_b - m_c).length() + (m_c - m_a).length();
+        return (a() - b()).length() + (b() - c()).length() + (c() - a()).length();
     }
 
     Vector2D centroid() const override
     {
-        return (m_a + m_b + m_c) / 3.0f;
+        return (a() + b() + c()) / 3.0f;
     }
 
     Triangle2D& translate(const Vector2D &translation) override
     {
-        m_a += translation;
-        m_b += translation;
-        m_c += translation;
+        for (auto& v : m_vertices)
+            v += translation;
         return *this;
     }
 
     Triangle2D& rotate(real_t angle)
     {
-        const Vector2D centroid = this->centroid();
-        m_a.rotateAround(angle, centroid);
-        m_b.rotateAround(angle, centroid);
-        m_c.rotateAround(angle, centroid);
+        const Vector2D c = centroid();
+        for (auto& v : m_vertices)
+            v.rotateAround(angle, c);
         return *this;
     }
 
     Triangle2D& rotate(real_t angle, const Vector2D& point)
     {
-        m_a.rotateAround(angle, point);
-        m_b.rotateAround(angle, point);
-        m_c.rotateAround(angle, point);
+        for (auto& v : m_vertices)
+            v.rotateAround(angle, point);
         return *this;
     }
 
     Triangle2D& scale(real_t factor)
     {
-        const Vector2D centroid = this->centroid();
-        m_a = centroid + (m_a - centroid) * factor;
-        m_b = centroid + (m_b - centroid) * factor;
-        m_c = centroid + (m_c - centroid) * factor;
+        const Vector2D c = centroid();
+        for (auto& v : m_vertices)
+            v = c + (v - c) * factor;
         return *this;
     }
 
-    Triangle2D copy() const
+    Triangle2D copy() const 
     {
         return *this;
     }
@@ -126,6 +125,9 @@ public:
     bool contains(const Vector2D &point) const override
     {
         const real_t areaABC = area();
+        const auto& m_a = this->a();
+        const auto& m_b = this->b();
+        const auto& m_c = this->c();
         const real_t areaPBC = 0.5f * fabs((m_b.x - point.x) * (m_c.y - point.y) - (m_c.x - point.x) * (m_b.y - point.y));
         const real_t areaPCA = 0.5f * fabs((m_c.x - point.x) * (m_a.y - point.y) - (m_a.x - point.x) * (m_c.y - point.y));
         const real_t areaPAB = 0.5f * fabs((m_a.x - point.x) * (m_b.y - point.y) - (m_b.x - point.x) * (m_a.y - point.y));
@@ -134,11 +136,14 @@ public:
 
     bool contains(const Triangle2D &triangle) const
     {
-        return contains(triangle.m_a) && contains(triangle.m_b) && contains(triangle.m_c);
+        return contains(triangle.a()) && contains(triangle.b()) && contains(triangle.c());
     }
 
     BBox2D boundingBox() const override
     {
+        const auto& m_a = this->a();
+        const auto& m_b = this->b();
+        const auto& m_c = this->c();
         return BBox2D(Vector2D(fminf(fminf(m_a.x, m_b.x), m_c.x), fminf(fminf(m_a.y, m_b.y), m_c.y)),
                       Vector2D(fmaxf(fmaxf(m_a.x, m_b.x), m_c.x), fmaxf(fmaxf(m_a.y, m_b.y), m_c.y)));
     }

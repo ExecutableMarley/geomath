@@ -5,11 +5,12 @@
 
 #pragma once
 
-#include <math.h>
-#include <vector>
-
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
+
+#include <math.h>
+#include <vector>
+#include <span>
 
 namespace Arns
 {
@@ -99,9 +100,9 @@ bool isCircleInsideBBox(const Circle2D& circle, const BBox2D& bbox);
 
 //
 
-bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::vector<Vector2D>& convexPoly);
+bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::span<const Vector2D> convexPoly);
 
-bool isShapeInsidePolygon(const IFiniteShape2D& shape, const std::vector<Vector2D>& poly);
+bool isShapeInsidePolygon(const IFiniteShape2D& shape, const std::span<const Vector2D> poly);
 
 bool isShapeInsideCircle(const IFiniteShape2D& shape, const Circle2D& circle);
 
@@ -203,7 +204,7 @@ bool intersectRectangleWithCircle(const Rectangle2D& rectangle, const Circle2D& 
 
 // --- Polygons --- 
 
-bool intersectConvexPolygonWithConvexPolygon(const std::vector<Vector2D>& p1, const std::vector<Vector2D>& p2);
+bool intersectConvexPolygonWithConvexPolygon(const std::span<const Vector2D> p1, const std::span<const Vector2D> p2);
 
 bool intersectPolygonWithPolygon(const ConvexPolygon2D& polygon1, const ConvexPolygon2D& polygon2);
 

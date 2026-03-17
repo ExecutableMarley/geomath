@@ -24,23 +24,26 @@ namespace Math
 class Rectangle2D : public IFiniteShape2D, IPolygonalShape2D
 {
 public:
-    Vector2D m_a;
-    Vector2D m_b;
-    Vector2D m_c;
-    Vector2D m_d;
+    std::array<Vector2D, 4> m_vertices;
 
-    Rectangle2D() : m_a(), m_b(), m_c(), m_d() {}
+    Rectangle2D() : m_vertices{ Vector2D{}, Vector2D{}, Vector2D{} } {}
 
-    Rectangle2D(const Vector2D &a, const Vector2D &b, const Vector2D &c, const Vector2D &d) : m_a(a), m_b(b), m_c(c), m_d(d) {}
+    Rectangle2D(const Vector2D &a, const Vector2D &b, const Vector2D &c, const Vector2D &d) : m_vertices{ a, b, c, d } {}
 
-    Rectangle2D(const Vector2D &pos, real_t width, real_t height) : m_a(pos), m_b(pos + Vector2D(width, 0)), m_c(pos + Vector2D(width, height)), m_d(pos + Vector2D(0, height)) {}
+    Rectangle2D(const Vector2D &pos, real_t width, real_t height) : m_vertices{ pos, pos + Vector2D(width, 0), pos + Vector2D(width, height), pos + Vector2D(0, height) } {}
 
-    ShapeType2D type() const override
-    {
-        return SHAPE2D_RECTANGLE;
-    }
-
+    ShapeType2D type() const override { return SHAPE2D_RECTANGLE; }
     static constexpr ShapeType2D shapeType = SHAPE2D_RECTANGLE;
+
+    Vector2D& a() { return m_vertices[0]; }
+    Vector2D& b() { return m_vertices[1]; }
+    Vector2D& c() { return m_vertices[2]; }
+    Vector2D& d() { return m_vertices[3]; }
+
+    const Vector2D& a() const { return m_vertices[0]; }
+    const Vector2D& b() const { return m_vertices[1]; }
+    const Vector2D& c() const { return m_vertices[2]; }
+    const Vector2D& d() const { return m_vertices[3]; }
 
     size_t vertexCount() const
     {
@@ -49,32 +52,27 @@ public:
 
     const Vector2D& vertexAt(size_t index) const
     {
-        if (index > 3)
-            throw std::out_of_range("Index out of range");
-
-        return (&m_a)[index];
+        return m_vertices[index];
     }
 
     Vector2D& vertexAt(size_t index)
     {
-        if (index > 3)
-            throw std::out_of_range("Index out of range");
-        return (&m_a)[index];
+        return m_vertices[index];
     }
 
-    std::vector<Vector2D> getVertices() const
+    const std::span<const Vector2D> vertices() const override
     {
-        return {m_a, m_b, m_c, m_d};
+        return m_vertices;
     }
 
     real_t width() const
     {
-        return (m_b - m_a).length();
+        return (b() - a()).length();
     }
 
     real_t height() const
     {
-        return (m_d - m_a).length();
+        return (d() - a()).length();
     }
 
     real_t area() const override
@@ -89,44 +87,36 @@ public:
 
     Vector2D centroid() const override
     {
-        return (m_a + m_b + m_c + m_d) / 4.0f;
+        return (a() + b() + c() + d()) / 4.0f;
     }
 
     Rectangle2D& translate(const Vector2D &translation) override
     {
-        m_a += translation;
-        m_b += translation;
-        m_c += translation;
-        m_d += translation;
+        for (auto& v : m_vertices)
+            v += translation;
         return *this;
     }
 
     Rectangle2D& rotate(real_t angle)
     {
-        const Vector2D centroid = this->centroid();
-        m_a.rotateAround(angle, centroid);
-        m_b.rotateAround(angle, centroid);
-        m_c.rotateAround(angle, centroid);
-        m_d.rotateAround(angle, centroid);
+        const Vector2D c = centroid();
+        for (auto& v : m_vertices)
+            v.rotateAround(angle, c);
         return *this;
     }
 
     Rectangle2D& rotate(real_t angle, const Vector2D& point)
     {
-        m_a.rotateAround(angle, point);
-        m_b.rotateAround(angle, point);
-        m_c.rotateAround(angle, point);
-        m_d.rotateAround(angle, point);
+        for (auto& v : m_vertices)
+            v.rotateAround(angle, point);
         return *this;
     }
 
     Rectangle2D& scale(real_t factor)
     {
-        const Vector2D centroid = this->centroid();
-        m_a = centroid + (m_a - centroid) * factor;
-        m_b = centroid + (m_b - centroid) * factor;
-        m_c = centroid + (m_c - centroid) * factor;
-        m_d = centroid + (m_d - centroid) * factor;
+        const Vector2D c = centroid();
+        for (auto& v : m_vertices)
+            v = c + (v - c) * factor;
         return *this;
     }
 
@@ -142,6 +132,11 @@ public:
 
     bool contains(const Vector2D &point) const override
     {
+        const auto& m_a = this->a();
+        const auto& m_b = this->b();
+        const auto& m_c = this->c();
+        const auto& m_d = this->d();
+
         const Vector2D ab = m_b - m_a;
         const Vector2D ap = point - m_a;
         const Vector2D bc = m_c - m_b;
@@ -156,12 +151,12 @@ public:
 
     bool contains(const Rectangle2D &rectangle) const
     {
-        return contains(rectangle.m_a) && contains(rectangle.m_b) && contains(rectangle.m_c) && contains(rectangle.m_d);
+        return contains(rectangle.a()) && contains(rectangle.b()) && contains(rectangle.c()) && contains(rectangle.d());
     }
 
     BBox2D boundingBox() const override
     {
-        return BBox2D(Vector2D::min(m_a, m_b, m_c, m_d), Vector2D::max(m_a, m_b, m_c, m_d));
+        return BBox2D(Vector2D::min(a(), b(), c(), d()), Vector2D::max(a(), b(), c(), d()));
     }
 
     Vector2D& operator[](size_t index)

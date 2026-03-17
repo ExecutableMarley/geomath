@@ -62,10 +62,16 @@ public:
         return m_vertices[wrapped];
     }
 
-    std::vector<Vector2D> getVertices() const
+    const std::span<const Vector2D> vertices() const override
     {
         return m_vertices;
     }
+
+    /*
+    std::vector<Vector2D> getVertices() const
+    {
+        return m_vertices;
+    }*/
 
     using iterator = std::vector<Vector2D>::iterator;
     using const_iterator = std::vector<Vector2D>::const_iterator;
