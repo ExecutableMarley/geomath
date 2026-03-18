@@ -22,15 +22,10 @@ namespace Arns
 namespace Math
 {
 
-class Triangle2D : public IFiniteShape2D, IPolygonalShape2D
+class Triangle2D : public IFiniteShape2D, public IPolygonalShape2D
 {
 public:
     std::array<Vector2D, 3> m_vertices;
-    /*
-    Vector2D m_a;
-    Vector2D m_b;
-    Vector2D m_c;
-    */
 
     Triangle2D() :  m_vertices{ Vector2D{}, Vector2D{}, Vector2D{} } {}
 
@@ -141,11 +136,7 @@ public:
 
     BBox2D boundingBox() const override
     {
-        const auto& m_a = this->a();
-        const auto& m_b = this->b();
-        const auto& m_c = this->c();
-        return BBox2D(Vector2D(fminf(fminf(m_a.x, m_b.x), m_c.x), fminf(fminf(m_a.y, m_b.y), m_c.y)),
-                      Vector2D(fmaxf(fmaxf(m_a.x, m_b.x), m_c.x), fmaxf(fmaxf(m_a.y, m_b.y), m_c.y)));
+        return BBox2D(Vector2D::min(a(), b(), c()), Vector2D::max(a(), b(), c()));
     }
 
     Vector2D& operator[](size_t index)
