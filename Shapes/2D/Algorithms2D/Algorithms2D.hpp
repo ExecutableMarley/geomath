@@ -111,13 +111,13 @@ bool isShapeInsideShape(const IFiniteShape2D& shape1, const IFiniteShape2D& shap
 
 // Distance calculation algorithms
 
-real_t distancePointToLine(const Vector2D& point, const Vector2D& lineStart, const Vector2D& lineEnd, Vector2D* closestPoint = nullptr);
+real_t distancePointToSegment(const Vector2D& point, const Vector2D& lineStart, const Vector2D& lineEnd, Vector2D* closestPoint = nullptr);
 
-real_t distancePointToLine(const Vector2D& point, const Line2D& line, Vector2D* closestPoint = nullptr);
+real_t distancePointToSegment(const Vector2D& point, const Segment2D& line, Vector2D* closestPoint = nullptr);
 
-real_t distanceLineToLine(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
+real_t distanceSegmentToSegment(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 
-real_t distanceLineToLine(const Line2D& line1, const Line2D& line2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
+real_t distanceSegmentToSegment(const Segment2D& line1, const Segment2D& line2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 
 //Todo: Distance to shapes
 
