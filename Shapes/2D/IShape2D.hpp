@@ -56,27 +56,6 @@ constexpr bool isConvexPolygonal(ShapeType2D type)
     }
 }
 
-/*
-Consider using std::span for efficient vertices access
-*/
-
-class IPolygonalShape2D
-{
-public:
-    virtual ~IPolygonalShape2D() = default;
-
-    /// Number of vertices
-    virtual size_t vertexCount() const = 0;
-
-    /// Read-only access to all vertices
-    //virtual std::vector<Vector2D> getVertices() const = 0;
-
-    virtual const std::span<const Vector2D> vertices() const = 0;
-
-    /// Indexed vertex access
-    virtual const Vector2D& operator[](size_t index) const = 0;
-};
-
 
 //Possibly infinite
 class IBaseShape2D
@@ -97,6 +76,8 @@ public:
     //virtual std::unique_ptr<IBaseShape2D> clone() const = 0;
 };
 
+class IPolygonalShape2D;
+
 //Finite Shape
 class IFiniteShape2D : public IBaseShape2D
 {
@@ -111,13 +92,22 @@ public:
 
     virtual std::unique_ptr<IFiniteShape2D> clone() const = 0;
 
-    const IPolygonalShape2D* polygonal() const
-    {
-        if (!isPolygonalShape(this->type()))
-            return nullptr;
+    const IPolygonalShape2D* polygonal() const;
+};
 
-        return dynamic_cast<const IPolygonalShape2D*>(this);
-    }
+class IPolygonalShape2D : public IFiniteShape2D
+{
+public:
+    virtual ~IPolygonalShape2D() = default;
+
+    /// Number of vertices
+    virtual size_t vertexCount() const = 0;
+
+    /// Read-only access to all vertices
+    virtual const std::span<const Vector2D> vertices() const = 0;
+
+    /// Indexed vertex access
+    virtual const Vector2D& operator[](size_t index) const = 0;
 };
 
 template <class T>
@@ -126,6 +116,13 @@ const T* shape_cast(const IBaseShape2D* shape)
     return (shape->type() == T::shapeType) ? dynamic_cast<const T*>(shape) : nullptr;
 }
 
+inline const IPolygonalShape2D *IFiniteShape2D::polygonal() const
+{
+    if (!isPolygonalShape(this->type()))
+        return nullptr;
+
+    return dynamic_cast<const IPolygonalShape2D *>(this);
+}
 
 } // namespace Math
 

@@ -21,7 +21,7 @@ namespace Arns
 namespace Math
 {
 
-class Rectangle2D : public IFiniteShape2D, public IPolygonalShape2D
+class Rectangle2D : public IPolygonalShape2D
 {
 public:
     std::array<Vector2D, 4> m_vertices;
