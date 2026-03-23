@@ -153,11 +153,11 @@ bool isSegmentInsideConvexPolygon(const Segment2D& segment, const ConvexPolygon2
     return isPointInsideConvexPolygon(segment.m_start, polygon) && isPointInsideConvexPolygon(segment.m_end, polygon);
 }
 
-bool isSegmentInsidePolygon(const Segment2D& segment, const Polygon2D polygon)
+bool isSegmentInsidePolygon(const Segment2D& segment, const Polygon2D& polygon)
 {
     if (isPointInsidePolygon(segment.m_start, polygon) && isPointInsidePolygon(segment.m_end, polygon))
     {
-        if (intersectSegmentWithPolygon(segment, polygon))
+        if (intersect(segment, polygon))
             return false;
         return true;
     }
@@ -264,7 +264,7 @@ bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::span<con
     {
         return isPolygonInsideConvexPolygon(shape.polygonal()->vertices(), convexPoly);
     }
-    else if (shape.type() == SHAPE2D_CONVEX_POLYGON)
+    else if (shape.type() == SHAPE2D_CIRCLE)
     {
         return isCircleInsideConvexPolygon(*shape.shape_cast<Circle2D>(), convexPoly);
     }
@@ -399,26 +399,26 @@ bool isShapeInsideShape(const IFiniteShape2D& shape1, const IFiniteShape2D& shap
 
 // Distance calculation algorithms
 
-real_t distancePointToSegment(const Vector2D& point, const Vector2D& lineStart, const Vector2D& lineEnd, Vector2D* closestPoint)
+real_t distancePointToSegment(const Vector2D& point, const Vector2D& segmentStart, const Vector2D& segmentEnd, Vector2D* closestPoint)
 {
-    const Vector2D r = lineEnd - lineStart;
-    const Vector2D s = point - lineStart;
+    const Vector2D r = segmentEnd - segmentStart;
+    const Vector2D s = point - segmentStart;
     const real_t rDotR = r.dot(r);
     if (rDotR == 0.0f)
     {
-        if (closestPoint) *closestPoint = lineStart;
-        return (point - lineStart).length();
+        if (closestPoint) *closestPoint = segmentStart;
+        return (point - segmentStart).length();
     }
     real_t t = std::clamp(s.dot(r) / rDotR, 0.0f, 1.0f);
-    const Vector2D projection = lineStart + r * t;
+    const Vector2D projection = segmentStart + r * t;
     if (closestPoint)
         *closestPoint = projection;
     return (point - projection).length();
 }
 
-real_t distancePointToSegment(const Vector2D& point, const Line2D& line, Vector2D* closestPoint)
+real_t distance(const Vector2D& point, const Segment2D& segment, Vector2D* closestPoint)
 {
-    return distancePointToSegment(point, line.m_start, line.m_end, closestPoint);
+    return distancePointToSegment(point, segment.m_start, segment.m_end, closestPoint);
 }
 
 real_t distanceSegmentToSegment(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2, Vector2D* closestPoint1, Vector2D* closestPoint2)
@@ -462,14 +462,14 @@ real_t distanceSegmentToSegment(const Vector2D& s1, const Vector2D& s2, const Ve
     return (closestPointOnLine1 - closestPointOnLine2).length();
 }
 
-real_t distanceSegmentToSegment(const Line2D& line1, const Line2D& line2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t distance(const Line2D& segment1, const Line2D& segment2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
-    return distanceSegmentToSegment(line1.m_start, line1.m_end, line2.m_start, line2.m_end, closestPoint1, closestPoint2);
+    return distanceSegmentToSegment(segment1.m_start, segment1.m_end, segment2.m_start, segment2.m_end, closestPoint1, closestPoint2);
 }
 
 //Todo: Distance to shapes
 
-real_t distancePointToBBox(const Vector2D& point, const BBox2D& bbox, Vector2D* closestPoint)
+real_t distance(const Vector2D& point, const BBox2D& bbox, Vector2D* closestPoint)
 {
     Vector2D c = bbox.closestPoint(point);
     if (closestPoint) *closestPoint = c;
@@ -479,7 +479,7 @@ real_t distancePointToBBox(const Vector2D& point, const BBox2D& bbox, Vector2D* 
 //Todo: Consider renaming slightly
 
 //Helper
-real_t distancePointToConvexVertices(const Vector2D& point, const std::span<const Vector2D> polygon, Vector2D* closestPoint)
+real_t distancePointToPolygonVertices(const Vector2D& point, const std::span<const Vector2D> polygon, Vector2D* closestPoint)
 {
     real_t minDist = std::numeric_limits<real_t>::max();
     Vector2D best;
@@ -503,6 +503,7 @@ real_t distancePointToConvexVertices(const Vector2D& point, const std::span<cons
     return std::sqrt(minDist);
 }
 
+/*
 real_t distanceToConvexPolygon(const Vector2D& point, const std::span<const Vector2D> polygon, Vector2D* closestPoint)
 {
     if (isPointInsideConvexPolygon(point, polygon))
@@ -510,54 +511,34 @@ real_t distanceToConvexPolygon(const Vector2D& point, const std::span<const Vect
         if (closestPoint) *closestPoint = point;
         return real_t{0};
     }
-    return distancePointToConvexVertices(point, polygon, closestPoint);
-} 
+    return distancePointToPolygonVertices(point, polygon, closestPoint);
+}*/ 
 
-real_t distancePointToTriangle(const Vector2D& point, const Triangle2D& triangle, Vector2D* closestPoint)
+real_t distance(const Vector2D& point, const IPolygonalShape2D& polygon, Vector2D* closestPoint)
 {
-    if (triangle.contains(point))
+    if (isConvexPolygonal(polygon.type()))
     {
-        if (closestPoint) *closestPoint = point;
-        return real_t{0};
+        if (isPointInsideConvexPolygon(point, polygon.vertices()))
+        {
+            if (closestPoint)
+                *closestPoint = point;
+            return real_t{0};
+        }
+        return distancePointToPolygonVertices(point, polygon.vertices(), closestPoint);
     }
-
-    return distancePointToConvexVertices(point, triangle.vertices(), closestPoint);
+    else
+    {
+        if (isPointInsidePolygon(point, polygon.vertices()))
+        {
+            if (closestPoint)
+                *closestPoint = point;
+            return real_t{0};
+        }
+        return distancePointToPolygonVertices(point, polygon.vertices(), closestPoint);
+    }
 }
 
-real_t distancePointToRectangle(const Vector2D& point, const Rectangle2D& rectangle, Vector2D* closestPoint)
-{
-    if (rectangle.contains(point))
-    {
-        if (closestPoint) *closestPoint = point;
-        return real_t{0};
-    }
-
-    return distancePointToConvexVertices(point, rectangle.vertices(), closestPoint);
-}
-
-real_t distancePointToPolygon(const Vector2D& point, const ConvexPolygon2D& polygon, Vector2D* closestPoint)
-{
-    if (polygon.contains(point))
-    {
-        if (closestPoint) *closestPoint = point;
-        return real_t{0};
-    }
-
-    return distancePointToConvexVertices(point, polygon.vertices(), closestPoint);
-}
-
-real_t distancePointToPolygon(const Vector2D& point, const Polygon2D& polygon, Vector2D* closestPoint)
-{
-    if (polygon.contains(point))
-    {
-        if (closestPoint) *closestPoint = point;
-        return real_t{0};
-    }
-
-    return distancePointToConvexVertices(point, polygon.vertices(), closestPoint);
-}
-
-real_t distancePointToCircle(const Vector2D& point, const Circle2D& circle, Vector2D* closestPoint)
+real_t distance(const Vector2D& point, const Circle2D& circle, Vector2D* closestPoint)
 {
     Vector2D delta = point - circle.m_center;
     real_t dist = delta.length();
@@ -620,26 +601,6 @@ real_t distanceSegmentToBBox(const Segment2D& segment, const BBox2D& bbox, Vecto
     return distanceSegmentToEdgeList(segment, bbox.corners(), true, closestPoint1, closestPoint2);
 }
 
-real_t distanceSegmentToTriangle(const Segment2D& segment, const Triangle2D& triangle, Vector2D* closestPoint1, Vector2D* closestPoint2)
-{
-    return distanceSegmentToEdgeList(segment, triangle.vertices(), true, closestPoint1, closestPoint2);
-}
-
-real_t distanceSegmentToRectangle2D(const Segment2D& segment, const Rectangle2D& rectangle, Vector2D* closestPoint1, Vector2D* closestPoint2)
-{
-    return distanceSegmentToEdgeList(segment, rectangle.vertices(), true, closestPoint1, closestPoint2);
-}
-
-real_t distanceSegmentToPolygon(const Segment2D& segment, const ConvexPolygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2)
-{
-    return distanceSegmentToEdgeList(segment, polygon.vertices(), true, closestPoint1, closestPoint2);
-}
-
-real_t distanceSegmentToPolygon(const Segment2D& segment, const Polygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2)
-{
-    return distanceSegmentToEdgeList(segment, polygon.vertices(), true, closestPoint1, closestPoint2);
-}
-
 real_t distance(const Segment2D& segment, const IPolygonalShape2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     return distanceSegmentToEdgeList(segment, polygon.vertices(), true, closestPoint1, closestPoint2);
@@ -674,7 +635,7 @@ real_t distanceSegmentToCircle(const Segment2D& segment, const Circle2D& circle,
 }
 
 
-real_t distanceBBoxToBBox(const BBox2D& a, const BBox2D& b, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t distance(const BBox2D& a, const BBox2D& b, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     real_t dx = 0;
     real_t dy = 0;
@@ -727,43 +688,6 @@ real_t distanceBBoxToBBox(const BBox2D& a, const BBox2D& b, Vector2D* closestPoi
 
     return std::sqrt(dx * dx + dy * dy);
 }
-
-//Todo: Implement
-real_t distanceBBoxToTriangle(const BBox2D& bbox1, const Triangle2D& triangle, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceBBoxToRectangle(const BBox2D& bbox1, const Rectangle2D& rectangle, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceBBoxToPolygon(const BBox2D& bbox1, const ConvexPolygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceBBoxToPolygon(const BBox2D& bbox1, const Polygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceBBoxToCircle(const BBox2D& bbox1, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-
-real_t distanceTriangleToTriangle(const Triangle2D& triangle1, const Triangle2D& triangle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceTriangleToRectangle(const Triangle2D& triangle, const Rectangle2D& rectangle, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceTriangleToPolygon(const Triangle2D& triangle, const ConvexPolygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceTriangleToPolygon(const Triangle2D& triangle, const Polygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceTriangleToCircle(const Triangle2D& triangle, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-
-real_t distanceRectangleToRectangle(const Rectangle2D& rectangle1, const Rectangle2D& rectangle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceRectangleToPolygon(const Rectangle2D& rectangle, const ConvexPolygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceRectangleToPolygon(const Rectangle2D& rectangle, const Polygon2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distanceRectangleToCircle(const Rectangle2D& rectangle, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-
-real_t distancePolygonToPolygon(const Polygon2D& polygon1, const Polygon2D& polygon2, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distancePolygonToPolygon(const Polygon2D& polygon, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
 
 //real_t distanceCircleToCircle(const Circle2D& circle1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
 
@@ -968,7 +892,7 @@ real_t distance(const IPolygonalShape2D& poly1, const Circle2D& circle2, Vector2
     return minDist;
 }
 
-real_t distanceCircleToCircle(const Circle2D& circle1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t distance(const Circle2D& circle1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     Vector2D delta = circle2.m_center - circle1.m_center;
     real_t dist = delta.length();
@@ -995,7 +919,45 @@ real_t distanceCircleToCircle(const Circle2D& circle1, const Circle2D& circle2, 
 
 //    --- Rays ---
 
-bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+// Internal Helper
+bool intersectParams(const Vector2D& p, const Vector2D& r, const Vector2D& q, const Vector2D& s, 
+    real_t& t, real_t& u)
+{
+    const real_t rxs = r.cross(s);
+    const Vector2D qp = q - p;
+
+    if (approximatelyZero(rxs))
+        return false; // parallel
+
+    t = qp.cross(s) / rxs;
+    u = qp.cross(r) / rxs;
+    return true;
+}
+
+bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2D& p2, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+{
+    real_t t, u;
+    if (!intersectParams(ray.m_origin, ray.m_direction, p1, p2 - p1, t, u))
+        return false;
+
+    if (t < t_min || t > t_max || u < 0.f || u > 1.f)
+        return false;
+
+    if (hitInfo)
+    {
+        hitInfo->t = t;
+        hitInfo->intersectionPoint = ray.m_origin + ray.m_direction * t;
+    }
+
+    return true;
+}
+
+bool intersect(const Ray2D& ray, const Segment2D& segment, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+{
+    return intersectRayWithSegment(ray, segment.m_start, segment.m_end, t_min, t_max, hitInfo);
+}
+
+bool intersect(const Ray2D& ray, const BBox2D& bbox, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     for (int i = 0; i < 2; i++)
     {
@@ -1029,37 +991,7 @@ bool intersectRayWithBBox(const Ray2D& ray, const BBox2D& bbox, real_t t_min, re
     return true;
 }
 
-bool intersectRayWithCircle(const Ray2D& ray, const Circle2D& circle, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
-{
-    const Vector2D oc = ray.m_origin - circle.m_center;
-    const real_t a = ray.m_direction.dot(ray.m_direction);
-    const real_t b = 2.0f * oc.dot(ray.m_direction);
-    const real_t c = oc.dot(oc) - circle.m_radius * circle.m_radius;
-    const real_t discriminant = b * b - 4 * a * c;
-
-    if (discriminant < 0)
-        return false;
-
-    const real_t sqrtDiscriminant = sqrt(discriminant);
-    real_t t = (-b - sqrtDiscriminant) / (2.0f * a);
-    if (t < t_min || t > t_max)
-    {
-        t = (-b + sqrtDiscriminant) / (2.0f * a);
-        if (t < t_min || t > t_max)
-            return false;
-    }
-
-    if (hitInfo)
-    {
-        hitInfo->t = t;
-        hitInfo->intersectionPoint = ray.pointAt(t);
-        //Vector2D normal = (hitInfo->intersectionPoint - circle.m_center).normalize();
-    }
-
-    return true;
-}
-
-bool intersectRayWithTriangle(const Ray2D& ray, const Triangle2D& triangle, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+bool intersect(const Ray2D& ray, const Triangle2D& triangle, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     const Vector2D edge1 = triangle.b() - triangle.a();
     const Vector2D edge2 = triangle.c() - triangle.a();
@@ -1099,79 +1031,12 @@ bool intersectRayWithTriangle(const Ray2D& ray, const Triangle2D& triangle, real
     return true;
 }
 
-bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2D& p2, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
-{
-    Vector2D v1 = ray.m_origin - p1;
-    Vector2D v2 = p2 - p1;
-    Vector2D v3(-ray.m_direction.y, ray.m_direction.x);
-
-    real_t dot = v2.dot(v3);
-    
-    if (approximatelyZero(dot))
-        return false; // Parallel
-
-    real_t t1 = v2.cross(v1) / dot;
-    real_t t2 = v1.dot(v3) / dot;
-
-    if (t1 < 0 || t2 < 0 || t2 > 1)
-        return false;
-
-    if (t1 >= t_min && t1 <= t_max)
-    {
-        if (hitInfo)
-        {
-            hitInfo->t = t1;
-            hitInfo->intersectionPoint = ray.m_origin + ray.m_direction * t1;
-        }
-        return true;
-    }
-
-    return false;
-}
-
-bool intersectRayWithRectangleOptimized(const Ray2D& ray, const Rectangle2D& rectangle, real_t t_min, real_t t_max)
-{
-    for (int i = 0; i < 4; i++)
-    {
-        const Vector2D& p1 = rectangle.vertexAt(i);
-        const Vector2D& p2 = rectangle.vertexAt((i + 1) % 4);
-
-        if (intersectRayWithSegment(ray, p1, p2, t_min, t_max, NULL))
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool intersectRayWithRectangle(const Ray2D& ray, const Rectangle2D& rectangle, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
-{
-    if (hitInfo == nullptr)
-        return intersectRayWithRectangleOptimized(ray, rectangle, t_min, t_max);
-
-    bool hit = false;
-    real_t t = t_max;
-
-    for (int i = 0; i < 4; i++)
-    {
-        const Vector2D& p1 = rectangle.vertexAt(i);
-        const Vector2D& p2 = rectangle.vertexAt((i + 1) % 4);
-
-        if (intersectRayWithSegment(ray, p1, p2, t_min, t, hitInfo))
-        {
-            hit = true;
-            t = hitInfo->t;
-        }
-    }
-    return hit;
-}
-
-bool intersectRayWithPolygonOptimized(const Ray2D& ray, const Polygon2D& polygon, real_t t_min, real_t t_max)
+bool intersectRayWithPolygonOptimized(const Ray2D& ray, const IPolygonalShape2D& polygon, real_t t_min, real_t t_max)
 {
     for (int i = 0; i < polygon.vertexCount(); i++)
     {
-        const Vector2D& p1 = polygon.vertexAt(i);
-        const Vector2D& p2 = polygon.vertexAt((i + 1) % polygon.vertexCount());
+        const Vector2D& p1 = polygon[i];
+        const Vector2D& p2 = polygon[(i + 1) % polygon.vertexCount()];
 
         if (intersectRayWithSegment(ray, p1, p2, t_min, t_max, NULL))
         {
@@ -1181,7 +1046,7 @@ bool intersectRayWithPolygonOptimized(const Ray2D& ray, const Polygon2D& polygon
     return false;
 }
 
-bool intersectRayWithPolygon(const Ray2D& ray, const Polygon2D& polygon, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+bool intersect(const Ray2D& ray, const IPolygonalShape2D& polygon, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     if (hitInfo == nullptr)
         return intersectRayWithPolygonOptimized(ray, polygon, t_min, t_max);
@@ -1191,8 +1056,8 @@ bool intersectRayWithPolygon(const Ray2D& ray, const Polygon2D& polygon, real_t 
 
     for (int i = 0; i < polygon.vertexCount(); i++)
     {
-        const Vector2D& p1 = polygon.vertexAt(i);
-        const Vector2D& p2 = polygon.vertexAt((i + 1) % polygon.vertexCount());
+        const Vector2D& p1 = polygon[i];
+        const Vector2D& p2 = polygon[(i + 1) % polygon.vertexCount()];
 
         if (intersectRayWithSegment(ray, p1, p2, t_min, t_max, hitInfo))
         {
@@ -1203,20 +1068,50 @@ bool intersectRayWithPolygon(const Ray2D& ray, const Polygon2D& polygon, real_t 
     return hit;
 }
 
-bool intersectRayWithShape(const Ray2D& ray, const IBaseShape2D& shape, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+bool intersect(const Ray2D& ray, const Circle2D& circle, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+{
+    const Vector2D oc = ray.m_origin - circle.m_center;
+    const real_t a = ray.m_direction.dot(ray.m_direction);
+    const real_t b = 2.0f * oc.dot(ray.m_direction);
+    const real_t c = oc.dot(oc) - circle.m_radius * circle.m_radius;
+    const real_t discriminant = b * b - 4 * a * c;
+
+    if (discriminant < 0)
+        return false;
+
+    const real_t sqrtDiscriminant = sqrt(discriminant);
+    real_t t = (-b - sqrtDiscriminant) / (2.0f * a);
+    if (t < t_min || t > t_max)
+    {
+        t = (-b + sqrtDiscriminant) / (2.0f * a);
+        if (t < t_min || t > t_max)
+            return false;
+    }
+
+    if (hitInfo)
+    {
+        hitInfo->t = t;
+        hitInfo->intersectionPoint = ray.pointAt(t);
+        //Vector2D normal = (hitInfo->intersectionPoint - circle.m_center).normalize();
+    }
+
+    return true;
+}
+
+bool intersect(const Ray2D& ray, const IBaseShape2D& shape, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     switch(shape.type())
     {
-        case ShapeType2D::SHAPE2D_CIRCLE:
-            return intersectRayWithCircle(ray, dynamic_cast<const Circle2D&>(shape), t_min, t_max, hitInfo);
-        case ShapeType2D::SHAPE2D_RECTANGLE:
-            return intersectRayWithRectangle(ray, dynamic_cast<const Rectangle2D&>(shape), t_min, t_max, hitInfo);
         case ShapeType2D::SHAPE2D_TRIANGLE:
-            return intersectRayWithTriangle(ray, dynamic_cast<const Triangle2D&>(shape), t_min, t_max, hitInfo);
+            return intersect(ray, dynamic_cast<const Triangle2D&>(shape), t_min, t_max, hitInfo);
+        case ShapeType2D::SHAPE2D_RECTANGLE:
         case ShapeType2D::SHAPE2D_POLYGON:
-            return intersectRayWithPolygon(ray, dynamic_cast<const Polygon2D&>(shape), t_min, t_max, hitInfo);
+            return intersect(ray, dynamic_cast<const Polygon2D&>(shape), t_min, t_max, hitInfo);
+         case ShapeType2D::SHAPE2D_CIRCLE:
+            return intersect(ray, dynamic_cast<const Circle2D&>(shape), t_min, t_max, hitInfo);
         default:
             //Todo: we might just want to throw and error here
+            assert("Unreachable Code reached!");
             return false;
     }
 }
@@ -1226,24 +1121,16 @@ bool intersectSegmentWithSegment(const Vector2D& p1, const Vector2D& p2, const V
     return intersectRayWithSegment(Ray2D(p1, p2 - p1), q1, q2, 0.f, 1.f, hitInfo);
 }
 
-bool intersectSegmentWithSegment(const Line2D& line1, const Line2D& line2, HitInfo2D* hitInfo)
+bool intersect(const Segment2D& segment1, const Segment2D& segment2, HitInfo2D* hitInfo)
 {
-    return intersectRayWithSegment(Ray2D(line1.m_start, line1.deltaVector()), line2.m_start, line2.m_end, 0.f, 1.f, hitInfo);
+    return intersectRayWithSegment(Ray2D(segment1.m_start, segment1.deltaVector()), segment2.m_start, segment2.m_end, 0.f, 1.f, hitInfo);
 }
 
 bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo)
 {
-    Vector2D r = p2 - p1;
-    Vector2D s = q2 - q1;
-    Vector2D qp = q1 - p1;
-
-    real_t rxs = r.cross(s);
-
-    if (approximatelyZero(rxs))
-        return false; // Parallel/collinear
-
-    real_t t = qp.cross(s) / rxs;
-    real_t u = qp.cross(r) / rxs;
+    real_t t, u;
+    if (!intersectParams(p1, p2 - p1, q1, q2 - q1, t, u))
+        return false;
 
     if (!approximatelyGreater(t, 0.f) || !approximatelyLess(t, 1.f) ||
         !approximatelyGreater(u, 0.f) || !approximatelyLess(u, 1.f))
@@ -1252,40 +1139,35 @@ bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, c
     if (hitInfo)
     {
         hitInfo->t = t;
-        hitInfo->intersectionPoint = p1 + r * t;
+        hitInfo->intersectionPoint = p1 + (p2 - p1) * t;
     }
 
     return true;
 }
 
-bool intersectSegmentWithSegmentStrict(const Line2D& line1, const Line2D& line2, HitInfo2D* hitInfo)
+bool intersect(const Line2D& line, const BBox2D& bbox, HitInfo2D* hitInfo)
 {
-    return intersectSegmentWithSegmentStrict(line1.m_start, line1.m_end, line2.m_start, line2.m_end, hitInfo);
+    return intersect(Ray2D(line.m_start, line.deltaVector()), bbox, 0.f, 1.f, hitInfo);
 }
 
-bool intersectSegmentWithBBox(const Line2D& line, const BBox2D& bbox, HitInfo2D* hitInfo)
+bool intersect(const Line2D& line, const Triangle2D& triangle, HitInfo2D* hitInfo)
 {
-    return intersectRayWithBBox(Ray2D(line.m_start, line.deltaVector()), bbox, 0.f, 1.f, hitInfo);
+    return intersect(Ray2D(line.m_start, line.deltaVector()), triangle, 0.f, 1.f, hitInfo);
 }
 
-bool intersectSegmentWithCircle(const Line2D& line, const Circle2D& circle, HitInfo2D* hitInfo)
+bool intersect(const Line2D& line, const IPolygonalShape2D& polygon, HitInfo2D* hitInfo)
 {
-    return intersectRayWithCircle(Ray2D(line.m_start, line.deltaVector()), circle, 0.f, 1.f, hitInfo);
+    return(intersect(Ray2D(line.m_start, line.direction()), polygon, 0.0f, line.length(), hitInfo));
 }
 
-bool intersectSegmentWithTriangle(const Line2D& line, const Triangle2D& triangle, HitInfo2D* hitInfo)
+bool intersect(const Line2D& line, const Circle2D& circle, HitInfo2D* hitInfo)
 {
-    return intersectRayWithTriangle(Ray2D(line.m_start, line.deltaVector()), triangle, 0.f, 1.f, hitInfo);
+    return intersect(Ray2D(line.m_start, line.deltaVector()), circle, 0.f, 1.f, hitInfo);
 }
 
-bool intersectSegmentWithRectangle(const Line2D& line, const Rectangle2D& rectangle, HitInfo2D* hitInfo)
+bool intersect(const Segment2D& segment, const IBaseShape2D& shape, HitInfo2D* hitInfo)
 {
-    return intersectRayWithRectangle(Ray2D(line.m_start, line.deltaVector()), rectangle, 0.f, 1.f, hitInfo);
-}
-
-bool intersectSegmentWithPolygon(const Line2D& line, const Polygon2D& polygon, HitInfo2D* hitInfo)
-{
-    return(intersectRayWithPolygon(Ray2D(line.m_start, line.direction()), polygon, 0.0f, line.length(), hitInfo));
+    return intersect(Ray2D(segment.m_start, segment.direction()), shape, 0.0f, segment.length(), hitInfo);
 }
 
 // --- Misc Helper ---
@@ -1321,7 +1203,7 @@ inline void projectBBoxOntoAxis(const BBox2D& bbox, const Vector2D& axis,
 
 // --- Bounding Box ---
 
-bool intersectBBoxWithBBox(const BBox2D& b1, const BBox2D& b2)
+bool intersect(const BBox2D& b1, const BBox2D& b2)
 {
     //Separating Axis Theorem (SAT)
 #if 0
@@ -1381,27 +1263,12 @@ inline bool intersectBBoxWithConvexShape(const BBox2D& bbox, std::span<const Vec
     return true; // No separating axis found
 }
 
-bool intersectBBoxWithTriangle(const BBox2D& bbox, const Triangle2D& triangle)
-{
-    return intersectBBoxWithConvexShape(bbox, triangle.vertices());
-}
-
-bool intersectBBoxWithRectangle(const BBox2D& bbox, const Rectangle2D& rectangle)
-{
-    return intersectBBoxWithConvexShape(bbox, rectangle.vertices());
-}
-
-bool intersectBBoxWithConvexPolygon(const BBox2D& bbox, const ConvexPolygon2D& poly)
-{
-    return intersectBBoxWithConvexShape(bbox, poly.vertices());
-}
-
 bool intersectBBoxWithPolygon(const BBox2D& bbox, const Polygon2D& polygon)
 {
     if (polygon.isConvex())
     {
         const ConvexPolygon2D* convex = static_cast<const ConvexPolygon2D*>(&polygon);
-        return intersectBBoxWithConvexPolygon(bbox, *convex);
+        return intersectBBoxWithConvexShape(bbox, polygon.vertices());
     }
     
     Vector2D box[4] =
@@ -1443,79 +1310,11 @@ bool intersectBBoxWithPolygon(const BBox2D& bbox, const Polygon2D& polygon)
     return false;
 }
 
-bool intersectBBoxWithCircle(const BBox2D& bbox, const Circle2D& circle)
+bool intersect(const BBox2D& bbox, const Circle2D& circle)
 {
     real_t distSq = bbox.minDistanceSquared(circle.m_center);
     real_t rSq = circle.m_radius * circle.m_radius;
     return distSq <= rSq;
-}
-
-// --- Triangles ---
-
-bool intersectTriangleWithTriangle(const Triangle2D& triangle1, const Triangle2D& triangle2)
-{
-    return intersectConvexPolygonWithConvexPolygon(triangle1.vertices(), triangle2.vertices());
-}
-
-bool intersectTriangleWithRectangle(const Triangle2D& triangle, const Rectangle2D& rectangle)
-{
-    return intersectConvexPolygonWithConvexPolygon(triangle.vertices(), rectangle.vertices());
-}
-
-bool intersectTriangleWithPolygon(const Triangle2D& triangle, const ConvexPolygon2D& polygon)
-{
-    return intersectConvexPolygonWithConvexPolygon(triangle.vertices(), polygon.vertices());
-}
-
-bool intersectTriangleWithCircle(const Triangle2D& triangle, const Circle2D& circle)
-{
-    if (triangle.contains(circle.centroid()))
-        return true;
-    
-    //Todo: Optimize with r^2
-    //real_t r2 = circle.m_radius * circle.m_radius;
-    real_t r = circle.m_radius;
-
-    if (distancePointToSegment(circle.m_center, triangle.a(), triangle.b()) <= r)
-        return true;
-    if (distancePointToSegment(circle.m_center, triangle.b(), triangle.c()) <= r)
-        return true;
-    if (distancePointToSegment(circle.m_center, triangle.c(), triangle.a()) <= r)
-        return true;
-    return false;
-}
-
-// --- Rectangles ---
-
-bool intersectRectangleWithRectangle(const Rectangle2D& rectangle1, const Rectangle2D& rectangle2)
-{
-    //Todo: Can be optimized
-    return intersectConvexPolygonWithConvexPolygon(rectangle1.vertices(), rectangle2.vertices());
-}
-
-bool intersectRectangleWithPolygon(const Rectangle2D& rectangle, const ConvexPolygon2D& polygon)
-{
-    return intersectConvexPolygonWithConvexPolygon(rectangle.vertices(), polygon.vertices());
-}
-
-bool intersectRectangleWithCircle(const Rectangle2D& rectangle, const Circle2D& circle)
-{
-    if (rectangle.contains(circle.centroid()))
-        return true;
-
-    //Todo: Optimize with r^2
-    //real_t r2 = circle.m_radius * circle.m_radius;
-    real_t r = circle.m_radius;
-
-    for (int i = 0; i < 4; ++i)
-    {
-        const Vector2D& a = rectangle[i];
-        const Vector2D& b = rectangle[(i + 1) % 4];
-
-        if (distancePointToSegment(circle.m_center, a, b) <= r)
-            return true;
-    }
-    return false;
 }
 
 // --- Polygons --- 
@@ -1613,11 +1412,6 @@ bool intersectPolygonWithPolygon(const std::span<const Vector2D> v1, const std::
    return false;
 }
 
-bool intersectPolygonWithPolygon(const ConvexPolygon2D& polygon1, const ConvexPolygon2D& polygon2)
-{
-    return intersectConvexPolygonWithConvexPolygon(polygon1.m_vertices, polygon2.m_vertices);
-}
-
 bool intersectPolygonWithCircle(const std::span<const Vector2D> poly, const Circle2D& circle)
 {
     if (isPointInsidePolygon(circle.m_center, poly))
@@ -1651,6 +1445,37 @@ bool intersectPolygonWithCircle(const ConvexPolygon2D& polygon, const Circle2D& 
     {
         const Vector2D& a = polygon.wrappedVertexAt(i);
         const Vector2D& b = polygon.wrappedVertexAt(i+1);
+
+        if (distancePointToSegment(circle.m_center, a, b) <= r)
+            return true;
+    }
+    return false;
+}
+
+// --- Polygonal ---
+
+bool intersect(const IPolygonalShape2D& polygon1, const IPolygonalShape2D& polygon2)
+{
+    if (isPolygonalShape(polygon1.type()) && isPolygonalShape(polygon2.type()))
+        return intersectConvexPolygonWithConvexPolygon(polygon1.vertices(), polygon2.vertices());
+
+    return intersectPolygonWithPolygon(polygon1.vertices(), polygon2.vertices());
+}
+
+bool intersect(const IPolygonalShape2D& polygon, const Circle2D& circle)
+{
+    if (polygon.contains(circle.centroid()))
+        return true;
+
+    //Todo: Optimize with r^2
+    //real_t r2 = circle.m_radius * circle.m_radius;
+    size_t n = polygon.vertexCount();
+    real_t r = circle.m_radius;
+
+    for (int i = 0; i < polygon.vertexCount(); ++i)
+    {
+        const Vector2D& a = polygon[i];
+        const Vector2D& b = polygon[(i + 1) % n];
 
         if (distancePointToSegment(circle.m_center, a, b) <= r)
             return true;
