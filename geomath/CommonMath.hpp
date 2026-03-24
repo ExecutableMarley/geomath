@@ -25,6 +25,8 @@ constexpr double DoubleAbsEpsilon = 1e-12;
 
 using real_t = float;
 
+constexpr real_t T_MAX = std::numeric_limits<real_t>::max();
+
 inline bool approximatelyZero(float value, float absEpsilon = FloatAbsEpsilon)
 {
     return fabs(value) < absEpsilon;

@@ -957,8 +957,9 @@ bool intersect(const Ray2D& ray, const Segment2D& segment, real_t t_min, real_t 
     return intersectRayWithSegment(ray, segment.m_start, segment.m_end, t_min, t_max, hitInfo);
 }
 
-bool intersect(const Ray2D& ray, const BBox2D& bbox, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+bool intersect(const Ray2D& ray, const BBox2D& bbox, real_t t_init_min, real_t t_init_max, HitInfo2D* hitInfo)
 {
+    real_t t_min = t_init_min; real_t t_max = t_init_max;
     for (int i = 0; i < 2; i++)
     {
         if (approximatelyZero(ray.m_direction[i]))
@@ -984,8 +985,9 @@ bool intersect(const Ray2D& ray, const BBox2D& bbox, real_t t_min, real_t t_max,
 
     if (hitInfo)
     {
-        hitInfo->t = t_min;
-        hitInfo->intersectionPoint = ray.m_origin + ray.m_direction * t_min;
+        real_t hit_t = (t_min > t_init_min) ? t_min : t_max;
+        hitInfo->t = hit_t;
+        hitInfo->intersectionPoint = ray.m_origin + ray.m_direction * hit_t;
     }
 
     return true;
@@ -1063,7 +1065,6 @@ bool intersect(const Ray2D& ray, const IBaseShape2D& shape, real_t t_min, real_t
     switch(shape.type())
     {
         case ShapeType2D::SHAPE2D_TRIANGLE:
-            return intersect(ray, dynamic_cast<const Triangle2D&>(shape), t_min, t_max, hitInfo);
         case ShapeType2D::SHAPE2D_RECTANGLE:
         case ShapeType2D::SHAPE2D_POLYGON:
             return intersect(ray, dynamic_cast<const IPolygonalShape2D&>(shape), t_min, t_max, hitInfo);
