@@ -1,7 +1,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "third_party/doctest.h"
 
-#include "../Math.hpp"
+#include "Math.hpp"
 
 using namespace Arns::Math;
 

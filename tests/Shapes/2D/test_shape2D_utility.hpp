@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../third_party/doctest.h"
-
-#include "../../Shapes/2D/IShape2D.hpp"
+#include "../../third_party/doctest.h"
+#include "CommonMath.hpp"
+#include "Shapes/2D/IShape2D.hpp"
 
 using namespace Arns::Math;
 
@@ -28,7 +28,7 @@ void check_is_polygonal(const IFiniteShape2D& shape, size_t expectedVertexCount)
     }
 }
 
-void check_is_not_polygonal(const IFiniteShape2D& shape)
+inline void check_is_not_polygonal(const IFiniteShape2D& shape)
 {
     SUBCASE("Not detected as polygonal")
     {

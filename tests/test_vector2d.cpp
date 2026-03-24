@@ -1,6 +1,6 @@
 #include "third_party/doctest.h"
 
-#include "../Geometry/Vector2D.hpp"
+#include "Geometry/Vector2D.hpp"
 
 using namespace Arns::Math;
 

@@ -1,8 +1,5 @@
-#include "../third_party/doctest.h"
-
-#include "../../CommonMath.hpp"
-#include "../../Shapes/2D/Rectangle2D.hpp"
 #include "test_shape2D_utility.hpp"
+#include "Shapes/2D/Rectangle2D.hpp"
 
 TEST_CASE("Rectangle2D polygonal interface")
 {

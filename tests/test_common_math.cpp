@@ -1,6 +1,6 @@
 #include "third_party/doctest.h"
 
-#include "../CommonMath.hpp"
+#include "CommonMath.hpp"
 
 using namespace Arns::Math;
 
