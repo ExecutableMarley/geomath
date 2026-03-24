@@ -1066,7 +1066,7 @@ bool intersect(const Ray2D& ray, const IBaseShape2D& shape, real_t t_min, real_t
             return intersect(ray, dynamic_cast<const Triangle2D&>(shape), t_min, t_max, hitInfo);
         case ShapeType2D::SHAPE2D_RECTANGLE:
         case ShapeType2D::SHAPE2D_POLYGON:
-            return intersect(ray, dynamic_cast<const Polygon2D&>(shape), t_min, t_max, hitInfo);
+            return intersect(ray, dynamic_cast<const IPolygonalShape2D&>(shape), t_min, t_max, hitInfo);
          case ShapeType2D::SHAPE2D_CIRCLE:
             return intersect(ray, dynamic_cast<const Circle2D&>(shape), t_min, t_max, hitInfo);
         default:
