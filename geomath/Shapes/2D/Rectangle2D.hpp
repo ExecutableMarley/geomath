@@ -6,6 +6,7 @@
 #pragma once
 
 #include <math.h>
+#include <array>
 #include <vector>
 #include <memory>
 #include <stdexcept>
@@ -26,7 +27,7 @@ class Rectangle2D : public IPolygonalShape2D
 public:
     std::array<Vector2D, 4> m_vertices;
 
-    Rectangle2D() : m_vertices{ Vector2D{}, Vector2D{}, Vector2D{} } {}
+    Rectangle2D() : m_vertices{ Vector2D{}, Vector2D{}, Vector2D{}, Vector2D{} } {}
 
     Rectangle2D(const Vector2D &a, const Vector2D &b, const Vector2D &c, const Vector2D &d) : m_vertices{ a, b, c, d } {}
 
@@ -45,7 +46,7 @@ public:
     const Vector2D& c() const { return m_vertices[2]; }
     const Vector2D& d() const { return m_vertices[3]; }
 
-    size_t vertexCount() const
+    size_t vertexCount() const override
     {
         return 4;
     }
@@ -164,9 +165,15 @@ public:
         return vertexAt(index);
     }
 
-    const Vector2D& operator[](size_t index) const
+    const Vector2D& operator[](size_t index) const override
     {
         return vertexAt(index);
+    }
+
+    static Rectangle2D fromMinMax(const Vector2D &min, const Vector2D &max)
+    {
+        return Rectangle2D(min, {max.x, min.y},
+            max, {min.x, max.y});
     }
 };
 
