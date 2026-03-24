@@ -991,46 +991,6 @@ bool intersect(const Ray2D& ray, const BBox2D& bbox, real_t t_min, real_t t_max,
     return true;
 }
 
-bool intersect(const Ray2D& ray, const Triangle2D& triangle, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
-{
-    const Vector2D edge1 = triangle.b() - triangle.a();
-    const Vector2D edge2 = triangle.c() - triangle.a();
-
-    // Calculate determinant
-    const Vector2D h = { -ray.m_direction.y, ray.m_direction.x };
-    const real_t det = edge1.dot(h);
-
-    if (approximatelyZero(det))
-        return false;
-
-    const real_t invDet = 1.0f / det;
-
-    const Vector2D s = ray.m_origin - triangle.a();
-    const real_t u = s.dot(h) * invDet;
-
-    if (u < 0.0f || u > 1.0f)
-        return false;
-
-    const Vector2D q = { -s.y, s.x };
-    const real_t v = ray.m_direction.dot(q) * invDet;
-
-    if (v < 0.0f || u + v > 1.0f)
-        return false;
-
-    const real_t t = edge2.dot(q) * invDet;
-
-    if (t < t_min || t > t_max)
-        return false;
-
-    if (hitInfo) 
-    {
-        hitInfo->t = t;
-        hitInfo->intersectionPoint = ray.pointAt(t);
-    }
-
-    return true;
-}
-
 bool intersectRayWithPolygonOptimized(const Ray2D& ray, const IPolygonalShape2D& polygon, real_t t_min, real_t t_max)
 {
     for (int i = 0; i < polygon.vertexCount(); i++)
@@ -1059,7 +1019,7 @@ bool intersect(const Ray2D& ray, const IPolygonalShape2D& polygon, real_t t_min,
         const Vector2D& p1 = polygon[i];
         const Vector2D& p2 = polygon[(i + 1) % polygon.vertexCount()];
 
-        if (intersectRayWithSegment(ray, p1, p2, t_min, t_max, hitInfo))
+        if (intersectRayWithSegment(ray, p1, p2, t_min, t, hitInfo))
         {
             hit = true;
             t = hitInfo->t;

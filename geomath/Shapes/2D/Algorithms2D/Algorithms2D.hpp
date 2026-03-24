@@ -152,8 +152,6 @@ bool intersect(const Ray2D& ray, const Segment2D& segment, real_t t_min = 0, rea
 
 bool intersect(const Ray2D& ray, const BBox2D& bbox, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
 
-bool intersect(const Ray2D& ray, const Triangle2D& triangle, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
-
 bool intersect(const Ray2D& ray, const IPolygonalShape2D& polygon, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
 
 bool intersect(const Ray2D& ray, const Circle2D& circle, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
