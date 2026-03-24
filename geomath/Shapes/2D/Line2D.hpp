@@ -33,6 +33,11 @@ public:
         return (m_start - m_end).length();
     }
 
+    Vector2D origin() const
+    {
+        return m_start;
+    }
+
     Vector2D direction() const
     {
         return (m_end - m_start).normalize();
