@@ -122,11 +122,11 @@ real_t distance(const Vector2D& point, const Circle2D& circle, Vector2D* closest
 
 real_t distance(const Segment2D& segment1, const Segment2D& segment2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 
-real_t distance(const Segment2D& segment, const BBox2D& bbox, Vector2D* closestPoint = nullptr);
+real_t distance(const Segment2D& segment, const BBox2D& bbox, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 
-real_t distance(const Segment2D& segment, const IPolygonalShape2D& polygon, Vector2D* closestPoint = nullptr);
+real_t distance(const Segment2D& segment, const IPolygonalShape2D& polygon, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 
-real_t distance(const Segment2D& segment, const Circle2D& circle, Vector2D* closestPoint = nullptr);
+real_t distance(const Segment2D& segment, const Circle2D& circle, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 
 //
 

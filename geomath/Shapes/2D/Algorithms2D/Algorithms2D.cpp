@@ -500,19 +500,8 @@ real_t distancePointToPolygonVertices(const Vector2D& point, const std::span<con
     }
 
     if (closestPoint) *closestPoint = best;
-    return std::sqrt(minDist);
+    return minDist;
 }
-
-/*
-real_t distanceToConvexPolygon(const Vector2D& point, const std::span<const Vector2D> polygon, Vector2D* closestPoint)
-{
-    if (isPointInsideConvexPolygon(point, polygon))
-    {
-        if (closestPoint) *closestPoint = point;
-        return real_t{0};
-    }
-    return distancePointToPolygonVertices(point, polygon, closestPoint);
-}*/ 
 
 real_t distance(const Vector2D& point, const IPolygonalShape2D& polygon, Vector2D* closestPoint)
 {
@@ -596,7 +585,7 @@ real_t distanceSegmentToEdgeList(const Line2D& seg, std::span<const Vector2D> ve
     return minDist;
 }
 
-real_t distanceSegmentToBBox(const Segment2D& segment, const BBox2D& bbox, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t distance(const Segment2D& segment, const BBox2D& bbox, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     return distanceSegmentToEdgeList(segment, bbox.corners(), true, closestPoint1, closestPoint2);
 }
@@ -606,7 +595,7 @@ real_t distance(const Segment2D& segment, const IPolygonalShape2D& polygon, Vect
     return distanceSegmentToEdgeList(segment, polygon.vertices(), true, closestPoint1, closestPoint2);
 }
 
-real_t distanceSegmentToCircle(const Segment2D& segment, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t distance(const Segment2D& segment, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     Vector2D p;
     real_t dist = distancePointToSegment(circle.m_center, segment.m_start, segment.m_end, &p);
@@ -870,7 +859,7 @@ real_t distance(const IPolygonalShape2D& poly1, const Circle2D& circle2, Vector2
         Vector2D b = v[(i + 1) % n];
 
         Vector2D p1, p2;
-        real_t d = distanceSegmentToCircle(Segment2D(a, b), circle2, &p1, &p2);
+        real_t d = distance(Segment2D(a, b), circle2, &p1, &p2);
 
         if (d < minDist)
         {
