@@ -34,11 +34,6 @@ public:
     static constexpr ShapeType2D shapeType = SHAPE2D_CONVEX_POLYGON;
 
 private:
-    //Todo: Consider moving this to Vector2D file
-    static real_t cross(const Vector2D& a, const Vector2D& b, const Vector2D& c)
-    {
-        return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-    }
 
     static std::vector<Vector2D> convex_hull(std::vector<Vector2D> points)
     {
@@ -60,14 +55,14 @@ private:
 
 	    for (size_t i = 0; i < n; ++i)
         {
-	    	while (hullSize >= 2 && cross(hull[hullSize-2], hull[hullSize-1], points[i]) <= 0)
+	    	while (hullSize >= 2 && orient2D(hull[hullSize-2], hull[hullSize-1], points[i]) <= 0)
                 hullSize--;
 	    	hull[hullSize++] = points[i];
 	    }
 
 	    for (size_t i = n-1, t = hullSize+1; i > 0; --i)
         {
-	    	while (hullSize >= t && cross(hull[hullSize-2], hull[hullSize-1], points[i-1]) <= 0)
+	    	while (hullSize >= t && orient2D(hull[hullSize-2], hull[hullSize-1], points[i-1]) <= 0)
                 hullSize--;
 	    	hull[hullSize++] = points[i-1];
 	    }
