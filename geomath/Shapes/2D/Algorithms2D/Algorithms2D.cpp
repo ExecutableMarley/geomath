@@ -1224,9 +1224,9 @@ inline bool intersectBBoxWithConvexShape(const BBox2D& bbox, std::span<const Vec
     return true; // No separating axis found
 }
 
-bool intersectBBoxWithPolygon(const BBox2D& bbox, const Polygon2D& polygon)
+bool intersect(const BBox2D& bbox, const IPolygonalShape2D& polygon)
 {
-    if (polygon.isConvex())
+    if (isConvexPolygonal(polygon.type()))
     {
         const ConvexPolygon2D* convex = static_cast<const ConvexPolygon2D*>(&polygon);
         return intersectBBoxWithConvexShape(bbox, polygon.vertices());
@@ -1244,7 +1244,7 @@ bool intersectBBoxWithPolygon(const BBox2D& bbox, const Polygon2D& polygon)
         if (polygon.contains(p))
             return true;
 
-    for (const Vector2D& p : polygon.m_vertices)
+    for (const Vector2D& p : polygon.vertices())
         if (bbox.contains(p))
             return true;
 
@@ -1256,12 +1256,12 @@ bool intersectBBoxWithPolygon(const BBox2D& bbox, const Polygon2D& polygon)
         { box[3], box[0] }
     };
 
-    const size_t n = polygon.m_vertices.size();
+    const size_t n = polygon.vertices().size();
 
     for (size_t i = 0; i < n; ++i)
     {
-        Vector2D a = polygon.m_vertices[i];
-        Vector2D b = polygon.m_vertices[(i + 1) % n];
+        Vector2D a = polygon.vertices()[i];
+        Vector2D b = polygon.vertices()[(i + 1) % n];
 
         for (int j = 0; j < 4; ++j)
             if (intersectSegmentWithSegment(a, b, boxEdges[j][0], boxEdges[j][1]))
@@ -1393,26 +1393,6 @@ bool intersectPolygonWithCircle(const std::span<const Vector2D> poly, const Circ
     return false;
 }
 
-bool intersectPolygonWithCircle(const ConvexPolygon2D& polygon, const Circle2D& circle)
-{
-    if (polygon.contains(circle.centroid()))
-        return true;
-
-    //Todo: Optimize with r^2
-    //real_t r2 = circle.m_radius * circle.m_radius;
-    real_t r = circle.m_radius;
-
-    for (int i = 0; i < polygon.vertexCount(); ++i)
-    {
-        const Vector2D& a = polygon.wrappedVertexAt(i);
-        const Vector2D& b = polygon.wrappedVertexAt(i+1);
-
-        if (distancePointToSegment(circle.m_center, a, b) <= r)
-            return true;
-    }
-    return false;
-}
-
 // --- Polygonal ---
 
 bool intersect(const IPolygonalShape2D& polygon1, const IPolygonalShape2D& polygon2)
@@ -1446,7 +1426,7 @@ bool intersect(const IPolygonalShape2D& polygon, const Circle2D& circle)
 
 // --- Circles ---
 
-bool intersectCircleWithCircle(const Circle2D& circle1, const Circle2D& circle2)
+bool intersect(const Circle2D& circle1, const Circle2D& circle2)
 {
     return circle1.intersects(circle2);
 }
@@ -1495,7 +1475,7 @@ bool intersect(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2)
         if (type2 == ShapeType2D::SHAPE2D_CIRCLE)
         {
             const Circle2D* s2 = shape2.shape_cast<Circle2D>();
-            return intersectCircleWithCircle(*s1, *s2);
+            return intersect(*s1, *s2);
         }
     }
     return false;
