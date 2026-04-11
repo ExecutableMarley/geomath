@@ -12,6 +12,7 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
+#include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
 #include "BBox2D.hpp"
 #include "IShape2D.hpp"
 
@@ -113,9 +114,19 @@ public:
         return (point - m_center).lengthSquared() <= m_radius * m_radius;
     }
 
+    bool contains(const Segment2D& segment)
+    {
+        return isSegmentInsideShape(segment, *this);
+    }
+
     bool contains(const Circle2D &circle) const
     {
         return (m_center - circle.m_center).lengthSquared() + circle.m_radius * circle.m_radius <= m_radius * m_radius;
+    }
+
+    bool contains(const IFiniteShape2D& shape)
+    {
+        return isShapeInsideCircle(shape, *this);
     }
 
     bool intersects(const Circle2D &circle) const

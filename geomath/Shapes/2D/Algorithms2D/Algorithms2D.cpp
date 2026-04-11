@@ -131,8 +131,14 @@ bool isPointInsideCircle(const Vector2D& point, const Circle2D& circle)
     return circle.contains(point);
 }
 
+bool isPointInShape(const Vector2D& point, const IBaseShape2D& shape)
+{
+    return shape.contains(point);
+}
+
 // Segment inside shape
 
+/*
 bool isSegmentInsideBBox(const Segment2D& segment, const BBox2D& bbox)
 {
     return isPointInsideBBox(segment.m_start, bbox) && isPointInsideBBox(segment.m_end, bbox);
@@ -168,7 +174,23 @@ bool isSegmentInsideCircle(const Segment2D& segment, const Circle2D& circle)
 {
     return isPointInsideCircle(segment.m_start, circle) && isPointInsideCircle(segment.m_end, circle);
 }
+*/
 
+bool isSegmentInsideShape(const Segment2D& segment, const IBaseShape2D& shape)
+{
+    if (isConvexPolygonal(shape.type()) || shape.type() == SHAPE2D_CIRCLE)
+        return shape.contains(segment.m_start) && shape.contains(segment.m_end);
+    else if (shape.type() == SHAPE2D_POLYGON)
+    {
+        if (shape.contains(segment.m_start) && shape.contains(segment.m_start))
+        {
+            return intersect(segment, shape);
+        }
+        return false;
+    }
+    assert(false && "Unreachable code reached!");
+    return false;
+}
 
 //Shape inside BBox
 
@@ -226,6 +248,20 @@ bool isBBoxInsideConvexPolygon(const BBox2D& bbox, const std::span<const Vector2
         isPointInsideConvexPolygon(bbox.topRight(), convexPoly) && isPointInsideConvexPolygon(bbox.bottomRight(), convexPoly);
 }
 
+bool isBBoxInsidePolygon(const BBox2D& bbox, const std::span<const Vector2D> poly)
+{
+    std::vector<Vector2D> bboxPoly = {bbox.bottomLeft(), bbox.bottomRight(), bbox.topRight(), bbox.topLeft()};
+
+    if (!isPointInsidePolygon(bbox.bottomLeft(), poly) || !isPointInsidePolygon(bbox.bottomRight(), poly) ||
+        !isPointInsidePolygon(bbox.topRight(), poly)   || !isPointInsidePolygon(bbox.topLeft(), poly))
+            return false;
+
+    if (edgeIntersectionPolygonWithPolygon(bboxPoly, poly))
+        return false;
+
+    return true;
+}
+
 bool isPolygonInsideConvexPolygon(const std::span<const Vector2D> poly, const std::span<const Vector2D> convexPoly)
 {
     for (const auto& point : poly)
@@ -233,6 +269,22 @@ bool isPolygonInsideConvexPolygon(const std::span<const Vector2D> poly, const st
         if (!isPointInsideConvexPolygon(point, convexPoly))
             return false;
     }
+    return true;
+}
+
+bool isPolygonInsidePolygon(const std::span<const Vector2D> poly1, const std::span<const Vector2D> poly2)
+{
+    for (const auto& point : poly2)
+    {
+        if (!isPointInsidePolygon(point, poly2))
+        {
+            return false;
+        }
+    }
+
+    if (edgeIntersectionPolygonWithPolygon(poly1, poly2))
+        return false;
+
     return true;
 }
 
@@ -255,50 +307,6 @@ bool isCircleInsideConvexPolygon(const Circle2D& circle, const std::span<const V
             return false;
         }
     }
-    return true;
-}
-
-bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::span<const Vector2D> convexPoly)
-{
-    if (isPolygonalShape(shape.type()))
-    {
-        return isPolygonInsideConvexPolygon(shape.polygonal()->vertices(), convexPoly);
-    }
-    else if (shape.type() == SHAPE2D_CIRCLE)
-    {
-        return isCircleInsideConvexPolygon(*shape.shape_cast<Circle2D>(), convexPoly);
-    }
-    assert(false && "Unreachable code reached!");
-    return false;
-}
-
-bool isBBoxInsidePolygon(const BBox2D& bbox, const std::span<const Vector2D> poly)
-{
-    std::vector<Vector2D> bboxPoly = {bbox.bottomLeft(), bbox.bottomRight(), bbox.topRight(), bbox.topLeft()};
-
-    if (!isPointInsidePolygon(bbox.bottomLeft(), poly) || !isPointInsidePolygon(bbox.bottomRight(), poly) ||
-        !isPointInsidePolygon(bbox.topRight(), poly)   || !isPointInsidePolygon(bbox.topLeft(), poly))
-            return false;
-
-    if (edgeIntersectionPolygonWithPolygon(bboxPoly, poly))
-        return false;
-
-    return true;
-}
-
-bool isPolygonInsidePolygon(const std::span<const Vector2D> poly1, const std::span<const Vector2D> poly2)
-{
-    for (const auto& point : poly2)
-    {
-        if (!isPointInsidePolygon(point, poly2))
-        {
-            return false;
-        }
-    }
-
-    if (edgeIntersectionPolygonWithPolygon(poly1, poly2))
-        return false;
-
     return true;
 }
 
@@ -325,13 +333,27 @@ bool isCircleInsidePolygon(const Circle2D& circle, const std::span<const Vector2
     return true;
 }
 
+bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::span<const Vector2D> convexPoly)
+{
+    if (isPolygonalShape(shape.type()))
+    {
+        return isPolygonInsideConvexPolygon(shape.polygonal()->vertices(), convexPoly);
+    }
+    else if (shape.type() == SHAPE2D_CIRCLE)
+    {
+        return isCircleInsideConvexPolygon(*shape.shape_cast<Circle2D>(), convexPoly);
+    }
+    assert(false && "Unreachable code reached!");
+    return false;
+}
+
 bool isShapeInsidePolygon(const IFiniteShape2D& shape, const std::span<const Vector2D> poly)
 {
     if (isPolygonalShape(shape.type()))
     {
         return isPolygonInsidePolygon(shape.polygonal()->vertices(), poly);
     }
-    else if (shape.type() == SHAPE2D_CONVEX_POLYGON)
+    else if (shape.type() == SHAPE2D_CIRCLE)
     {
         return isCircleInsidePolygon(*shape.shape_cast<Circle2D>(), poly);
     }

@@ -13,6 +13,7 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
+#include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
 #include "BBox2D.hpp"
 #include "IShape2D.hpp"
 
@@ -150,9 +151,19 @@ public:
         return ab.cross(ap) >= 0 && bc.cross(bp) >= 0 && cd.cross(cp) >= 0 && da.cross(dp) >= 0;
     }
 
+    bool contains(const Segment2D& segment) const
+    {
+        return isSegmentInsideShape(segment, *this);
+    }
+
     bool contains(const Rectangle2D &rectangle) const
     {
         return contains(rectangle.a()) && contains(rectangle.b()) && contains(rectangle.c()) && contains(rectangle.d());
+    }
+
+    bool contains(const IFiniteShape2D& shape) const
+    {
+        return isShapeInsideConvexPolygon(shape, m_vertices);
     }
 
     BBox2D boundingBox() const override

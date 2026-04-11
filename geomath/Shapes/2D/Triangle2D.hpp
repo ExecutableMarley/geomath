@@ -13,6 +13,7 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
+#include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
 #include "BBox2D.hpp"
 #include "IShape2D.hpp"
 
@@ -129,9 +130,19 @@ public:
         return approximatelyEqual(areaABC, areaPBC + areaPCA + areaPAB);
     }
 
+    bool contains(const Segment2D& segment) const
+    {
+        return isSegmentInsideShape(segment, *this);
+    }
+
     bool contains(const Triangle2D &triangle) const
     {
         return contains(triangle.a()) && contains(triangle.b()) && contains(triangle.c());
+    }
+
+    bool contains(const IFiniteShape2D& shape) const
+    {
+        return isShapeInsideConvexPolygon(shape, m_vertices);
     }
 
     BBox2D boundingBox() const override

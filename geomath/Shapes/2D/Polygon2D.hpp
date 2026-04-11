@@ -236,6 +236,16 @@ public:
         return contains;
     }
 
+    bool contains(const Segment2D& segment) const
+    {
+        return isSegmentInsideShape(segment, *this);
+    }
+
+    bool contains(const IFiniteShape2D& shape) const
+    {
+        return isShapeInsidePolygon(shape, m_vertices);
+    }
+
     BBox2D boundingBox() const
     {
         if (m_vertices.empty())
