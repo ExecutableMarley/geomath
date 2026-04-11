@@ -275,6 +275,16 @@ inline Vector3D operator *(real_t scalar, const Vector3D& vector)
     return vector * scalar;
 }
 
+inline real_t dot(const Vector3D& a, const Vector3D& b)
+{
+    return a.dot(b);
+}
+
+inline Vector3D cross(const Vector3D& a, const Vector3D& b)
+{
+    return a.cross(b);
+}
+
 } // namespace Math
 
 } // namespace Arns

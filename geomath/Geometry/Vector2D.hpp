@@ -259,6 +259,16 @@ inline Vector2D operator *(real_t scalar, const Vector2D& vector)
     return vector * scalar;
 }
 
+inline real_t dot(const Vector2D& a, const Vector2D& b)
+{
+    return a.dot(b);
+}
+
+inline real_t cross(const Vector2D& a, const Vector2D& b)
+{
+    return a.cross(b);
+}
+
 inline real_t orient2D(const Vector2D& a, const Vector2D& b, const Vector2D& c)
 {
     return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
