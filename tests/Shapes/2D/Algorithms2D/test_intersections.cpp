@@ -54,19 +54,19 @@ TEST_CASE("ray hits primitive")
     SUBCASE("Axis-Aligned Bounding Box")
     {
         BBox2D box({7, -1}, {9, 1});
-        checkHit(ray, box, {true, {7.0f, 0.0f}, 7.0f});
+        checkHit(ray, box, {true, {7, 0}, 7});
     }
 
     SUBCASE("Triangle")
     {
         Triangle2D tri({15, -1}, {18, 1}, {18, -1});
-        checkHit(ray, tri, {true, {16.5f, 0.0f}, 16.5f});
+        checkHit(ray, tri, {true, {16.5, 0.0}, 16.5});
     }
 
     SUBCASE("Rectangle")
     {
-        auto rect = Rectangle2D::fromMinMax({10.0f, -1.0f}, {14.0f, 1.0f});
-        checkHit(ray, rect, {true, {10.0f, 0.0f}, 10.0f});
+        auto rect = Rectangle2D::fromMinMax({10.0, -1.0}, {14.0, 1.0});
+        checkHit(ray, rect, {true, {10, 0}, 10});
     }
 
     SUBCASE("Circle")
@@ -117,13 +117,13 @@ TEST_CASE("ray starts inside primitive")
 
     SUBCASE("Triangle containing ray origin")
     {
-        auto tri = Triangle2D({-2.0f, -2.0f}, {2.0f, -2.0f}, {2.0f, 3.0f});
+        auto tri = Triangle2D({-2, -2}, {2, -2}, {2, 3});
         checkHit(ray, tri, {true, {2, 0}, 2});
     }
 
     SUBCASE("Rectangle containing ray origin")
     {
-        auto rect = Rectangle2D::fromMinMax({-1.0f, -1.0f}, {4.0f, 1.0f});
+        auto rect = Rectangle2D::fromMinMax({-1, -1}, {4, 1});
         checkHit(ray, rect, {true, {4, 0}, 4});
     }
 
@@ -140,7 +140,7 @@ TEST_CASE("ray tangent to primitive")
     
     SUBCASE("BBox tangent to ray")
     {
-        auto rect = BBox2D({8.0f, 0.0f}, {12.0f, 1.0f});
+        auto rect = BBox2D({8, 0}, {12, 1});
         checkHit(ray, rect, {true, {8, 1}, 8});
     }
 
@@ -152,7 +152,7 @@ TEST_CASE("ray tangent to primitive")
 
     SUBCASE("Rectangle tangent to ray")
     {
-        auto rect = Rectangle2D::fromMinMax({8.0f, 0.0f}, {12.0f, 1.0f});
+        auto rect = Rectangle2D::fromMinMax({8, 0}, {12, 1});
         checkHit(ray, rect, {true, {8, 1}, 8});
     }
 
@@ -170,33 +170,35 @@ TEST_CASE("ray picks closest hit")
     BBox2D box({6,-1}, {8,1});
     checkHit(ray, box, {
         true, 
-        {6.0f, 0.0f}, 
-        6.0f
+        {6, 0}, 
+        6
     });
 
     Triangle2D tri({3, 1}, {3, -1}, {6, -1});
     checkHit(ray, tri, {
     true, 
-    {3.0f, 0.0f}, 
-    3.0f
+    {3, 0}, 
+    3
     });
 
-    Rectangle2D rect = Rectangle2D::fromMinMax({5.0f, -1.0f}, {10.0f, 1.0f}); 
+    Rectangle2D rect = Rectangle2D::fromMinMax({5, -1}, {10, 1}); 
     checkHit(ray, rect, {
         true, 
-        {5.0f, 0.0f}, 
-        5.0f
+        {5, 0}, 
+        5
     });
 
-    Circle2D circ({11.0f, 0.0f}, 1.0f);
+    Circle2D circ({11.0, 0.0}, 1.0);
     checkHit(ray, circ, {
         true, 
-        {10.0f, 0.0f}, 
-        10.0f
+        {10, 0}, 
+        10
     });
 }
 
-// --- Shape-Shape Intersections ---
+// ============================================================================
+// Shape-Shape Intersections
+// ============================================================================
 
 TEST_CASE("BBox2D intersection")
 {
