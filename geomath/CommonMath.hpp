@@ -8,6 +8,7 @@
 #include <math.h>
 #include <cmath>
 #include <algorithm>
+#include <numbers>
 
 namespace Arns
 {
@@ -16,8 +17,6 @@ namespace Math
 {
 
 
-#define PI 3.14159265359f
-
 constexpr float FloatRelEpsilon = 1e-5f;
 constexpr float FloatAbsEpsilon = 1e-6f;
 constexpr double DoubleRelEpsilon = 1e-10;
@@ -25,7 +24,10 @@ constexpr double DoubleAbsEpsilon = 1e-12;
 
 using real_t = float;
 
+constexpr real_t PI = std::numbers::pi_v<real_t>;
+
 constexpr real_t T_MAX = std::numeric_limits<real_t>::max();
+constexpr real_t T_MIN = std::numeric_limits<real_t>::min();
 
 inline bool approximatelyZero(float value, float absEpsilon = FloatAbsEpsilon)
 {
@@ -176,30 +178,6 @@ inline int sign(T value)
     return (value > T(0)) - (value < T(0));
 }
 
-inline int wrapValue(int value, int min, int max)
-{
-    const int range = max - min;
-    if (range == 0)
-        return min;
-    value = (value - min) % range;
-    if (value < 0) 
-        value += range;
-    
-    return value + min;
-}
-
-inline float wrapValue(float value, float min, float max)
-{
-    const float range = max - min;
-    if (range == 0) 
-        return min;
-    value = fmod(value - min, range);
-    if (value < 0) 
-        value += range;
-    
-    return value + min;
-}
-
 template <class T>
 inline T wrapValue(T value, T min, T max)
 {
@@ -247,13 +225,13 @@ inline bool intervalsOverlap(const T& minA, const T& maxA, const T& minB, const 
 template <typename T>
 inline T degToRad(T degrees)
 {
-    return degrees * (PI / 180.0f);
+    return degrees * (PI / real_t{180.0});
 }
 
 template <typename T>
 inline T radToDeg(T radians)
 {
-    return radians * (180.0f / PI);
+    return radians * (real_t{180.0} / PI);
 }
 
 template <typename T>
