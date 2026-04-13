@@ -184,7 +184,7 @@ bool isSegmentInsideShape(const Segment2D& segment, const IBaseShape2D& shape)
     {
         if (shape.contains(segment.m_start) && shape.contains(segment.m_start))
         {
-            return intersect(segment, shape);
+            return !intersect(segment, shape);
         }
         return false;
     }
@@ -274,7 +274,7 @@ bool isPolygonInsideConvexPolygon(const std::span<const Vector2D> poly, const st
 
 bool isPolygonInsidePolygon(const std::span<const Vector2D> poly1, const std::span<const Vector2D> poly2)
 {
-    for (const auto& point : poly2)
+    for (const auto& point : poly1)
     {
         if (!isPointInsidePolygon(point, poly2))
         {

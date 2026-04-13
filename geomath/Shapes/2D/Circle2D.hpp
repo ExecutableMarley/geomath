@@ -114,17 +114,19 @@ public:
         return (point - m_center).lengthSquared() <= m_radius * m_radius;
     }
 
-    bool contains(const Segment2D& segment)
+    bool contains(const Segment2D& segment) const
     {
         return isSegmentInsideShape(segment, *this);
     }
 
     bool contains(const Circle2D &circle) const
     {
-        return (m_center - circle.m_center).lengthSquared() + circle.m_radius * circle.m_radius <= m_radius * m_radius;
+        if (circle.m_radius > m_radius) return false;
+        real_t radiusDelta = m_radius - circle.m_radius;
+        return (m_center - circle.m_center).lengthSquared() <= (radiusDelta * radiusDelta);
     }
 
-    bool contains(const IFiniteShape2D& shape)
+    bool contains(const IFiniteShape2D& shape) const
     {
         return isShapeInsideCircle(shape, *this);
     }
