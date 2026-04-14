@@ -62,7 +62,7 @@ public:
     {
         Vector2D deltaVector = m_end - m_start;
         const real_t lengthSquared = deltaVector.lengthSquared();
-        return lengthSquared == 0.f ? 0.f : (point - m_start).dot(deltaVector) / lengthSquared;
+        return approximatelyZero(lengthSquared) ? real_t{0} : (point - m_start).dot(deltaVector) / lengthSquared;
     }
 };
 
