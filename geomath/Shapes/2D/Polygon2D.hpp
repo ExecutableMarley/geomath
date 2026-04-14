@@ -33,14 +33,14 @@ public:
 
     Polygon2D(std::vector<Vector2D>&& vertices) noexcept : m_vertices(std::move(vertices)) {}
 
-    ShapeType2D type() const
+    ShapeType2D type() const override
     {
         return SHAPE2D_POLYGON;
     }
 
     static constexpr ShapeType2D shapeType = SHAPE2D_POLYGON;
 
-    size_t vertexCount() const
+    size_t vertexCount() const override
     {
         return m_vertices.size();
     }
@@ -124,7 +124,7 @@ public:
         return true;
     }
 
-    real_t area() const
+    real_t area() const override
     {
         double area = 0;
         for (int i = 0; i < m_vertices.size(); i++)
@@ -138,7 +138,7 @@ public:
         return (real_t)area / real_t{2};
     }
 
-    real_t perimeter() const
+    real_t perimeter() const override
     {
         real_t perimeter = 0;
 
@@ -150,7 +150,7 @@ public:
         return perimeter;
     }
 
-    Vector2D centroid() const
+    Vector2D centroid() const override
     {
         Vector2D centroid;
 
@@ -197,13 +197,13 @@ public:
         return *this;
     }
 
-    std::unique_ptr<IFiniteShape2D> clone() const
+    std::unique_ptr<IFiniteShape2D> clone() const override
     {
         return std::make_unique<Polygon2D>(*this);        
     }
 
     /*This only works for "simple" (non self intersecting) polygons*/
-    bool contains(const Vector2D &point) const
+    bool contains(const Vector2D &point) const override
     {
         bool contains = false;
         for (size_t i = 0, j = m_vertices.size() - 1; i < m_vertices.size(); j = i++)
@@ -246,7 +246,7 @@ public:
         return isShapeInsidePolygon(shape, m_vertices);
     }
 
-    BBox2D boundingBox() const
+    BBox2D boundingBox() const override
     {
         if (m_vertices.empty())
             return BBox2D();
@@ -256,10 +256,8 @@ public:
 
         for (int i = 1; i < m_vertices.size(); i++)
         {
-            min.x = fmin(min.x, m_vertices[i].x);
-            min.y = fmin(min.y, m_vertices[i].y);
-            max.x = fmax(max.x, m_vertices[i].x);
-            max.y = fmax(max.y, m_vertices[i].y);
+            min = Vector2D::min(min, m_vertices[i]);
+            max = Vector2D::max(max, m_vertices[i]);
         }
 
         return BBox2D(min, max);
@@ -270,7 +268,7 @@ public:
         return m_vertices[index];
     }
 
-    const Vector2D& operator[](size_t index) const
+    const Vector2D& operator[](size_t index) const override
     {
         return m_vertices[index];
     }
