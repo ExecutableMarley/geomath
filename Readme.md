@@ -1,3 +1,6 @@
+[![CMake on multiple platforms](https://github.com/ExecutableMarley/geomath/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/ExecutableMarley/geomath/actions/workflows/cmake-multi-platform.yml)
+[![License](https://img.shields.io/github/license/ExecutableMarley/geomath)](./LICENSE)
+
 # GeoMath
 
 A lightweight C++ geometry and math library focused on shape
