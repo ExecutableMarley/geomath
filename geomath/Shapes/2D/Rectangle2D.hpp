@@ -84,12 +84,12 @@ public:
 
     real_t perimeter() const override
     {
-        return 2.0f * (width() + height());
+        return real_t{2} * (width() + height());
     }
 
     Vector2D centroid() const override
     {
-        return (a() + b() + c() + d()) / 4.0f;
+        return (a() + b() + c() + d()) / real_t{4};
     }
 
     Rectangle2D& translate(const Vector2D &translation) override

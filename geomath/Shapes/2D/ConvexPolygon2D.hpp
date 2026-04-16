@@ -25,7 +25,7 @@ public:
     ConvexPolygon2D() = default;
 
     //Todo: This is bad
-    ConvexPolygon2D(const std::vector<Vector2D> points)
+    ConvexPolygon2D(const std::vector<Vector2D>& points)
     {
         this->m_vertices = convex_hull(points);
     }
@@ -35,8 +35,10 @@ public:
 
 private:
 
-    static std::vector<Vector2D> convex_hull(std::vector<Vector2D> points)
+    static std::vector<Vector2D> convex_hull(const std::vector<Vector2D>& v)
     {
+        auto points = v;
+
         sort(points.begin(), points.end(), [](const Vector2D& a, const Vector2D& b)
             {
                 return a.x < b.x || (a.x == b.x && a.y < b.y);

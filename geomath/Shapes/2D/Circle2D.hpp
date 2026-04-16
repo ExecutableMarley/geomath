@@ -32,11 +32,7 @@ public:
 
     Circle2D(const Vector2D &center, real_t radius) : m_center(center), m_radius(radius) {}
 
-    ShapeType2D type() const override
-    {
-        return SHAPE2D_CIRCLE;
-    }
-
+    ShapeType2D type() const override { return SHAPE2D_CIRCLE; }
     static constexpr ShapeType2D shapeType = SHAPE2D_CIRCLE;
 
     std::vector<Vector2D> getVertices(int resolution = 32) const
@@ -44,7 +40,7 @@ public:
         std::vector<Vector2D> vertices;
         vertices.reserve(resolution);
 
-        const real_t step = 2.0f * static_cast<real_t>(PI) / resolution;
+        const real_t step = real_t{2} * static_cast<real_t>(PI) / resolution;
         for (int i = 0; i < resolution; ++i)
         {
             real_t angle = i * step;
@@ -63,7 +59,7 @@ public:
 
     real_t circumference() const
     {
-        return 2.0f * PI * m_radius;
+        return real_t{2} * PI * m_radius;
     }
 
     real_t perimeter() const override
@@ -104,7 +100,7 @@ public:
         return *this;
     }
 
-    std::unique_ptr<IFiniteShape2D> clone() const
+    std::unique_ptr<IFiniteShape2D> clone() const override
     {
         return std::make_unique<Circle2D>(*this);        
     }

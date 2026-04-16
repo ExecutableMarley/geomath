@@ -75,7 +75,7 @@ public:
 
     Vector2D centroid() const override
     {
-        return (a() + b() + c()) / 3.0f;
+        return (a() + b() + c()) / real_t{3};
     }
 
     Triangle2D& translate(const Vector2D &translation) override
@@ -113,7 +113,7 @@ public:
         return *this;
     }
 
-    std::unique_ptr<IFiniteShape2D> clone() const
+    std::unique_ptr<IFiniteShape2D> clone() const override
     {
         return std::make_unique<Triangle2D>(*this);        
     }
@@ -124,9 +124,9 @@ public:
         const auto& m_a = this->a();
         const auto& m_b = this->b();
         const auto& m_c = this->c();
-        const real_t areaPBC = 0.5f * fabs((m_b.x - point.x) * (m_c.y - point.y) - (m_c.x - point.x) * (m_b.y - point.y));
-        const real_t areaPCA = 0.5f * fabs((m_c.x - point.x) * (m_a.y - point.y) - (m_a.x - point.x) * (m_c.y - point.y));
-        const real_t areaPAB = 0.5f * fabs((m_a.x - point.x) * (m_b.y - point.y) - (m_b.x - point.x) * (m_a.y - point.y));
+        const real_t areaPBC = real_t{0.5} * std::abs((m_b.x - point.x) * (m_c.y - point.y) - (m_c.x - point.x) * (m_b.y - point.y));
+        const real_t areaPCA = real_t{0.5} * std::abs((m_c.x - point.x) * (m_a.y - point.y) - (m_a.x - point.x) * (m_c.y - point.y));
+        const real_t areaPAB = real_t{0.5} * std::abs((m_a.x - point.x) * (m_b.y - point.y) - (m_b.x - point.x) * (m_a.y - point.y));
         return approximatelyEqual(areaABC, areaPBC + areaPCA + areaPAB);
     }
 
@@ -155,7 +155,7 @@ public:
         return vertexAt(index);
     }
 
-    const Vector2D& operator[](size_t index) const
+    const Vector2D& operator[](size_t index) const override
     {
         return vertexAt(index);
     }

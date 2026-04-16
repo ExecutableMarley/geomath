@@ -33,11 +33,7 @@ public:
 
     Polygon2D(std::vector<Vector2D>&& vertices) noexcept : m_vertices(std::move(vertices)) {}
 
-    ShapeType2D type() const override
-    {
-        return SHAPE2D_POLYGON;
-    }
-
+    ShapeType2D type() const override { return SHAPE2D_POLYGON; }
     static constexpr ShapeType2D shapeType = SHAPE2D_POLYGON;
 
     size_t vertexCount() const override
@@ -66,12 +62,6 @@ public:
     {
         return m_vertices;
     }
-
-    /*
-    std::vector<Vector2D> getVertices() const
-    {
-        return m_vertices;
-    }*/
 
     using iterator = std::vector<Vector2D>::iterator;
     using const_iterator = std::vector<Vector2D>::const_iterator;
@@ -162,7 +152,7 @@ public:
         return centroid / m_vertices.size();
     }
 
-    Polygon2D& translate(const Vector2D &translation)
+    Polygon2D& translate(const Vector2D &translation) override
     {
         for (int i = 0; i < m_vertices.size(); i++)
             m_vertices[i] += translation;
