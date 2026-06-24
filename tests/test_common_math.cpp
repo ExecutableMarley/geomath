@@ -4,6 +4,10 @@
 
 using namespace Arns::Math;
 
+// ============================================================================
+// Approximations
+// ============================================================================
+
 TEST_CASE("approximatelyZero(float)")
 {
     constexpr float eps = FloatAbsEpsilon;
@@ -75,3 +79,7 @@ TEST_CASE("approximatelyEqual - clearly unequal")
     CHECK_FALSE(approximatelyEqual(1.0f, 1.1f));
     CHECK_FALSE(approximatelyEqual(1.0, 1.1));
 }
+
+// ============================================================================
+// 
+// ============================================================================
