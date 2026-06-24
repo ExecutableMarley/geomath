@@ -136,6 +136,16 @@ public:
     {
         return BBox2D(m_center - Vector2D(m_radius, m_radius), m_center + Vector2D(m_radius, m_radius));
     }
+
+    bool operator==(const Circle2D& other) const
+    {
+        return this->m_center == other.m_center && this->m_radius == other.m_radius;
+    }
+
+    bool operator!=(const Circle2D& other) const
+    {
+        return !(*this == other);
+    }
 };
 
 } // namespace Math

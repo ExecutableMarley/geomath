@@ -181,6 +181,21 @@ public:
         return vertexAt(index);
     }
 
+    // --- ---
+
+    bool operator==(const Rectangle2D& other) const
+    {
+        return this->a() == other.a() && 
+            this->b() == other.b() && 
+            this->c() == other.c() && 
+            this->d() == other.d();
+    }
+
+    bool operator!=(const Rectangle2D& other) const
+    {
+        return !(*this == other);
+    }
+
     static Rectangle2D fromMinMax(const Vector2D &min, const Vector2D &max)
     {
         return Rectangle2D(min, {max.x, min.y},

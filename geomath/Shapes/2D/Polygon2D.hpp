@@ -262,6 +262,27 @@ public:
     {
         return m_vertices[index];
     }
+
+    // --- ---
+
+    bool operator==(const Polygon2D& other) const
+    {
+        if (this->vertexCount() != other.vertexCount())
+            return false;
+
+        for (int i = 0; i < m_vertices.size(); i++)
+        {
+            if (this->vertexAt(i) != other.vertexAt(i))
+                return false;
+        }
+
+        return true;
+    }
+
+    bool operator!=(const Polygon2D& other) const
+    {
+        return !(*this == other);
+    }
 };
 
 

@@ -159,6 +159,20 @@ public:
     {
         return vertexAt(index);
     }
+
+    // --- ---
+
+    bool operator==(const Triangle2D& other) const
+    {
+        return this->a() == other.a() && 
+            this->b() == other.b() && 
+            this->c() == other.c();
+    }
+
+    bool operator!=(const Triangle2D& other) const
+    {
+        return !(*this == other);
+    }
 };
 
 } // namespace Math

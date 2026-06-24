@@ -45,6 +45,18 @@ public:
     {
         return (point - m_origin).dot(m_direction) / m_direction.lengthSquared();
     }
+
+    // --- ---
+
+    bool operator==(const Ray2D& other) const
+    {
+        return this->m_origin == other.m_origin && this->m_direction == other.m_direction;
+    }
+
+    bool operator!=(const Ray2D& other) const
+    {
+        return !(*this == other);
+    }
 };
 
 } // namespace Math

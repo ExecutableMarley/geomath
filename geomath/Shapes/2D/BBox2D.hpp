@@ -164,6 +164,18 @@ public:
         return m_min.x <= rectangle.m_max.x && m_max.x >= rectangle.m_min.x && m_min.y <= rectangle.m_max.y && m_max.y >= rectangle.m_min.y;
     }
 
+    // --- ---
+
+    bool operator==(const BBox2D& other) const
+    {
+        return this->m_min == other.m_min && this->m_max == other.m_max;
+    }
+
+    bool operator!=(const BBox2D& other) const
+    {
+        return !(*this == other);
+    }
+
     // --- Static factory Functions ---
 
     template <typename Iter>

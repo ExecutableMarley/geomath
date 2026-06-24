@@ -64,6 +64,18 @@ public:
         const real_t lengthSquared = deltaVector.lengthSquared();
         return approximatelyZero(lengthSquared) ? real_t{0} : (point - m_start).dot(deltaVector) / lengthSquared;
     }
+
+    // --- ---
+
+    bool operator==(const Line2D& other) const
+    {
+        return this->m_start == other.m_start && this->m_end == other.m_end;
+    }
+
+    bool operator!=(const Line2D& other) const
+    {
+        return !(*this == other);
+    }
 };
 
 } // namespace Math
