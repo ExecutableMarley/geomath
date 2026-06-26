@@ -13,21 +13,9 @@ TEST_CASE("Circle2D is not polygonal")
     check_is_not_polygonal(circle);
 }
 
-TEST_CASE("Circle2D geometry and transformations")
+TEST_CASE("Circle2D accessors and geometry")
 {
     Circle2D circle(Vector2D{1, 2}, real_t{3.0});
-
-    SUBCASE("Area, circumference, and perimeter")
-    {
-        CHECK(circle.area() == doctest::Approx(PI * real_t{9}));
-        CHECK(circle.circumference() == doctest::Approx(real_t{2} * PI * real_t{3}));
-        CHECK(circle.perimeter() == doctest::Approx(circle.circumference()));
-    }
-
-    SUBCASE("Centroid is center")
-    {
-        CHECK(circle.centroid() == Vector2D{1, 2});
-    }
 
     SUBCASE("Get vertices returns requested resolution")
     {
@@ -38,6 +26,27 @@ TEST_CASE("Circle2D geometry and transformations")
         CHECK(vertices[0].y == doctest::Approx(real_t{2}));
     }
 
+    SUBCASE("Area calculation")
+    {
+        CHECK(circle.area() == doctest::Approx(PI * real_t{9}));
+    }
+
+    SUBCASE("Perimeter/Circumference calculation")
+    {
+        CHECK(circle.perimeter() == doctest::Approx(circle.circumference()));
+        CHECK(circle.circumference() == doctest::Approx(real_t{2} * PI * real_t{3}));
+    }
+
+    SUBCASE("Centroid is center")
+    {
+        CHECK(circle.centroid() == Vector2D{1, 2});
+    }
+}
+
+TEST_CASE("Circle2D transformations")
+{
+    Circle2D circle(Vector2D{1, 2}, real_t{3.0});
+
     SUBCASE("Translate moves center without changing radius")
     {
         circle.translate(Vector2D{2, -1});
@@ -46,12 +55,13 @@ TEST_CASE("Circle2D geometry and transformations")
         CHECK(circle.m_radius == doctest::Approx(real_t{3}));
     }
 
-    SUBCASE("Scale changes radius but keeps center")
+    SUBCASE("Rotate around center does not change circle")
     {
-        circle.scale(real_t{0.5});
+        Circle2D original = circle;
 
-        CHECK(circle.centroid() == Vector2D{1, 2});
-        CHECK(circle.m_radius == doctest::Approx(real_t{1.5}));
+        circle.rotate(real_t{123});
+
+        CHECK(original == circle);
     }
 
     SUBCASE("Rotate around another point moves the center")
@@ -64,12 +74,38 @@ TEST_CASE("Circle2D geometry and transformations")
         CHECK(rotatedCircle.m_radius == doctest::Approx(real_t{3}));
     }
 
+    SUBCASE("Rotate around center does not change circle")
+    {
+        Circle2D rotated = circle;
+
+        rotated.rotate(real_t{123}, rotated.centroid());
+
+        CHECK(rotated.centroid() == circle.centroid());
+        CHECK(rotated.m_radius == doctest::Approx(circle.m_radius));
+    }
+
+    SUBCASE("Scale changes radius but keeps center")
+    {
+        circle.scale(real_t{0.5});
+
+        CHECK(circle.centroid() == Vector2D{1, 2});
+        CHECK(circle.m_radius == doctest::Approx(real_t{1.5}));
+    }
+}
+
+TEST_CASE("Circle2D copy and clone")
+{
+    Circle2D circle(Vector2D{1, 2}, real_t{3.0});
+
     SUBCASE("Copy duplicates the circle")
     {
         Circle2D copy = circle.copy();
 
         CHECK(copy.centroid() == circle.centroid());
         CHECK(copy.m_radius == doctest::Approx(circle.m_radius));
+
+        copy.translate(Vector2D(5,0));
+        CHECK(copy.centroid() != circle.centroid());
     }
 
     SUBCASE("Clone returns an equivalent unique_ptr")
@@ -85,6 +121,11 @@ TEST_CASE("Circle2D geometry and transformations")
         CHECK(clonedCircle->centroid() == circle.centroid());
         CHECK(clonedCircle->m_radius == doctest::Approx(circle.m_radius));
     }
+}
+
+TEST_CASE("Circle2D bounding box")
+{
+    Circle2D circle(Vector2D{1, 2}, real_t{3.0});
 
     SUBCASE("Bounding box matches circle extents")
     {
