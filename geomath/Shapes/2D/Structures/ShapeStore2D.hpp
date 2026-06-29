@@ -13,117 +13,245 @@ namespace Arns
 namespace Math
 {
 
-//Prototype
-class ShapeStore2D
+struct ShapeID
 {
-public:
-    size_t add(std::unique_ptr<IFiniteShape2D> shape)
+    uint32_t index;
+    uint32_t generation;
+};
+
+struct ShapeHandle2D
+{
+    ShapeType2D type;
+    uint32_t index;
+    //uint32_t generation;
+};
+
+struct ShapeObject
+{
+    ShapeHandle2D handle;
+    uint32_t generation;
+    bool isAlive;
+};
+
+template <typename T>
+class SlotVector2D
+{
+private:
+    struct Slot
     {
-        size_t idx;
-        if (!_freeIndices.empty())
+        T value;
+        //uint32_t generation = 0;
+    };
+
+public:
+    struct Handle
+    {
+        uint32_t index;
+        //uint32_t generation;
+    };
+
+    Handle add(const T& value)
+    {
+        uint32_t idx;
+
+        if (!_free.empty())
         {
-            idx = _freeIndices.back();
-            _freeIndices.pop_back();
-            _shapes[idx] = std::move(shape);
+            // Use an empty slot
+            idx = _free.back();
+            _free.pop_back();
+
+            _slots[idx].value = value;
         }
         else
         {
-            idx = _shapes.size();
-            _shapes.push_back(std::move(shape));
+            // Create a new slot
+            idx = static_cast<uint32_t>(_slots.size());
+            _slots.push_back({ value });
         }
-        return idx;
+
+        return { idx };
     }
 
-    size_t add(const IFiniteShape2D& shape)
+    void remove(Handle h)
     {
-        return add(shape.clone());
-    }
-    
-    template <typename Container>
-    std::vector<size_t> add(const Container& shapes)
-    {
-        std::vector<size_t> indices;
-        indices.reserve(shapes.size());
-        
-        for (const auto& shape_ref : shapes)
-        {
-            indices.push_back(add(shape_ref.clone()));
-        }
-        
-        return indices;
+        if (!isValid(h)) return;
+
+        auto& slot = _slots[h.index];
+        //slot.alive = false;
+        //slot.generation++;       // invalidate old handles
+        _free.push_back(h.index);
     }
 
-    void remove(size_t index)
+    void remove(uint32_t idx)
     {
-        if (index < _shapes.size() && _shapes[index])
+        if (!isValid(idx)) return;
+
+        auto& slot = _slots[idx];
+        //slot.alive = false;
+        //slot.generation++;       // invalidate old handles
+        _free.push_back(idx);
+    }
+
+    bool isValid(Handle h) const
+    {
+        return h.index < _slots.size();
+    }
+
+    bool isValid(uint32_t idx) const
+    {
+        return idx < _slots.size();
+    }
+
+    T* get(Handle h)
+    {
+        return isValid(h) ? &_slots[h.index].value : nullptr;
+    }
+
+    const T* get(Handle h) const
+    {
+        return isValid(h) ? &_slots[h.index].value : nullptr;
+    }
+
+private:
+    std::vector<Slot> _slots;
+    std::vector<uint32_t> _free;
+};
+
+class ShapeStore2D
+{
+public:
+    ShapeID add(const Triangle2D& t)
+    {
+        auto h = _triangles.add(t);
+        //return { ShapeType2D::SHAPE2D_TRIANGLE, h.index, h.generation };
+        return insertHandle({ ShapeType2D::SHAPE2D_TRIANGLE, h.index } );
+    }
+
+    ShapeID add(const Rectangle2D& r)
+    {
+        auto h = _rectangles.add(r);
+        //return { ShapeType2D::SHAPE2D_RECTANGLE, h.index, h.generation };
+        return insertHandle({ ShapeType2D::SHAPE2D_RECTANGLE, h.index } );
+    }
+
+    ShapeID add(const Polygon2D& p)
+    {
+        auto h = _polygons.add(p);
+        return insertHandle({ ShapeType2D::SHAPE2D_POLYGON, h.index } );
+    }
+
+    ShapeID add(const Circle2D& c)
+    {
+        auto h = _circles.add(c);
+        return insertHandle({ ShapeType2D::SHAPE2D_CIRCLE, h.index } );
+    }
+
+private:
+    ShapeID insertHandle(ShapeHandle2D h)
+    {
+        uint32_t idx;
+        uint32_t generation;
+        if (!_freeIndices.empty())
         {
-            _shapes[index].reset();
+            // Use an empty slot
+            idx = _freeIndices.back();
+            _freeIndices.pop_back();
+            generation = _handleMap[idx].generation;
+            _handleMap[idx].handle = h;
+            _handleMap[idx].isAlive = true;
+        }
+        else
+        {
+            // Create a new slot
+            idx = static_cast<uint32_t>(_handleMap.size());
+            generation = 0;
+            _handleMap.push_back({ h, 0, true });
+        }
+        return { idx, generation };
+    }
+
+private:
+    void _remove(ShapeHandle2D h)
+    {
+        switch (h.type)
+        {
+        case ShapeType2D::SHAPE2D_CIRCLE:    _circles.remove(h.index); break;
+        case ShapeType2D::SHAPE2D_TRIANGLE:  _triangles.remove(h.index); break;
+        case ShapeType2D::SHAPE2D_RECTANGLE: _rectangles.remove(h.index); break;
+        case ShapeType2D::SHAPE2D_POLYGON:   _polygons.remove(h.index); break;
+        }
+    }
+
+public:
+    void remove(ShapeID id)
+    {
+        if (isValid(id))
+        {
+            ShapeHandle2D h = _handleMap[id.index].handle;
+            _handleMap[id.index].generation++;
+            _handleMap[id.index].isAlive = false;
+            _remove(h);
+            _freeIndices.push_back(id.index);
+        }
+    }
+
+    void removeUnsafe(uint32_t index)
+    {
+        if (isValid(index))
+        {
+            ShapeHandle2D h = _handleMap[index].handle;
+            _handleMap[index].generation++;
+            _handleMap[index].isAlive = false;
+            _remove(h);
             _freeIndices.push_back(index);
         }
     }
 
-    void remove(const std::vector<size_t>& indices)
+    bool isValid(uint32_t index) const
     {
-        for (auto index : indices)
-            remove(index);
+        return index < _handleMap.size() && _handleMap[index].isAlive;
     }
 
-    void clear()
+    bool isValid(ShapeID id) const
     {
-        _shapes.clear();
-        _freeIndices.clear();
+        return isValid(id.index) && _handleMap[id.index].generation == id.generation;
     }
 
-    IFiniteShape2D* get(size_t index) const
+    template <typename Fn>
+    void visit(ShapeID id, Fn&& fn)
     {
-        return (index < _shapes.size()) ? _shapes[index].get() : nullptr;
-    }
+        if (!isValid(id)) return;
 
-    size_t count() const { return _shapes.size() - _freeIndices.size(); }
-    size_t size()  const { return _shapes.size(); }
-    //size_t maxIndex() const { return size(); }
-    //Todo: Consider sorted active indices list
+        auto h = _handleMap[id.index].handle;
 
-    bool isValid(size_t index) const
-    {
-        return index < _shapes.size() && _shapes[index] != nullptr;
-    }
-
-    //Todo: Additional Iteration methods
-
-    void forEach(const std::function<void(size_t, IFiniteShape2D&)>& fn)
-    {
-        for (size_t i = 0; i < _shapes.size(); ++i)
-        if (_shapes[i])
-            fn(i, *_shapes[i]);
-    }
-
-    void forEachConst(const std::function<void(size_t, const IFiniteShape2D&)>& fn) const
-    {
-        for (size_t i = 0; i < _shapes.size(); ++i)
-            if (_shapes[i])
-                fn(i, *_shapes[i]);
-    }
-
-    //Used to construct spatial index structures
-    void getAllShapeBoundsPairs(std::vector<std::pair<BBox2D, size_t>>& out) const
-    {
-        out.clear();
-        out.reserve(size());
-        for (size_t i = 0; i < _shapes.size(); i++)
+        switch (h.type)
         {
-            if (_shapes[i])
-                out.emplace_back(_shapes[i]->boundingBox(), i);
+        case ShapeType2D::SHAPE2D_CIRCLE:
+            if (auto* p = _circles.get({h.index})) fn(*p);
+            break;
+        case ShapeType2D::SHAPE2D_TRIANGLE:
+            if (auto* p = _triangles.get({h.index})) fn(*p);
+            break;
+        case ShapeType2D::SHAPE2D_RECTANGLE:
+            if (auto* p = _rectangles.get({h.index})) fn(*p);
+            break;
+        case ShapeType2D::SHAPE2D_POLYGON:
+            if (auto* p = _polygons.get({h.index})) fn(*p);
+            break;
         }
     }
 
 private:
-    std::vector<std::unique_ptr<IFiniteShape2D>> _shapes;
-    std::vector<size_t> _freeIndices;
+    SlotVector2D<Circle2D>    _circles;
+    SlotVector2D<Triangle2D>  _triangles;
+    SlotVector2D<Rectangle2D> _rectangles;
+    SlotVector2D<Polygon2D>   _polygons;
 
-    //Todo: cache bounding boxes?
-    //Todo: cache combined bounding box?
+private:
+    std::vector<ShapeObject> _handleMap;
+    std::vector<uint32_t> _freeIndices;
 };
+
 
 } // namespace Math
 
