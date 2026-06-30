@@ -17,6 +17,16 @@ struct ShapeID
 {
     uint32_t index;
     uint32_t generation;
+
+    static constexpr ShapeID invalid() 
+    {
+        return ShapeID{std::numeric_limits<uint32_t>::max(), 0};
+    }
+
+    bool operator==(const ShapeID& other) const
+    {
+        return index == other.index && generation == other.generation;
+    }
 };
 
 struct ShapeHandle2D
@@ -146,6 +156,19 @@ public:
         return insertHandle({ ShapeType2D::SHAPE2D_CIRCLE, h.index } );
     }
 
+    ShapeID add(const IFiniteShape2D& shape)
+    {
+        switch(shape.type())
+        {
+        case ShapeType2D::SHAPE2D_CIRCLE:    return add(*shape.shape_cast<Circle2D>());
+        case ShapeType2D::SHAPE2D_TRIANGLE:  return add(*shape.shape_cast<Triangle2D>());
+        case ShapeType2D::SHAPE2D_RECTANGLE: return add(*shape.shape_cast<Rectangle2D>());
+        case ShapeType2D::SHAPE2D_POLYGON:   return add(*shape.shape_cast<Polygon2D>());
+        case ShapeType2D::SHAPE2D_CONVEX_POLYGON: return ShapeID::invalid();
+        }
+        return ShapeID::invalid();
+    }
+
 private:
     ShapeID insertHandle(ShapeHandle2D h)
     {
@@ -221,7 +244,6 @@ public:
     void visit(ShapeID id, Fn&& fn)
     {
         if (!isValid(id)) return;
-
         auto h = _handleMap[id.index].handle;
 
         switch (h.type)
@@ -238,7 +260,54 @@ public:
         case ShapeType2D::SHAPE2D_POLYGON:
             if (auto* p = _polygons.get({h.index})) fn(*p);
             break;
+        case ShapeType2D::SHAPE2D_CONVEX_POLYGON:
+            break;
         }
+    }
+
+    template <typename Container, typename Fn>
+    void forEachId(const Container& ids, Fn&& fn)
+    {
+        for (const ShapeID& id : ids)
+        {
+            visit(id, fn);
+        }
+    }
+
+    template <typename T>
+    const T* get_as(ShapeID id) const
+    {
+        if (!isValid(id)) return nullptr;
+        auto h = _handleMap[id.index].handle;
+
+        if (h.type != T::shapeType)
+            return nullptr;
+
+        switch(h.type)
+        {
+        case ShapeType2D::SHAPE2D_CIRCLE:    return _circles.get({h.index});
+        case ShapeType2D::SHAPE2D_TRIANGLE:  return _triangles.get({h.index});
+        case ShapeType2D::SHAPE2D_RECTANGLE: return _rectangles.get({h.index});
+        case ShapeType2D::SHAPE2D_POLYGON:   return _polygons.get({h.index});
+        case ShapeType2D::SHAPE2D_CONVEX_POLYGON: nullptr;
+        }
+        return nullptr;
+    }
+
+    const IFiniteShape2D* get(ShapeID id) const
+    {
+        if (!isValid(id)) return nullptr;
+        auto h = _handleMap[id.index].handle;
+
+        switch(h.type)
+        {
+        case ShapeType2D::SHAPE2D_CIRCLE:    return _circles.get({h.index});
+        case ShapeType2D::SHAPE2D_TRIANGLE:  return _triangles.get({h.index});
+        case ShapeType2D::SHAPE2D_RECTANGLE: return _rectangles.get({h.index});
+        case ShapeType2D::SHAPE2D_POLYGON:   return _polygons.get({h.index});
+        case ShapeType2D::SHAPE2D_CONVEX_POLYGON: nullptr;
+        }
+        return nullptr;
     }
 
 private:
