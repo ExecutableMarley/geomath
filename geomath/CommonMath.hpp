@@ -9,6 +9,7 @@
 #include <cmath>
 #include <algorithm>
 #include <numbers>
+#include <stdexcept>
 
 namespace Arns
 {
@@ -263,6 +264,86 @@ template <typename T>
 inline void sinCosDeg(T degrees, T &sine, T &cosine)
 {
     sinCos(degToRad(degrees), sine, cosine);
+}
+
+
+// Check for GCC/Clang builtins
+#if defined(__GNUC__) || defined(__clang__)
+    #define HAS_BUILTIN_OVERFLOW 1
+#else
+    #define HAS_BUILTIN_OVERFLOW 0
+#endif
+
+// Overflow aware arithmetic
+
+// Safe signed multiplication
+template <std::integral T>
+inline T safe_mul(T a, T b) 
+{
+#if HAS_BUILTIN_OVERFLOW
+    T result;
+    if (__builtin_mul_overflow(a, b, &result)) {
+        throw std::overflow_error("Multiplication overflow");
+    }
+    return result;
+#else
+    // Software Fallback
+    if (a == 0 || b == 0) return 0;
+    if (a > 0)
+    {
+        if (b > 0) { if (a > std::numeric_limits<T>::max() / b) throw std::overflow_error("Multiplication Overflow"); }
+        else { if (b < std::numeric_limits<T>::min() / a) throw std::overflow_error("Multiplication Overflow"); }
+    } 
+    else
+    {
+        if (b > 0) { if (a < std::numeric_limits<T>::min() / b) throw std::overflow_error("Multiplication Overflow"); }
+        else {
+            if (a == std::numeric_limits<T>::min() || b == std::numeric_limits<T>::min()) throw std::overflow_error("Multiplication Overflow");
+            if (-a > std::numeric_limits<T>::max() / (-b)) throw std::overflow_error("Multiplication Overflow");
+        }
+    }
+    return a * b;
+#endif
+}
+
+// Safe signed addition
+template <std::integral T>
+inline T safe_add(T a, T b) 
+{
+#if HAS_BUILTIN_OVERFLOW
+    T result;
+    if (__builtin_add_overflow(a, b, &result)) {
+        throw std::overflow_error("Addition overflow");
+    }
+    return result;
+#else
+    // Software Fallback
+    if ((b > 0 && a > std::numeric_limits<T>::max() - b) ||
+        (b < 0 && a < std::numeric_limits<T>::min() - b)) {
+        throw std::overflow_error("Addition overflow");
+    }
+    return a + b;
+#endif
+}
+
+// Safe signed subtraction
+template <std::integral T>
+inline T safe_sub(T a, T b) 
+{
+#if HAS_BUILTIN_OVERFLOW
+    T result;
+    if (__builtin_sub_overflow(a, b, &result)) {
+        throw std::overflow_error("Subtraction overflow");
+    }
+    return result;
+#else
+    // Software Fallback
+    if ((b > 0 && a < std::numeric_limits<T>::min() + b) ||
+        (b < 0 && a > std::numeric_limits<T>::max() + b)) {
+        throw std::overflow_error("Subtraction overflow");
+    }
+    return a - b;
+#endif
 }
 
 

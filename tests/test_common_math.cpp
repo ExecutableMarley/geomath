@@ -1,6 +1,8 @@
 #include "third_party/doctest.h"
 
 #include "CommonMath.hpp"
+#include <stdexcept>
+#include <cstdint>
 
 using namespace Arns::Math;
 
@@ -83,3 +85,84 @@ TEST_CASE("approximatelyEqual - clearly unequal")
 // ============================================================================
 // 
 // ============================================================================
+
+TEST_SUITE("Safe Integer Arithmetic")
+{
+    TEST_CASE("safe_add")
+    {
+        CHECK(safe_add<int64_t>(0, 0) == 0);
+        CHECK(safe_add<int64_t>(1, 2) == 3);
+        CHECK(safe_add<int64_t>(-1, -2) == -3);
+        CHECK(safe_add<int64_t>(5, -3) == 2);
+        CHECK(safe_add<int64_t>(-5, 3) == -2);
+
+        CHECK(safe_add<int64_t>(INT64_MAX, 0) == INT64_MAX);
+        CHECK(safe_add<int64_t>(INT64_MIN, 0) == INT64_MIN);
+
+        CHECK(safe_add<int64_t>(INT64_MAX - 1, 1) == INT64_MAX);
+        CHECK(safe_add<int64_t>(INT64_MIN + 1, -1) == INT64_MIN);
+
+        CHECK_THROWS_AS(safe_add<int64_t>(INT64_MAX, 1), std::overflow_error);
+        CHECK_THROWS_AS(safe_add<int64_t>(INT64_MAX - 10, 11), std::overflow_error);
+
+        CHECK_THROWS_AS(safe_add<int64_t>(INT64_MIN, -1), std::overflow_error);
+        CHECK_THROWS_AS(safe_add<int64_t>(INT64_MIN + 10, -11), std::overflow_error);
+    }
+
+    TEST_CASE("safe_sub")
+    {
+        CHECK(safe_sub<int64_t>(0, 0) == 0);
+        CHECK(safe_sub<int64_t>(5, 3) == 2);
+        CHECK(safe_sub<int64_t>(-5, -3) == -2);
+        CHECK(safe_sub<int64_t>(5, -3) == 8);
+        CHECK(safe_sub<int64_t>(-5, 3) == -8);
+
+        CHECK(safe_sub<int64_t>(INT64_MAX, 0) == INT64_MAX);
+        CHECK(safe_sub<int64_t>(INT64_MIN, 0) == INT64_MIN);
+
+        CHECK(safe_sub<int64_t>(INT64_MAX, INT64_MAX) == 0);
+        CHECK(safe_sub<int64_t>(INT64_MIN, INT64_MIN) == 0);
+
+        CHECK_THROWS_AS(safe_sub<int64_t>(INT64_MAX, -1), std::overflow_error);
+
+        CHECK_THROWS_AS(safe_sub<int64_t>(INT64_MIN, 1), std::overflow_error);
+        CHECK_THROWS_AS(safe_sub<int64_t>(INT64_MAX, INT64_MIN), std::overflow_error);
+        CHECK_THROWS_AS(safe_sub<int64_t>(INT64_MIN, INT64_MAX), std::overflow_error);
+    }
+
+    TEST_CASE("safe_mul")
+    {
+        CHECK(safe_mul<int64_t>(0, 0) == 0);
+        CHECK(safe_mul<int64_t>(0, 123456) == 0);
+        CHECK(safe_mul<int64_t>(123456, 0) == 0);
+
+        CHECK(safe_mul<int64_t>(2, 3) == 6);
+        CHECK(safe_mul<int64_t>(-2, 3) == -6);
+        CHECK(safe_mul<int64_t>(2, -3) == -6);
+        CHECK(safe_mul<int64_t>(-2, -3) == 6);
+
+        CHECK(safe_mul<int64_t>(1, INT64_MAX) == INT64_MAX);
+        CHECK(safe_mul<int64_t>(INT64_MAX, 1) == INT64_MAX);
+
+        CHECK(safe_mul<int64_t>(-1, INT64_MAX) == -INT64_MAX);
+        CHECK(safe_mul<int64_t>(INT64_MAX, -1) == -INT64_MAX);
+
+        CHECK(safe_mul<int64_t>(INT64_MIN, 1) == INT64_MIN);
+        CHECK(safe_mul<int64_t>(1, INT64_MIN) == INT64_MIN);
+
+        CHECK(safe_mul<int64_t>(INT64_MAX / 2, 2) == (INT64_MAX / 2) * 2);
+        CHECK(safe_mul<int64_t>(INT64_MIN / 2, 2) == (INT64_MIN / 2) * 2);
+
+        CHECK_THROWS_AS(safe_mul<int64_t>(INT64_MAX, 2), std::overflow_error);
+        CHECK_THROWS_AS(safe_mul<int64_t>(2, INT64_MAX), std::overflow_error);
+
+        CHECK_THROWS_AS(safe_mul<int64_t>(INT64_MIN, -1), std::overflow_error);
+        CHECK_THROWS_AS(safe_mul<int64_t>(-1, INT64_MIN), std::overflow_error);
+
+        CHECK_THROWS_AS(safe_mul<int64_t>(INT64_MIN, 2), std::overflow_error);
+        CHECK_THROWS_AS(safe_mul<int64_t>(2, INT64_MIN), std::overflow_error);
+
+        CHECK_THROWS_AS(safe_mul<int64_t>(INT64_MAX, INT64_MAX), std::overflow_error);
+        CHECK_THROWS_AS(safe_mul<int64_t>(INT64_MIN, INT64_MIN), std::overflow_error);
+    }
+}
