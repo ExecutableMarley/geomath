@@ -28,6 +28,8 @@ public:
     Vector2D m_center;
     real_t m_radius;
 
+    // --- Constructors ---
+
     Circle2D() : m_center(), m_radius(0) {}
 
     Circle2D(const Vector2D &center, real_t radius) : m_center(center), m_radius(radius) {}
@@ -71,6 +73,8 @@ public:
     {
         return m_center;
     }
+
+    // --- Transform / modification ---
 
     Circle2D& translate(const Vector2D &translation) override
     {
@@ -136,6 +140,8 @@ public:
     {
         return BBox2D(m_center - Vector2D(m_radius, m_radius), m_center + Vector2D(m_radius, m_radius));
     }
+
+    // --- Operators ---
 
     bool operator==(const Circle2D& other) const
     {

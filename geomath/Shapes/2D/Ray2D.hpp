@@ -19,6 +19,9 @@ namespace Math
 class Ray2D
 {
 public:
+
+    // --- Constructors ---
+
     Vector2D m_origin;
     Vector2D m_direction;
 
@@ -46,7 +49,7 @@ public:
         return (point - m_origin).dot(m_direction) / m_direction.lengthSquared();
     }
 
-    // --- ---
+    // --- Operators ---
 
     bool operator==(const Ray2D& other) const
     {

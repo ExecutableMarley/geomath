@@ -22,6 +22,8 @@ public:
     Vector2D m_start;
     Vector2D m_end;
 
+    // --- Constructors ---
+
     Line2D() : m_start(), m_end() {}
 
     Line2D(Vector2D startPoint, Vector2D endPoint) : m_start(startPoint), m_end(endPoint) {}
@@ -65,7 +67,7 @@ public:
         return approximatelyZero(lengthSquared) ? real_t{0} : (point - m_start).dot(deltaVector) / lengthSquared;
     }
 
-    // --- ---
+    // --- Operators ---
 
     bool operator==(const Line2D& other) const
     {

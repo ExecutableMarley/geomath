@@ -27,6 +27,8 @@ class Polygon2D : public IPolygonalShape2D
 public:
     std::vector<Vector2D> m_vertices;
 
+    // --- Constructors ---
+
     Polygon2D() : m_vertices() {}
 
     Polygon2D(const std::vector<Vector2D> &vertices) : m_vertices(vertices) {}
@@ -152,6 +154,8 @@ public:
         return centroid / m_vertices.size();
     }
 
+    // --- Transform / modification ---
+
     Polygon2D& translate(const Vector2D &translation) override
     {
         for (int i = 0; i < m_vertices.size(); i++)
@@ -263,7 +267,7 @@ public:
         return m_vertices[index];
     }
 
-    // --- ---
+    // --- Operators ---
 
     bool operator==(const Polygon2D& other) const
     {

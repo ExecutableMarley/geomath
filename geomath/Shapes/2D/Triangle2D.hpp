@@ -28,6 +28,8 @@ class Triangle2D : public IPolygonalShape2D
 public:
     std::array<Vector2D, 3> m_vertices;
 
+    // --- Constructors ---
+
     Triangle2D() :  m_vertices{ Vector2D{}, Vector2D{}, Vector2D{} } {}
 
     Triangle2D(const Vector2D &a, const Vector2D &b, const Vector2D &c) : m_vertices{ a, b, c } {}
@@ -77,6 +79,8 @@ public:
     {
         return (a() + b() + c()) / real_t{3};
     }
+
+    // --- Transform / modification ---
 
     Triangle2D& translate(const Vector2D &translation) override
     {
@@ -160,7 +164,7 @@ public:
         return vertexAt(index);
     }
 
-    // --- ---
+    // --- Operators ---
 
     bool operator==(const Triangle2D& other) const
     {

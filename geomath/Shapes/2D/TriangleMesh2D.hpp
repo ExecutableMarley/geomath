@@ -43,6 +43,8 @@ public:
     std::vector <Vector2D> m_vertices;
     std::vector <TriangleIndices> m_triangles;
 
+    // --- Constructors ---
+
     TriangleMesh2D() : m_vertices(), m_triangles() {};
 
     TriangleMesh2D(const std::vector<Vector2D>& vertices, const std::vector<TriangleIndices>& triangles) :

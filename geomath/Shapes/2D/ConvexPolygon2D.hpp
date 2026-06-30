@@ -22,6 +22,9 @@ namespace Math
 class ConvexPolygon2D : public Polygon2D
 {
 public:
+
+    // --- Constructors ---
+
     ConvexPolygon2D() = default;
 
     //Todo: This is bad

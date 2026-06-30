@@ -28,6 +28,8 @@ class Rectangle2D : public IPolygonalShape2D
 public:
     std::array<Vector2D, 4> m_vertices;
 
+    // --- Constructors ---
+
     Rectangle2D() : m_vertices{ Vector2D{}, Vector2D{}, Vector2D{}, Vector2D{} } {}
 
     Rectangle2D(const Vector2D &a, const Vector2D &b, const Vector2D &c, const Vector2D &d) : m_vertices{ a, b, c, d } {}
@@ -92,6 +94,8 @@ public:
         return (a() + b() + c() + d()) / real_t{4};
     }
 
+    // --- Transform / modification ---
+
     Rectangle2D& translate(const Vector2D &translation) override
     {
         for (auto& v : m_vertices)
@@ -127,7 +131,7 @@ public:
         return *this;
     }
 
-    std::unique_ptr<IFiniteShape2D> clone() const
+    std::unique_ptr<IFiniteShape2D> clone() const override
     {
         return std::make_unique<Rectangle2D>(*this);        
     }
@@ -181,7 +185,7 @@ public:
         return vertexAt(index);
     }
 
-    // --- ---
+    // --- Operators ---
 
     bool operator==(const Rectangle2D& other) const
     {
