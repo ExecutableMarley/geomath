@@ -21,6 +21,7 @@ namespace Math
 class Matrix : public IMatrix
 {
 protected:
+    // Todo: Consider not using std::vector
     std::vector<std::vector<real_t>> m_data;
     size_t m_rows;
     size_t m_columns;

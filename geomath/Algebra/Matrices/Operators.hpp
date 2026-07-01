@@ -135,6 +135,25 @@ inline Matrix operator-(const IMatrix& lhs, real_t scalar)
     return result;
 }
 
+// [==]
+
+inline bool operator==(const IMatrix& lhs, const IMatrix& rhs)
+{
+    if (lhs.rows() != rhs.rows() || lhs.columns() != rhs.columns())
+        return false;
+
+    for (int i = 0; i < lhs.rows(); i++)
+        for (int j = 0; j < lhs.columns(); j++)
+            if (!approximatelyEqual(lhs(i, j), rhs(i, j)))
+                return false;
+
+    return true;
+}
+
+inline bool operator!=(const IMatrix& lhs, const IMatrix& rhs)
+{
+    return !(lhs == rhs);
+}
 
 } // namespace Math
 

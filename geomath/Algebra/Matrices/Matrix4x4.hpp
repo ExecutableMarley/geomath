@@ -11,6 +11,7 @@
 #include "CommonMath.hpp"
 #include "IMatrix.hpp"
 #include "Geometry/Vector3D.hpp"
+#include "Geometry/Vector4D.hpp"
 
 namespace Arns
 {
@@ -179,6 +180,23 @@ public:
         return result;
     }
 
+    Vector4D operator*(const Vector4D& vec) const
+    {
+        return Vector4D(
+            m_data[0][0] * vec.x + m_data[0][1] * vec.y + m_data[0][2] * vec.z + m_data[0][3] * vec.w,
+            m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2] * vec.z + m_data[1][3] * vec.w,
+            m_data[2][0] * vec.x + m_data[2][1] * vec.y + m_data[2][2] * vec.z + m_data[2][3] * vec.w,
+            m_data[3][0] * vec.x + m_data[3][1] * vec.y + m_data[3][2] * vec.z + m_data[3][3] * vec.w);
+    }
+
+    Vector3D operator*(const Vector3D& vec) const
+    {
+        return Vector3D(
+            m_data[0][0] * vec.x + m_data[0][1] * vec.y + m_data[0][2] * vec.z + m_data[0][3],
+            m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2] * vec.z + m_data[1][3],
+            m_data[2][0] * vec.x + m_data[2][1] * vec.y + m_data[2][2] * vec.z + m_data[2][3]);
+    }
+
     Matrix4x4 operator*(real_t scalar) const
     {
         Matrix4x4 result;
@@ -198,8 +216,69 @@ public:
                 result(i, j) = m_data[i][j] / scalar;
         return result;
     }
-};
 
+    //[Static]
+
+    // 3D homogeneous transforms
+
+    static Matrix4x4 createTranslation3D(real_t tx, real_t ty, real_t tz)
+    {
+        return Matrix4x4(
+            1.f, 0.f, 0.f, tx,
+            0.f, 1.f, 0.f, ty,
+            0.f, 0.f, 1.f, tz,
+            0.f, 0.f, 0.f, 1.f);
+    }
+
+    static Matrix4x4 createScale3D(real_t sx, real_t sy, real_t sz)
+    {
+        return Matrix4x4(
+            sx,   0.0f, 0.0f, 0.0f,
+            0.0f, sy,   0.0f, 0.0f,
+            0.0f, 0.0f, sz,   0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+        );
+    }
+
+    static Matrix4x4 createRotationXRads(real_t angle)
+    {
+        real_t sin, cos;
+        sinCos(angle, sin, cos);
+
+        return Matrix4x4(
+            1.f, 0.f,  0.f, 0.f,
+            0.f, cos, -sin, 0.f,
+            0.f, sin,  cos, 0.f,
+            0.f, 0.f,  0.f, 1.f
+        );
+    }
+
+    static Matrix4x4 createRotationYRads(real_t angle)
+    {
+        real_t sin, cos;
+        sinCos(angle, sin, cos);
+
+        return Matrix4x4(
+            cos, 0.f, sin, 0.f,
+            0.f, 1.f, 0.f, 0.f,
+            -sin, 0.f, cos, 0.f,
+            0.f, 0.f, 0.f, 1.f
+        );
+    }
+
+    static Matrix4x4 createRotationZRads(real_t angle)
+    {
+        real_t sin, cos;
+        sinCos(angle, sin, cos);
+
+        return Matrix4x4(
+            cos, -sin, 0.f, 0.f,
+            sin,  cos, 0.f, 0.f,
+            0.f,  0.f, 1.f, 0.f,
+            0.f,  0.f, 0.f, 1.f
+        );
+    }
+};
 
 } // namespace Math
 

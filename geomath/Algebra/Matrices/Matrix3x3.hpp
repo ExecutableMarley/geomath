@@ -237,11 +237,11 @@ public:
             m_data[2][0] * other.x + m_data[2][1] * other.y + m_data[2][2] * other.z);
     }
 
-    Vector2D operator*(const Vector2D& other)
+    Vector2D operator*(const Vector2D& other) const
     {
-        real_t resultX = m_data[0][0] * other.x + m_data[0][1] * other.y + m_data[0][2] * 1.0f;
-        real_t resultY = m_data[1][0] * other.x + m_data[1][1] * other.y + m_data[1][2] * 1.0f;
-        real_t resultW = m_data[2][0] * other.x + m_data[2][1] * other.y + m_data[2][2] * 1.0f;
+        real_t resultX = m_data[0][0] * other.x + m_data[0][1] * other.y + m_data[0][2];
+        real_t resultY = m_data[1][0] * other.x + m_data[1][1] * other.y + m_data[1][2];
+        real_t resultW = m_data[2][0] * other.x + m_data[2][1] * other.y + m_data[2][2];
 
         // Normalization
         if (!approximatelyZero(resultW) && !approximatelyEqual(resultW, 1.0f))
@@ -271,15 +271,18 @@ public:
 
     //[Static]
 
-    static Matrix3x3 createTranslation(const Vector2D& translation)
+
+    // 2D homogeneous transforms
+
+    static Matrix3x3 createTranslation2D(const Vector2D& translation)
     {
         return Matrix3x3(
             1, 0, translation.x,
             0, 1, translation.y,
-            0, 0, 1.f);
+            0, 0, 1);
     }
 
-    static Matrix3x3 createScale(real_t sx, real_t sy)
+    static Matrix3x3 createScale2D(real_t sx, real_t sy)
     {
         return Matrix3x3(
             sx,   0.0f, 0.0f,
@@ -288,7 +291,7 @@ public:
         );
     }
 
-    static Matrix3x3 createRotationRads(real_t angle)
+    static Matrix3x3 createRotationRads2D(real_t angle)
     {
         real_t sin, cos;
         sinCos(angle, sin, cos);
@@ -299,7 +302,7 @@ public:
             0.f,  0.f, 1.f);
     }
 
-    static Matrix3x3 createRotationDegs(real_t angle)
+    static Matrix3x3 createRotationDegs2D(real_t angle)
     {
         real_t sin, cos;
         sinCosDeg(angle, sin, cos);
@@ -308,6 +311,53 @@ public:
             cos, -sin, 0.f,
             sin,  cos, 0.f,
             0.f,  0.f, 1.f);
+    }
+
+    // 3D linear transforms
+
+    static Matrix3x3 createScale3D(real_t sx, real_t sy, real_t sz)
+    {
+        return Matrix3x3(
+            sx,   0.0f, 0.0f,
+            0.0f, sy,   0.0f,
+            0.0f, 0.0f, sz
+        );
+    }
+
+    static Matrix3x3 createRotationXRads(real_t angle)
+    {
+        real_t sin, cos;
+        sinCos(angle, sin, cos);
+
+        return Matrix3x3(
+            1.f, 0.f,  0.f,
+            0.f, cos, -sin,
+            0.f, sin,  cos
+        );
+    }
+
+    static Matrix3x3 createRotationYRads(real_t angle)
+    {
+        real_t sin, cos;
+        sinCos(angle, sin, cos);
+
+        return Matrix3x3(
+            cos, 0.f, sin,
+            0.f, 1.f, 0.f,
+            -sin, 0.f, cos
+        );
+    }
+
+    static Matrix3x3 createRotationZRads(real_t angle)
+    {
+        real_t sin, cos;
+        sinCos(angle, sin, cos);
+
+        return Matrix3x3(
+            cos, -sin, 0.f,
+            sin,  cos, 0.f,
+            0.f,  0.f, 1.f
+        );
     }
 };
 
