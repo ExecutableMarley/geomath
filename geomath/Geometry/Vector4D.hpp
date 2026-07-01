@@ -22,9 +22,9 @@ struct Vector4D
     real_t z;
     real_t w;
 
-    Vector4D() : x(0), y(0), z(0), w(0) {}
+    constexpr Vector4D() : x(0), y(0), z(0), w(0) {}
 
-    Vector4D(real_t x, real_t y, real_t z, real_t w) : x(x), y(y), z(z), w(w) {}
+    constexpr Vector4D(real_t x, real_t y, real_t z, real_t w) : x(x), y(y), z(z), w(w) {}
 
     real_t length() const
     {
@@ -162,6 +162,14 @@ struct Vector4D
     {
         return Vector4D(-x, -y, -z, -w);
     }
+
+    // Constants
+
+    static constexpr Vector4D zero()  { return Vector4D(0, 0, 0, 0); }
+    static constexpr Vector4D unitX() { return Vector4D(1, 0, 0, 0); }
+    static constexpr Vector4D unitY() { return Vector4D(0, 1, 0, 0); }
+    static constexpr Vector4D unitZ() { return Vector4D(0, 0, 1, 0); }
+    static constexpr Vector4D unitW() { return Vector4D(0, 0, 0, 1); }
 };
 
 } // namespace Math

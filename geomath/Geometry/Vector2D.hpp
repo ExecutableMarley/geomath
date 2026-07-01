@@ -20,9 +20,9 @@ struct Vector2D
     real_t x;
     real_t y;
 
-    Vector2D() : x(0), y(0) {}
+    constexpr Vector2D() : x(0), y(0) {}
 
-    Vector2D(real_t x, real_t y) : x(x), y(y) {}
+    constexpr Vector2D(real_t x, real_t y) : x(x), y(y) {}
 
 
     real_t length() const
@@ -228,6 +228,12 @@ struct Vector2D
     {
         return Vector2D(-x, -y);
     }
+
+    // Constants
+
+    static constexpr Vector2D zero()  { return Vector2D(0, 0); }
+    static constexpr Vector2D unitX() { return Vector2D(1, 0); }
+    static constexpr Vector2D unitY() { return Vector2D(0, 1); }
 
     // Static functions
 

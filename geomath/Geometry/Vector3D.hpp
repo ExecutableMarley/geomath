@@ -21,9 +21,9 @@ struct Vector3D
     real_t y;
     real_t z;
 
-    Vector3D() : x(0), y(0), z(0) {}
+    constexpr Vector3D() : x(0), y(0), z(0) {}
 
-    Vector3D(real_t x, real_t y, real_t z) : x(x), y(y), z(z) {}
+    constexpr Vector3D(real_t x, real_t y, real_t z) : x(x), y(y), z(z) {}
 
 
     real_t length() const
@@ -238,6 +238,13 @@ struct Vector3D
     {
         return Vector3D(-x, -y, -z);
     }
+
+    // Constants
+
+    static constexpr Vector3D zero()  { return Vector3D(0, 0, 0); }
+    static constexpr Vector3D unitX() { return Vector3D(1, 0, 0); }
+    static constexpr Vector3D unitY() { return Vector3D(0, 1, 0); }
+    static constexpr Vector3D unitZ() { return Vector3D(0, 0, 1); }
 
     // Static functions
 
