@@ -13,6 +13,7 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
+#include "Algebra/Matrices/Matrix3x3.hpp"
 #include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
 #include "BBox2D.hpp"
 #include "IShape2D.hpp"
@@ -36,8 +37,12 @@ public:
 
     Rectangle2D(const Vector2D &pos, real_t width, real_t height) : m_vertices{ pos, pos + Vector2D(width, 0), pos + Vector2D(width, height), pos + Vector2D(0, height) } {}
 
+    // --- Metadata & Interface Queries ---
+
     ShapeType2D type() const override { return SHAPE2D_RECTANGLE; }
     static constexpr ShapeType2D shapeType = SHAPE2D_RECTANGLE;
+
+    // --- Data Accessors & Mutators ---
 
     Vector2D& a() { return m_vertices[0]; }
     Vector2D& b() { return m_vertices[1]; }
@@ -68,6 +73,8 @@ public:
     {
         return m_vertices;
     }
+
+    // --- Geometric Properties ---
 
     real_t width() const
     {
@@ -126,6 +133,15 @@ public:
         return *this;
     }
 
+    Rectangle2D& transform(const Matrix3x3& matrix)
+    {
+        for (auto& v : m_vertices)
+            v = matrix.transformPoint(v);
+        return *this;
+    }
+
+    // --- Lifecycle / Factory Methods ---
+
     Rectangle2D copy() const
     {
         return *this;
@@ -135,6 +151,8 @@ public:
     {
         return std::make_unique<Rectangle2D>(*this);        
     }
+
+    // --- Spatial Queries ---
 
     bool contains(const Vector2D &point) const override
     {
@@ -175,6 +193,8 @@ public:
         return BBox2D(Vector2D::min(a(), b(), c(), d()), Vector2D::max(a(), b(), c(), d()));
     }
 
+    // --- Operators ---
+
     Vector2D& operator[](size_t index)
     {
         return vertexAt(index);
@@ -184,8 +204,6 @@ public:
     {
         return vertexAt(index);
     }
-
-    // --- Operators ---
 
     bool operator==(const Rectangle2D& other) const
     {

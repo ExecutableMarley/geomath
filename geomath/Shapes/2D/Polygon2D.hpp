@@ -12,6 +12,7 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
+#include "Algebra/Matrices/Matrix3x3.hpp"
 #include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
 #include "BBox2D.hpp"
 #include "IShape2D.hpp"
@@ -35,8 +36,12 @@ public:
 
     Polygon2D(std::vector<Vector2D>&& vertices) noexcept : m_vertices(std::move(vertices)) {}
 
+    // --- Metadata & Interface Queries ---
+
     ShapeType2D type() const override { return SHAPE2D_POLYGON; }
     static constexpr ShapeType2D shapeType = SHAPE2D_POLYGON;
+
+    // --- Data Accessors & Mutators ---
 
     size_t vertexCount() const override
     {
@@ -116,6 +121,8 @@ public:
         return true;
     }
 
+    // --- Geometric Properties ---
+
     real_t area() const override
     {
         double area = 0;
@@ -186,6 +193,15 @@ public:
         return *this;
     }
 
+    Polygon2D& transform(const Matrix3x3& matrix)
+    {
+        for (int i = 0; i < m_vertices.size(); i++)
+            m_vertices[i] = matrix.transformPoint(m_vertices[i]);
+        return *this;
+    }
+
+    // --- Lifecycle / Factory Methods ---
+
     Polygon2D copy() const
     {
         return *this;
@@ -195,6 +211,8 @@ public:
     {
         return std::make_unique<Polygon2D>(*this);        
     }
+
+    // --- Spatial Queries ---
 
     /*This only works for "simple" (non self intersecting) polygons*/
     bool contains(const Vector2D &point) const override
@@ -257,6 +275,8 @@ public:
         return BBox2D(min, max);
     }
 
+    // --- Operators ---
+
     Vector2D& operator[](size_t index)
     {
         return m_vertices[index];
@@ -266,8 +286,6 @@ public:
     {
         return m_vertices[index];
     }
-
-    // --- Operators ---
 
     bool operator==(const Polygon2D& other) const
     {

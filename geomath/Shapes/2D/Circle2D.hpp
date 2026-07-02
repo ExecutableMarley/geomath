@@ -34,8 +34,12 @@ public:
 
     Circle2D(const Vector2D &center, real_t radius) : m_center(center), m_radius(radius) {}
 
+    // --- Metadata & Interface Queries ---
+
     ShapeType2D type() const override { return SHAPE2D_CIRCLE; }
     static constexpr ShapeType2D shapeType = SHAPE2D_CIRCLE;
+
+    // --- Data Accessors & Mutators ---
 
     std::vector<Vector2D> getVertices(int resolution = 32) const
     {
@@ -53,6 +57,8 @@ public:
 
         return vertices;
     }
+
+    // --- Geometric Properties ---
 
     real_t area() const override
     {
@@ -99,6 +105,8 @@ public:
         return *this;
     }
 
+    // --- Lifecycle / Factory Methods ---
+
     Circle2D copy() const
     {
         return *this;
@@ -108,6 +116,8 @@ public:
     {
         return std::make_unique<Circle2D>(*this);        
     }
+
+    // --- Spatial Queries ---
 
     bool contains(const Vector2D &point) const override
     {
