@@ -141,11 +141,18 @@ public:
 
     //
 
-    Vector2D transform(const Vector2D& vec) const
+    Vector2D transformPoint(const Vector2D& vec) const
     {
         return Vector2D(
             m_data[0][0] * vec.x + m_data[0][1] * vec.y + m_data[0][2] * 1,
             m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2] * 1);
+    }
+
+    Vector2D transformVector(const Vector2D& vec) const
+    {
+        return Vector2D(
+            m_data[0][0] * vec.x + m_data[0][1] * vec.y,
+            m_data[1][0] * vec.x + m_data[1][1] * vec.y);
     }
 
     real_t* operator[](size_t row)
@@ -304,13 +311,7 @@ public:
 
     static Matrix3x3 createRotationDegs2D(real_t angle)
     {
-        real_t sin, cos;
-        sinCosDeg(angle, sin, cos);
-        
-        return Matrix3x3(
-            cos, -sin, 0.f,
-            sin,  cos, 0.f,
-            0.f,  0.f, 1.f);
+        return createRotationRads2D(degToRad(angle));
     }
 
     // 3D linear transforms
@@ -336,6 +337,11 @@ public:
         );
     }
 
+    static Matrix3x3 createRotationXDegs(real_t angle)
+    {
+        return createRotationXRads(degToRad(angle));
+    }
+
     static Matrix3x3 createRotationYRads(real_t angle)
     {
         real_t sin, cos;
@@ -348,6 +354,11 @@ public:
         );
     }
 
+    static Matrix3x3 createRotationYDegs(real_t angle)
+    {
+        return createRotationYRads(degToRad(angle));
+    }
+
     static Matrix3x3 createRotationZRads(real_t angle)
     {
         real_t sin, cos;
@@ -358,6 +369,11 @@ public:
             sin,  cos, 0.f,
             0.f,  0.f, 1.f
         );
+    }
+
+    static Matrix3x3 createRotationZDegs(real_t angle)
+    {
+        return createRotationZRads(degToRad(angle));
     }
 };
 

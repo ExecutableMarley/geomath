@@ -96,12 +96,20 @@ public:
 
     //
 
-    Vector3D transform(const Vector3D& vec) const
+    Vector3D transformPoint(const Vector3D& vec) const
     {
         return Vector3D(
             m_data[0][0] * vec.x + m_data[0][1] * vec.y + m_data[0][2] * 1,
             m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2] * 1,
             m_data[2][0] * vec.x + m_data[2][1] * vec.y + m_data[2][2] * 1);
+    }
+
+    Vector3D transformVector(const Vector3D& vec) const
+    {
+        return Vector3D(
+            m_data[0][0] * vec.x + m_data[0][1] * vec.y + m_data[0][2] * vec.z,
+            m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2] * vec.z,
+            m_data[2][0] * vec.x + m_data[2][1] * vec.y + m_data[2][2] * vec.z);
     }
 
     real_t* operator[](size_t row)
@@ -253,6 +261,11 @@ public:
         );
     }
 
+    static Matrix4x4 createRotationXDegs(real_t angle)
+    {
+        return createRotationXRads(degToRad(angle));
+    }
+
     static Matrix4x4 createRotationYRads(real_t angle)
     {
         real_t sin, cos;
@@ -266,6 +279,11 @@ public:
         );
     }
 
+    static Matrix4x4 createRotationYDegs(real_t angle)
+    {
+        return createRotationYRads(degToRad(angle));
+    }
+
     static Matrix4x4 createRotationZRads(real_t angle)
     {
         real_t sin, cos;
@@ -277,6 +295,11 @@ public:
             0.f,  0.f, 1.f, 0.f,
             0.f,  0.f, 0.f, 1.f
         );
+    }
+
+    static Matrix4x4 createRotationZDegs(real_t angle)
+    {
+        return createRotationZRads(degToRad(angle));
     }
 };
 
