@@ -202,6 +202,7 @@ private:
         case ShapeType2D::SHAPE2D_TRIANGLE:  _triangles.remove(h.index); break;
         case ShapeType2D::SHAPE2D_RECTANGLE: _rectangles.remove(h.index); break;
         case ShapeType2D::SHAPE2D_POLYGON:   _polygons.remove(h.index); break;
+        case ShapeType2D::SHAPE2D_CONVEX_POLYGON: break;
         }
     }
 
