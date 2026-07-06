@@ -8,6 +8,9 @@
 #include <math.h>
 
 #include "CommonMath.hpp"
+#include "Geometry/Vector3D.hpp"
+#include "Algebra/Matrices/Matrix3x3.hpp"
+#include "Algebra/Matrices/Matrix4x4.hpp"
 
 namespace Arns
 {
@@ -137,6 +140,22 @@ public:
     bool operator!=(const EulerAngles &other) const
     {
         return !approximatelyEqual(m_pitch, other.m_pitch) || !approximatelyEqual(m_yaw, other.m_yaw) || !approximatelyEqual(m_roll, other.m_roll);
+    }
+
+    // Conversion between EulerAngles and Matrix
+
+    Matrix3x3 toMatrix3x3() const
+    {
+        return Matrix3x3::createRotationXRads(degToRad(m_pitch)) * 
+            Matrix3x3::createRotationYRads(degToRad(m_yaw)) * 
+            Matrix3x3::createRotationZRads(degToRad(m_roll));
+    }
+
+    Matrix4x4 toMatrix4x4() const
+    {
+        return Matrix4x4::createRotationXRads(degToRad(m_pitch)) * 
+            Matrix4x4::createRotationYRads(degToRad(m_yaw)) * 
+            Matrix4x4::createRotationZRads(degToRad(m_roll));
     }
 };
 

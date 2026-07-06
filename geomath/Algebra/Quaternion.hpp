@@ -9,6 +9,8 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector3D.hpp"
+#include "Matrices/Matrix3x3.hpp"
+#include "Algebra/Matrices/Matrix4x4.hpp"
 
 namespace Arns
 {
@@ -146,6 +148,47 @@ struct Quaternion
     bool operator!=(const Quaternion &other) const
     {
         return !approximatelyEqual(x, other.x) || !approximatelyEqual(y, other.y) || !approximatelyEqual(z, other.z) || !approximatelyEqual(w, other.w);
+    }
+
+    // Conversation between Quaternion and Matrix
+
+    Matrix3x3 toMatrix3x3() const
+    {
+        real_t xx = x * x;
+        real_t yy = y * y;
+        real_t zz = z * z;
+        real_t xy = x * y;
+        real_t xz = x * z;
+        real_t yz = y * z;
+        real_t wx = w * x;
+        real_t wy = w * y;
+        real_t wz = w * z;
+
+        return Matrix3x3(
+            real_t(1) - real_t(2) * (yy + zz), real_t(2) * (xy - wz), real_t(2) * (xz + wy),
+            real_t(2) * (xy + wz), real_t(1) - real_t(2) * (xx + zz), real_t(2) * (yz - wx),
+            real_t(2) * (xz - wy), real_t(2) * (yz + wx), real_t(1) - real_t(2) * (xx + yy)
+        );
+    }
+
+    Matrix4x4 toMatrix4x4() const
+    {
+        real_t xx = x * x;
+        real_t yy = y * y;
+        real_t zz = z * z;
+        real_t xy = x * y;
+        real_t xz = x * z;
+        real_t yz = y * z;
+        real_t wx = w * x;
+        real_t wy = w * y;
+        real_t wz = w * z;
+
+        return Matrix4x4(
+            real_t(1) - real_t(2) * (yy + zz), real_t(2) * (xy - wz), real_t(2) * (xz + wy), 0,
+            real_t(2) * (xy + wz), real_t(1) - real_t(2) * (xx + zz), real_t(2) * (yz - wx), 0,
+            real_t(2) * (xz - wy), real_t(2) * (yz + wx), real_t(1) - real_t(2) * (xx + yy), 0,
+            0, 0, 0, 1
+        );
     }
 };
 
