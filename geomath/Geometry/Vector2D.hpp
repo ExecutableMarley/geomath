@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <math.h>
-
 #include "../CommonMath.hpp"
+#include <math.h>
+#include <ostream>
 
 namespace Arns
 {
@@ -257,6 +257,10 @@ struct Vector2D
     static Vector2D max(const Vector2D& a, const Vector2D& b, Args... args)
     {
         return max(a, max(b, args...));
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Vector2D& vec) {
+        return os << "{" << vec.x << ", " << vec.y << "}";
     }
 };
 

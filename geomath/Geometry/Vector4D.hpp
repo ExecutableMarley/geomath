@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <math.h>
-
 #include "../CommonMath.hpp"
+#include <math.h>
+#include <ostream>
 
 namespace Arns
 {
@@ -170,6 +170,10 @@ struct Vector4D
     static constexpr Vector4D unitY() { return Vector4D(0, 1, 0, 0); }
     static constexpr Vector4D unitZ() { return Vector4D(0, 0, 1, 0); }
     static constexpr Vector4D unitW() { return Vector4D(0, 0, 0, 1); }
+
+    friend std::ostream& operator<<(std::ostream& os, const Vector4D& vec) {
+        return os << "{" << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << "}";
+    }
 };
 
 } // namespace Math
