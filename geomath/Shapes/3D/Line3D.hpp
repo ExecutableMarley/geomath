@@ -25,7 +25,7 @@ public:
 
     Line3D(const Vector3D &start, const Vector3D &end) : m_start(start), m_end(end) {}
 
-    Line3D(const Vector3D &start, const Vector3D &direction, real_t length) : m_start(start), m_end(start + direction.createNormalized() * length) {}
+    Line3D(const Vector3D &start, const Vector3D &direction, real_t length) : m_start(start), m_end(start + direction.copy().normalize() * length) {}
 
     real_t length() const
     {

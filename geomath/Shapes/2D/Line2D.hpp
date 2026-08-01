@@ -29,7 +29,7 @@ public:
 
     Line2D(Vector2D startPoint, Vector2D endPoint) : m_start(startPoint), m_end(endPoint) {}
 
-    Line2D(Vector2D startPoint, Vector2D direction, real_t length) : m_start(startPoint), m_end(startPoint + direction.createNormalized() * length) {}
+    Line2D(Vector2D startPoint, Vector2D direction, real_t length) : m_start(startPoint), m_end(startPoint + direction.copy().normalize() * length) {}
 
     // --- Geometric Properties ---
 
@@ -119,7 +119,7 @@ public:
         return *this;
     }
 
-    // --- Operators ---
+    // --- Comparison Operators ---
 
     bool operator==(const Line2D& other) const
     {

@@ -21,10 +21,13 @@ struct Vector3D
     real_t y;
     real_t z;
 
+    // --- Constructors ---
+
     constexpr Vector3D() : x(0), y(0), z(0) {}
 
     constexpr Vector3D(real_t x, real_t y, real_t z) : x(x), y(y), z(z) {}
 
+    // --- Geometric Properties ---
 
     real_t length() const
     {
@@ -34,63 +37,6 @@ struct Vector3D
     real_t lengthSquared() const
     {
         return x * x + y * y + z * z;
-    }
-
-    bool isZero() const
-    {
-        return approximatelyZero(x) && approximatelyZero(y) && approximatelyZero(z);
-    }
-
-    Vector3D& normalize()
-    {
-        const real_t len = length();
-        if (len != 0)
-        {
-            x /= len;
-            y /= len;
-            z /= len;
-        }
-        return *this;
-    }
-
-    Vector3D createNormalized() const
-    {
-        const real_t len = length();
-        if (len != 0)
-        {
-            return Vector3D(x / len, y / len, z / len);
-        }
-        return Vector3D();
-    }
-
-    Vector3D& resize(real_t newLength)
-    {
-        const real_t len = length();
-        if (len != 0)
-        {
-            x *= newLength / len;
-            y *= newLength / len;
-            z *= newLength / len;
-        }
-        return *this;
-    }
-
-    Vector3D createResized(real_t newLength) const
-    {
-        const real_t len = length();
-        if (len != 0)
-        {
-            return Vector3D(x * newLength / len, y * newLength / len, z * newLength / len);
-        }
-        return Vector3D();
-    }
-
-    Vector3D& clamp(const Vector3D& min, const Vector3D& max)
-    {
-        x = Arns::Math::clamp(x, min.x, max.x);
-        y = Arns::Math::clamp(y, min.y, max.y);
-        z = Arns::Math::clamp(z, min.z, max.z);
-        return *this;
     }
 
     real_t dot(const Vector3D& other) const
@@ -106,6 +52,18 @@ struct Vector3D
             x * other.y - y * other.x);
     }
 
+    // --- State Queries ---
+
+    bool isZero() const
+    {
+        return approximatelyZero(x) && approximatelyZero(y) && approximatelyZero(z);
+    }
+
+    bool isNormalized() const
+    {
+        return approximatelyEqual(length(), 1);
+    }
+
     bool isParallel(const Vector3D& other) const
     {
         return approximatelyZero(cross(other).length());
@@ -114,6 +72,32 @@ struct Vector3D
     bool isOrthogonal(const Vector3D& other) const
     {
         return approximatelyZero(dot(other));
+    }
+
+    // --- Transform / Modification ---
+
+    Vector3D& normalize()
+    {
+        const real_t len = length();
+        if (len != 0)
+        {
+            x /= len;
+            y /= len;
+            z /= len;
+        }
+        return *this;
+    }
+
+    Vector3D& resize(real_t newLength)
+    {
+        const real_t len = length();
+        if (len != 0)
+        {
+            x *= newLength / len;
+            y *= newLength / len;
+            z *= newLength / len;
+        }
+        return *this;
     }
 
     Vector3D& rotateAroundX(real_t angle)
@@ -162,6 +146,23 @@ struct Vector3D
         return (*this -= point).rotate(xAngle, yAngle, zAngle) += point;
     }
 
+    Vector3D& clamp(const Vector3D& min, const Vector3D& max)
+    {
+        x = Arns::Math::clamp(x, min.x, max.x);
+        y = Arns::Math::clamp(y, min.y, max.y);
+        z = Arns::Math::clamp(z, min.z, max.z);
+        return *this;
+    }
+
+    // --- Derived Vectors ---
+
+    Vector3D copy() const
+    {
+        return *this;
+    }
+
+    // --- Conversion ---
+
     operator real_t*()
     {
         return &x;
@@ -171,6 +172,8 @@ struct Vector3D
     {
         return &x;
     }
+
+    // --- Arithmetic Operators ---
 
     Vector3D operator+(const Vector3D& other) const
     {
@@ -224,6 +227,13 @@ struct Vector3D
         return *this;
     }
 
+    Vector3D operator-() const
+    {
+        return Vector3D(-x, -y, -z);
+    }
+
+    // --- Comparison Operators ---
+
     bool operator==(const Vector3D& other) const
     {
         return approximatelyEqual(x, other.x) && approximatelyEqual(y, other.y) && approximatelyEqual(z, other.z);
@@ -234,20 +244,15 @@ struct Vector3D
         return !approximatelyEqual(x, other.x) || !approximatelyEqual(y, other.y) || !approximatelyEqual(z, other.z);
     }
 
-    Vector3D operator-() const
-    {
-        return Vector3D(-x, -y, -z);
-    }
-
-    // Constants
+    // --- Constants ---
 
     static constexpr Vector3D zero()  { return Vector3D(0, 0, 0); }
     static constexpr Vector3D unitX() { return Vector3D(1, 0, 0); }
     static constexpr Vector3D unitY() { return Vector3D(0, 1, 0); }
     static constexpr Vector3D unitZ() { return Vector3D(0, 0, 1); }
 
-    // Static functions
-
+    // --- Utility Functions ---
+    
     static Vector3D min(const Vector3D& a, const Vector3D& b)
     {
         return Vector3D(
@@ -275,6 +280,8 @@ struct Vector3D
     {
         return max(a, max(b, args...));
     }
+
+    // --- Stream Output ---
 
     friend std::ostream& operator<<(std::ostream& os, const Vector3D& vec) {
         return os << "{" << vec.x << ", " << vec.y << ", " << vec.z << "}";

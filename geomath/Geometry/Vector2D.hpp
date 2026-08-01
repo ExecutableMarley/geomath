@@ -20,10 +20,13 @@ struct Vector2D
     real_t x;
     real_t y;
 
+    // --- Constructors ---
+
     constexpr Vector2D() : x(0), y(0) {}
 
     constexpr Vector2D(real_t x, real_t y) : x(x), y(y) {}
 
+    // --- Geometric Properties ---
 
     real_t length() const
     {
@@ -33,70 +36,6 @@ struct Vector2D
     real_t lengthSquared() const
     {
         return x * x + y * y;
-    }
-
-    bool isZero() const
-    {
-        return approximatelyZero(x) && approximatelyZero(y);
-    }
-
-    Vector2D& normalize()
-    {
-        const real_t len = length();
-        if (len != 0)
-        {
-            x /= len;
-            y /= len;
-        }
-        return *this;
-    }
-
-    Vector2D createNormalized() const
-    {
-        const real_t len = length();
-        if (len != 0)
-        {
-            return Vector2D(x / len, y / len);
-        }
-        return Vector2D();
-    }
-
-    Vector2D& resize(real_t newLength)
-    {
-        const real_t len = length();
-        if (len != 0)
-        {
-            x *= newLength / len;
-            y *= newLength / len;
-        }
-        return *this;
-    }
-
-    Vector2D createResized(real_t newLength) const
-    {
-        const real_t len = length();
-        if (len != 0)
-        {
-            return Vector2D(x * newLength / len, y * newLength / len);
-        }
-        return Vector2D();
-    }
-
-    Vector2D& clamp(const Vector2D& min, const Vector2D& max)
-    {
-        x = Arns::Math::clamp(x, min.x, max.x);
-        y = Arns::Math::clamp(y, min.y, max.y);
-        return *this;
-    }
-
-    Vector2D createPerpendicular() const
-    {
-        return Vector2D(-y, x);
-    }
-
-    Vector2D createUnitPerpendicular() const
-    {
-        return createPerpendicular().normalize();
     }
 
     real_t distance(const Vector2D& other) const
@@ -119,6 +58,13 @@ struct Vector2D
         return x * other.y - y * other.x;
     }
 
+    // --- State Queries ---
+
+    bool isZero() const
+    {
+        return approximatelyZero(x) && approximatelyZero(y);
+    }
+
     bool isNormalized() const
     {
         return approximatelyEqual(length(), 1);
@@ -139,6 +85,37 @@ struct Vector2D
         return isOrthogonal(other);
     }
 
+    // --- Transform / Modification ---
+
+    Vector2D& normalize()
+    {
+        const real_t len = length();
+        if (len != 0)
+        {
+            x /= len;
+            y /= len;
+        }
+        return *this;
+    }
+
+    Vector2D& resize(real_t newLength)
+    {
+        const real_t len = length();
+        if (len != 0)
+        {
+            x *= newLength / len;
+            y *= newLength / len;
+        }
+        return *this;
+    }
+
+    Vector2D& clamp(const Vector2D& min, const Vector2D& max)
+    {
+        x = Arns::Math::clamp(x, min.x, max.x);
+        y = Arns::Math::clamp(y, min.y, max.y);
+        return *this;
+    }
+
     Vector2D& rotate(real_t degree)
     {
         real_t cosAngle, sinAngle;
@@ -156,6 +133,25 @@ struct Vector2D
         return (*this -= point).rotate(degree) += point;
     }
 
+    // --- Derived Vectors ---
+
+    Vector2D copy() const
+    {
+        return *this;
+    }
+
+    Vector2D createPerpendicular() const
+    {
+        return Vector2D(-y, x);
+    }
+
+    Vector2D createUnitPerpendicular() const
+    {
+        return createPerpendicular().normalize();
+    }
+
+    // --- Conversion ---
+
     operator real_t*()
     {
         return &x;
@@ -165,6 +161,8 @@ struct Vector2D
     {
         return &x;
     }
+
+    // --- Arithmetic Operators ---
 
     Vector2D operator+(const Vector2D& other) const
     {
@@ -214,6 +212,13 @@ struct Vector2D
         return *this;
     }
 
+    Vector2D operator-() const
+    {
+        return Vector2D(-x, -y);
+    }
+
+    // --- Comparison Operators ---
+
     bool operator==(const Vector2D& other) const
     {
         return approximatelyEqual(x, other.x) && approximatelyEqual(y, other.y);
@@ -224,18 +229,13 @@ struct Vector2D
         return !approximatelyEqual(x, other.x) || !approximatelyEqual(y, other.y);
     }
 
-    Vector2D operator-() const
-    {
-        return Vector2D(-x, -y);
-    }
-
-    // Constants
+    // --- Constants ---
 
     static constexpr Vector2D zero()  { return Vector2D(0, 0); }
     static constexpr Vector2D unitX() { return Vector2D(1, 0); }
     static constexpr Vector2D unitY() { return Vector2D(0, 1); }
 
-    // Static functions
+    // --- Utility Functions ---
 
     static Vector2D min(const Vector2D& a, const Vector2D& b)
     {
@@ -258,6 +258,8 @@ struct Vector2D
     {
         return max(a, max(b, args...));
     }
+
+    // --- Stream Output ---
 
     friend std::ostream& operator<<(std::ostream& os, const Vector2D& vec) {
         return os << "{" << vec.x << ", " << vec.y << "}";
