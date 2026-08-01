@@ -44,6 +44,11 @@ public:
         return m_max.y - m_min.y;
     }
 
+    real_t diagonalLength() const
+    {
+        return (m_min - m_max).length();
+    }
+
     real_t area() const
     {
         return width() * height();
@@ -82,6 +87,13 @@ public:
     std::vector<Vector2D> corners() const
     {
         return { topLeft(), bottomLeft(), bottomRight(), topRight() };
+    }
+
+    // --- State Queries ---
+
+    bool isEmpty() const
+    {
+        return approximatelyZero(width()) || approximatelyZero(height());
     }
 
     // --- Transform / modification ---
@@ -125,6 +137,13 @@ public:
 
     // --- ---
 
+    BBox2D copy() const
+    {
+        return *this;
+    }
+
+    // --- ---
+
     Vector2D closestPoint(const Vector2D& p) const
     {
         return Vector2D(
@@ -140,6 +159,11 @@ public:
         return dx * dx + dy * dy;
     }
 
+    real_t minDistance(const Vector2D& point) const
+    {
+        return sqrt(minDistanceSquared(point));
+    }
+
     real_t maxDistanceSquared(const Vector2D& point) const
     {
         real_t dx1 = point.x - m_min.x;
@@ -147,6 +171,11 @@ public:
         real_t dy1 = point.y - m_min.y;
         real_t dy2 = point.y - m_max.y;
         return std::max(dx1*dx1, dx2*dx2) + std::max(dy1*dy1, dy2*dy2);
+    }
+
+    real_t maxDistance(const Vector2D& point) const
+    {
+        return sqrt(maxDistanceSquared(point));
     }
 
     // --- ---
@@ -166,7 +195,7 @@ public:
         return m_min.x <= rectangle.m_max.x && m_max.x >= rectangle.m_min.x && m_min.y <= rectangle.m_max.y && m_max.y >= rectangle.m_min.y;
     }
 
-    // --- Operators ---
+    // --- Comparison Operators ---
 
     bool operator==(const BBox2D& other) const
     {
