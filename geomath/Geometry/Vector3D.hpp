@@ -39,6 +39,16 @@ struct Vector3D
         return x * x + y * y + z * z;
     }
 
+    real_t distance(const Vector3D& other) const
+    {
+        return (*this - other).length();
+    }
+
+    real_t distanceSquared(const Vector3D& other) const
+    {
+        return (*this - other).lengthSquared();
+    }
+
     real_t dot(const Vector3D& other) const
     {
         return x * other.x + y * other.y + z * other.z;
@@ -100,6 +110,14 @@ struct Vector3D
         return *this;
     }
 
+    Vector3D& clamp(const Vector3D& min, const Vector3D& max)
+    {
+        x = Arns::Math::clamp(x, min.x, max.x);
+        y = Arns::Math::clamp(y, min.y, max.y);
+        z = Arns::Math::clamp(z, min.z, max.z);
+        return *this;
+    }
+
     Vector3D& rotateAroundX(real_t angle)
     {
         const real_t cosAngle = cos(angle);
@@ -144,14 +162,6 @@ struct Vector3D
     Vector3D& rotateAround(real_t xAngle, real_t yAngle, real_t zAngle, const Vector3D& point)
     {
         return (*this -= point).rotate(xAngle, yAngle, zAngle) += point;
-    }
-
-    Vector3D& clamp(const Vector3D& min, const Vector3D& max)
-    {
-        x = Arns::Math::clamp(x, min.x, max.x);
-        y = Arns::Math::clamp(y, min.y, max.y);
-        z = Arns::Math::clamp(z, min.z, max.z);
-        return *this;
     }
 
     // --- Derived Vectors ---

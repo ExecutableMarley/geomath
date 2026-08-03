@@ -22,9 +22,13 @@ struct Vector4D
     real_t z;
     real_t w;
 
+    // --- Constructors ---
+
     constexpr Vector4D() : x(0), y(0), z(0), w(0) {}
 
     constexpr Vector4D(real_t x, real_t y, real_t z, real_t w) : x(x), y(y), z(z), w(w) {}
+
+    // --- Geometric Properties ---
 
     real_t length() const
     {
@@ -35,6 +39,20 @@ struct Vector4D
     {
         return x * x + y * y + z * z + w * w;
     }
+
+    // --- State Queries ---
+
+    bool isZero() const
+    {
+        return approximatelyZero(x) && approximatelyZero(y) && approximatelyZero(z) && approximatelyZero(w);
+    }
+
+    bool isNormalized() const
+    {
+        return approximatelyEqual(length(), 1);
+    }
+
+    // --- Transform / Modification ---
 
     Vector4D& normalize()
     {
@@ -82,6 +100,15 @@ struct Vector4D
         return Vector4D();
     }
 
+    // --- Derived Vectors ---
+
+    Vector4D copy() const
+    {
+        return *this;
+    }
+
+    // --- Conversion ---
+
     operator real_t*()
     {
         return &x;
@@ -91,6 +118,8 @@ struct Vector4D
     {
         return &x;
     }
+
+    // --- Arithmetic Operators ---
 
     Vector4D operator+(const Vector4D &other) const
     {
@@ -148,6 +177,13 @@ struct Vector4D
         return *this;
     }
 
+    Vector4D operator-() const
+    {
+        return Vector4D(-x, -y, -z, -w);
+    }
+
+    // --- Comparison Operators ---
+
     bool operator==(const Vector4D &other) const
     {
         return approximatelyEqual(x, other.x) && approximatelyEqual(y, other.y) && approximatelyEqual(z, other.z) && approximatelyEqual(w, other.w);
@@ -158,12 +194,7 @@ struct Vector4D
         return !approximatelyEqual(x, other.x) || !approximatelyEqual(y, other.y) || !approximatelyEqual(z, other.z) || !approximatelyEqual(w, other.w);
     }
 
-    Vector4D operator-() const
-    {
-        return Vector4D(-x, -y, -z, -w);
-    }
-
-    // Constants
+    // --- Constants ---
 
     static constexpr Vector4D zero()  { return Vector4D(0, 0, 0, 0); }
     static constexpr Vector4D unitX() { return Vector4D(1, 0, 0, 0); }
@@ -171,10 +202,49 @@ struct Vector4D
     static constexpr Vector4D unitZ() { return Vector4D(0, 0, 1, 0); }
     static constexpr Vector4D unitW() { return Vector4D(0, 0, 0, 1); }
 
+    // --- Utility Functions ---
+
+    static Vector4D min(const Vector4D& a, const Vector4D& b)
+    {
+        return Vector4D(
+            a.x < b.x ? a.x : b.x,
+            a.y < b.y ? a.y : b.y,
+            a.z < b.z ? a.z : b.z,
+            a.w < b.w ? a.w : b.w);
+    }
+
+    template <typename... Args>
+    static Vector4D min(const Vector4D& a, const Vector4D& b, Args... args)
+    {
+        return min(a, min(b, args...));
+    }
+
+    static Vector4D max(const Vector4D& a, const Vector4D& b)
+    {
+        return Vector4D(
+            a.x > b.x ? a.x : b.x,
+            a.y > b.y ? a.y : b.y,
+            a.z > b.z ? a.z : b.z,
+            a.w > b.w ? a.w : b.w);
+    }
+
+    template <typename... Args>
+    static Vector4D max(const Vector4D& a, const Vector4D& b, Args... args)
+    {
+        return max(a, max(b, args...));
+    }
+
+    // --- Stream Output ---
+
     friend std::ostream& operator<<(std::ostream& os, const Vector4D& vec) {
         return os << "{" << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << "}";
     }
 };
+
+inline Vector4D operator *(real_t scalar, const Vector4D& vector)
+{
+    return vector * scalar;
+}
 
 } // namespace Math
 
