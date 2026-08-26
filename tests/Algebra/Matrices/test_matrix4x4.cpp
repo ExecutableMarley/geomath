@@ -129,15 +129,7 @@ TEST_SUITE("Matrix4x4")
         CHECK(invertible);
 
         // Check that mat * inv is approximately the identity matrix
-        bool allElementsCorrect = true;
-        Matrix4x4 identity = mat * inv;
-        for (size_t i = 0; i < identity.rows(); ++i)
-            for (size_t j = 0; j < identity.columns(); ++j)
-                if (i == j && identity(i, j) != doctest::Approx(1))
-                    allElementsCorrect = false;
-                else if (i != j && identity(i, j) != doctest::Approx(0))
-                    allElementsCorrect = false;
-        CHECK(allElementsCorrect);
+        CHECK(mat * inv == Matrix4x4::identity());
     }
 
     TEST_CASE("Matrix4x4 Inverse of non-invertible matrix")

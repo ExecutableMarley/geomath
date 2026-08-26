@@ -125,15 +125,7 @@ TEST_SUITE("Matrix3x3")
         CHECK(invertible);
 
         // Check that mat * inv is approximately the identity matrix
-        bool allElementsCorrect = true;
-        Matrix3x3 identity = mat * inv;
-        for (size_t i = 0; i < identity.rows(); ++i)
-            for (size_t j = 0; j < identity.columns(); ++j)
-                if (i == j && identity(i, j) != doctest::Approx(1))
-                    allElementsCorrect = false;
-                else if (i != j && identity(i, j) != doctest::Approx(0))
-                    allElementsCorrect = false;
-        CHECK(allElementsCorrect);
+        CHECK(mat * inv == Matrix3x3::identity());
     }
 
     TEST_CASE("Matrix3x3 Inverse of non-invertible matrix")

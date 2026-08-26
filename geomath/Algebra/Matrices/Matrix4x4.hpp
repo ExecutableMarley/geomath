@@ -348,6 +348,15 @@ public:
 
     //[Static]  
 
+    static Matrix4x4 identity()
+    {
+        return Matrix4x4(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1);
+    }
+
     // 3D homogeneous transforms
 
     static Matrix4x4 createTranslation3D(real_t tx, real_t ty, real_t tz)
