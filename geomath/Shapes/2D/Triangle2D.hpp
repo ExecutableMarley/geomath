@@ -111,12 +111,16 @@ public:
         return *this;
     }
 
+    Triangle2D& scale(real_t factor, const Vector2D& point)
+    {
+        for (auto& v : m_vertices)
+            v = point + (v - point) * factor;
+        return *this;
+    }
+
     Triangle2D& scale(real_t factor)
     {
-        const Vector2D c = centroid();
-        for (auto& v : m_vertices)
-            v = c + (v - c) * factor;
-        return *this;
+        return scale(factor, this->centroid());
     }
 
     Triangle2D& transform(const Matrix3x3& matrix)
@@ -183,6 +187,8 @@ public:
     {
         return vertexAt(index);
     }
+
+    // --- Comparison Operators ---
 
     bool operator==(const Triangle2D& other) const
     {

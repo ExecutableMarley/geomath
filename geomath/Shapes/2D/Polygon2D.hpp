@@ -185,12 +185,16 @@ public:
         return *this;
     }
 
+    Polygon2D& scale(real_t factor, const Vector2D& point)
+    {
+        for (int i = 0; i < m_vertices.size(); i++)
+            m_vertices[i] = point + (m_vertices[i] - point) * factor;
+        return *this;
+    }
+
     Polygon2D& scale(real_t factor)
     {
-        const Vector2D centroid = this->centroid();
-        for (int i = 0; i < m_vertices.size(); i++)
-            m_vertices[i] = centroid + (m_vertices[i] - centroid) * factor;
-        return *this;
+        return scale(factor, this->centroid());
     }
 
     Polygon2D& transform(const Matrix3x3& matrix)
@@ -286,6 +290,8 @@ public:
     {
         return m_vertices[index];
     }
+
+    // --- Comparison Operators ---
 
     bool operator==(const Polygon2D& other) const
     {

@@ -105,13 +105,16 @@ public:
         return *this;
     }
 
+    BBox2D& scale(real_t factor, const Vector2D& point)
+    {
+        m_min = point + (m_min - point) * factor;
+        m_max = point + (m_max - point) * factor;
+        return *this;
+    }
+
     BBox2D& scale(real_t factor)
     {
-        Vector2D center = centroid();
-        Vector2D halfSize = (m_max - m_min) * 0.5f;
-        m_min = center - halfSize * factor;
-        m_max = center + halfSize * factor;
-        return *this;
+        return scale(factor, this->centroid());
     }
 
     BBox2D& pad(real_t amount)

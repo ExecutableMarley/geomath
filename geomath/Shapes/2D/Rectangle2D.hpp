@@ -125,12 +125,16 @@ public:
         return *this;
     }
 
+    Rectangle2D& scale(real_t factor, const Vector2D& point)
+    {
+        for (auto& v : m_vertices)
+            v = point + (v - point) * factor;
+        return *this;
+    }
+
     Rectangle2D& scale(real_t factor)
     {
-        const Vector2D c = centroid();
-        for (auto& v : m_vertices)
-            v = c + (v - c) * factor;
-        return *this;
+        return scale(factor, this->centroid());
     }
 
     Rectangle2D& transform(const Matrix3x3& matrix)
@@ -204,6 +208,8 @@ public:
     {
         return vertexAt(index);
     }
+
+    // --- Comparison Operators ---
 
     bool operator==(const Rectangle2D& other) const
     {

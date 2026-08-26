@@ -99,7 +99,7 @@ public:
         return *this;
     }
 
-    // --- Operators ---
+    // --- Comparison Operators ---
 
     bool operator==(const Ray2D& other) const
     {

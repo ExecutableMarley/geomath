@@ -151,7 +151,7 @@ public:
         return BBox2D(m_center - Vector2D(m_radius, m_radius), m_center + Vector2D(m_radius, m_radius));
     }
 
-    // --- Operators ---
+    // --- Comparison Operators ---
 
     bool operator==(const Circle2D& other) const
     {
