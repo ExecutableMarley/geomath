@@ -248,6 +248,32 @@ public:
         );
     }
 
+    static Matrix4x4 createRotation3DRads(real_t angle, const Vector3D& axis)
+    {
+        real_t sin, cos;
+        sinCos(angle, sin, cos);
+        real_t oneMinusCos = 1.0f - cos;
+
+        return Matrix4x4(
+            cos + axis.x * axis.x * oneMinusCos,
+            axis.x * axis.y * oneMinusCos - axis.z * sin,
+            axis.x * axis.z * oneMinusCos + axis.y * sin,
+            0.f,
+
+            axis.y * axis.x * oneMinusCos + axis.z * sin,
+            cos + axis.y * axis.y * oneMinusCos,
+            axis.y * axis.z * oneMinusCos - axis.x * sin,
+            0.f,
+
+            axis.z * axis.x * oneMinusCos - axis.y * sin,
+            axis.z * axis.y * oneMinusCos + axis.x * sin,
+            cos + axis.z * axis.z * oneMinusCos,
+            0.f,
+
+            0.f, 0.f, 0.f, 1.f
+        );
+    }
+
     static Matrix4x4 createRotationXRads(real_t angle)
     {
         real_t sin, cos;
