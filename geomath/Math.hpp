@@ -25,24 +25,21 @@
 
 #pragma once
 
-#include <math.h>
-
 #include "CommonMath.hpp"
 
 #include "Geometry/Vector2D.hpp"
 #include "Geometry/Vector3D.hpp"
 #include "Geometry/Vector4D.hpp"
 
-#include "Algebra/EulerAngles.hpp"
 #include "Algebra/Fraction.hpp"
-#include "Algebra/Quaternion.hpp"
 #include "Algebra/Matrices/IMatrix.hpp"
 #include "Algebra/Matrices/Matrix.hpp"
 #include "Algebra/Matrices/Matrix3x3.hpp"
 #include "Algebra/Matrices/Matrix4x4.hpp"
 #include "Algebra/Matrices/Operators.hpp"
-#include "Algebra/RotationMatrix.hpp"
 #include "Algebra/ViewMatrix.hpp"
+#include "Algebra/EulerAngles.hpp"
+#include "Algebra/Quaternion.hpp"
 
 // 2D
 #include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
