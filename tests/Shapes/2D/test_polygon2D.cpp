@@ -184,6 +184,17 @@ TEST_CASE("Polygon2D transformations")
         CHECK(poly.centroid() == originalCentroid);
         CHECK(poly.area() == doctest::Approx(16.0f));
     }
+
+    SUBCASE("Scale around arbitrary point")
+    {
+        Vector2D pivot{0, 0};
+        poly.scale(real_t{0.5}, pivot);
+        CHECK(poly[0] == Vector2D{0, 0});
+        CHECK(poly[1] == Vector2D{1, 0});
+        CHECK(poly[2] == Vector2D{1, 1});
+        CHECK(poly[3] == Vector2D{0, 1});
+        CHECK(poly.area() == doctest::Approx(1.0));
+    }
 }
 
 TEST_CASE("Polygon2D copy and clone")

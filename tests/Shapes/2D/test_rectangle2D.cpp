@@ -149,6 +149,16 @@ TEST_CASE("Rectangle2D transformations")
         CHECK(rect.centroid() == originalCentroid);
         CHECK(rect.area() == doctest::Approx(48.0f));
     }
+
+    SUBCASE("Scale around arbitrary point")
+    {
+        rect.scale(real_t{0.5}, Vector2D{0, 0});
+        CHECK(rect.a() == Vector2D{0, 0});
+        CHECK(rect.b() == Vector2D{2, 0});
+        CHECK(rect.c() == Vector2D{2, 1.5f});
+        CHECK(rect.d() == Vector2D{0, 1.5f});
+        CHECK(rect.area() == doctest::Approx(3.0f));
+    }
 }
 
 TEST_CASE("Rectangle2D copy and clone")

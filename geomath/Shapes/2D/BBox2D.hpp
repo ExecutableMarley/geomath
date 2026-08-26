@@ -138,7 +138,7 @@ public:
         return *this;
     }
 
-    // --- ---
+    // --- Lifecycle / Factory Methods ---
 
     BBox2D copy() const
     {

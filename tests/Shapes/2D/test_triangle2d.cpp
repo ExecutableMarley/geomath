@@ -129,6 +129,17 @@ TEST_CASE("Triangle2D transformations")
         CHECK(tri.area() == doctest::Approx(24.0f));
     }
 
+    SUBCASE("Scale around arbitrary point")
+    {
+        Vector2D pivot{0, 0};
+        tri.scale(real_t{2.0}, pivot);
+
+        CHECK(tri.a() == Vector2D{0, 0});
+        CHECK(tri.b() == Vector2D{8, 0});
+        CHECK(tri.c() == Vector2D{4, 6});
+        CHECK(tri.area() == doctest::Approx(24.0f));
+    }
+
     SUBCASE("Scale by 0.5")
     {
         tri.scale(real_t{0.5});
