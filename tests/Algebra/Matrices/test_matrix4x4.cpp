@@ -105,6 +105,55 @@ TEST_SUITE("Matrix4x4")
         CHECK(transposed == expected);
     }
 
+    TEST_CASE("Matrix4x4 determinant")
+    {
+        Matrix4x4 mat(1, 2, 3, 4,
+                      5, 6, 7, 8,
+                      2, 6, 4, 8,
+                      3, 1, 1, 2);
+
+        CHECK(mat.determinant() == doctest::Approx(72));
+    }
+
+    TEST_CASE("Matrix4x4 Inverse")
+    {
+        Matrix4x4 mat(3, 4, 5, 6,
+                      6, 6, 5, 5,
+                      6, 4, 5, 4,
+                      3, 4, 5, 3);
+        
+        REQUIRE(mat.isInvertible());
+
+        Matrix4x4 inv;
+        bool invertible = mat.inverse(inv);
+        CHECK(invertible);
+
+        // Check that mat * inv is approximately the identity matrix
+        bool allElementsCorrect = true;
+        Matrix4x4 identity = mat * inv;
+        for (size_t i = 0; i < identity.rows(); ++i)
+            for (size_t j = 0; j < identity.columns(); ++j)
+                if (i == j && identity(i, j) != doctest::Approx(1))
+                    allElementsCorrect = false;
+                else if (i != j && identity(i, j) != doctest::Approx(0))
+                    allElementsCorrect = false;
+        CHECK(allElementsCorrect);
+    }
+
+    TEST_CASE("Matrix4x4 Inverse of non-invertible matrix")
+    {
+        Matrix4x4 mat(1, 2, 3, 4,
+                      5, 6, 7, 8,
+                      9, 10, 11, 12,
+                      13, 14, 15, 16); // This matrix is singular (determinant is 0)
+        
+        CHECK_FALSE(mat.isInvertible());
+
+        Matrix4x4 inv;
+        bool invertible = mat.inverse(inv);
+        CHECK_FALSE(invertible);
+    }
+
     TEST_CASE("Operator overloads for Matrix4x4")
     {
         SUBCASE("Addition")
