@@ -67,16 +67,6 @@ struct Vector4D
         return *this;
     }
 
-    Vector4D createNormalized() const
-    {
-        const real_t len = length();
-        if (len != 0)
-        {
-            return Vector4D(x / len, y / len, z / len, w / len);
-        }
-        return Vector4D();
-    }
-
     Vector4D& resize(real_t newLength)
     {
         const real_t len = length();
@@ -90,14 +80,13 @@ struct Vector4D
         return *this;
     }
 
-    Vector4D createResized(real_t newLength) const
+    Vector4D& clamp(const Vector4D& min, const Vector4D& max)
     {
-        const real_t len = length();
-        if (len != 0)
-        {
-            return Vector4D(x * newLength / len, y * newLength / len, z * newLength / len, w * newLength / len);
-        }
-        return Vector4D();
+        x = Arns::Math::clamp(x, min.x, max.x);
+        y = Arns::Math::clamp(y, min.y, max.y);
+        z = Arns::Math::clamp(z, min.z, max.z);
+        w = Arns::Math::clamp(w, min.w, max.w);
+        return *this;
     }
 
     // --- Derived Vectors ---
