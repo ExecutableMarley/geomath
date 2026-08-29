@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <math.h>
-
 #include "CommonMath.hpp"
 #include "Geometry/Vector3D.hpp"
 #include "Algebra/Matrices/Matrix3x3.hpp"
@@ -29,6 +27,8 @@ public:
 
     EulerAngles(real_t pitch, real_t yaw, real_t roll) : m_pitch(pitch), m_yaw(yaw), m_roll(roll) {}
 
+    // --- Geometric Properties ---
+
     real_t length() const
     {
         return sqrt(m_pitch * m_pitch + m_yaw * m_yaw + m_roll * m_roll);
@@ -39,17 +39,26 @@ public:
         return m_pitch * m_pitch + m_yaw * m_yaw + m_roll * m_roll;
     }
 
+    real_t distance(const EulerAngles &other) const
+    {
+        return (*this - other).length();
+    }
+
+    // --- State Queries ---
+
+    bool isNormalized() const
+    {
+        return m_pitch >= -180 && m_pitch <= 180 && m_yaw >= -180 && m_yaw <= 180 && m_roll >= -180 && m_roll <= 180;
+    }
+
+    // --- Transform / modification ---
+
     EulerAngles& normalize()
     {
         m_pitch = wrapValue(m_pitch, -180.f, 180.f);
         m_yaw   = wrapValue(m_yaw,   -180.f, 180.f);
         m_roll  = wrapValue(m_roll,  -180.f, 180.f);
         return *this;
-    }
-    
-    bool isNormalized() const
-    {
-        return m_pitch >= -180 && m_pitch <= 180 && m_yaw >= -180 && m_yaw <= 180 && m_roll >= -180 && m_roll <= 180;
     }
 
     EulerAngles& clampPitch(real_t min, real_t max)
@@ -75,10 +84,7 @@ public:
         return EulerAngles(m_pitch + (other.m_pitch - m_pitch) * t, m_yaw + (other.m_yaw - m_yaw) * t, m_roll + (other.m_roll - m_roll) * t).normalize();
     }
 
-    real_t distance(const EulerAngles &other) const
-    {
-        return (*this - other).length();
-    }
+    // --- Operators ---
 
     EulerAngles operator+(const EulerAngles &other) const
     {
@@ -131,6 +137,8 @@ public:
         m_roll /= scalar;
         return this->normalize();
     }
+
+    // --- Comparison Operators ---
 
     bool operator==(const EulerAngles &other) const
     {

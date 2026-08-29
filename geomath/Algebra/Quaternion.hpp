@@ -5,12 +5,10 @@
 
 #pragma once
 
-#include <math.h>
-
 #include "CommonMath.hpp"
 #include "Geometry/Vector3D.hpp"
 #include "Matrices/Matrix3x3.hpp"
-#include "Algebra/Matrices/Matrix4x4.hpp"
+#include "Matrices/Matrix4x4.hpp"
 
 namespace Arns
 {
@@ -29,6 +27,8 @@ struct Quaternion
 
     Quaternion(real_t x, real_t y, real_t z, real_t w) : x(x), y(y), z(z), w(w) {}
 
+    // --- Geometric Properties ---
+
     real_t length() const
     {
         return sqrt(x * x + y * y + z * z + w * w);
@@ -38,6 +38,15 @@ struct Quaternion
     {
         return x * x + y * y + z * z + w * w;
     }
+
+    // --- State Queries ---
+
+    bool isNormalized() const
+    {
+        return approximatelyEqual(length(), 1);
+    }
+
+    // --- Transform / modification ---
 
     Quaternion& normalize()
     {
@@ -52,16 +61,6 @@ struct Quaternion
         return *this;
     }
 
-    Quaternion createNormalized() const
-    {
-        const real_t len = length();
-        if (len != 0)
-        {
-            return Quaternion(x / len, y / len, z / len, w / len);
-        }
-        return Quaternion(0,0,0,0);
-    }
-
     Quaternion& resize(real_t newLength)
     {
         const real_t len = length();
@@ -73,6 +72,23 @@ struct Quaternion
             w *= newLength / len;
         }
         return *this;
+    }
+
+    // --- Lifecycle / Factory Methods ---
+
+    Quaternion copy() const
+    {
+        return *this;
+    }
+
+    Quaternion createNormalized() const
+    {
+        const real_t len = length();
+        if (len != 0)
+        {
+            return Quaternion(x / len, y / len, z / len, w / len);
+        }
+        return Quaternion(0,0,0,0);
     }
 
     Quaternion conjugate() const
@@ -90,11 +106,15 @@ struct Quaternion
         return Quaternion(0,0,0,0);
     }
 
+    //
+
     Vector3D rotate(const Vector3D &vec) const
     {
         Quaternion q = *this * Quaternion(vec.x, vec.y, vec.z, 0) * conjugate();
         return Vector3D(q.x, q.y, q.z);
     }
+
+    // --- Operators ---
 
     Quaternion operator*(const Quaternion &other) const
     {
@@ -140,6 +160,8 @@ struct Quaternion
         return *this;
     }
 
+    // --- Comparison Operators ---
+
     bool operator==(const Quaternion &other) const
     {
         return approximatelyEqual(x, other.x) && approximatelyEqual(y, other.y) && approximatelyEqual(z, other.z) && approximatelyEqual(w, other.w);
@@ -150,7 +172,7 @@ struct Quaternion
         return !approximatelyEqual(x, other.x) || !approximatelyEqual(y, other.y) || !approximatelyEqual(z, other.z) || !approximatelyEqual(w, other.w);
     }
 
-    // Conversation between Quaternion and Matrix
+    // --- Conversation between Quaternion and Matrix ---
 
     Matrix3x3 toMatrix3x3() const
     {
