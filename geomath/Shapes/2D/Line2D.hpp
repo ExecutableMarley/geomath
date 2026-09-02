@@ -17,7 +17,7 @@ namespace Arns
 namespace Math
 {
 
-class Line2D
+class Segment2D
 {
 public:
     Vector2D m_start;
@@ -25,11 +25,11 @@ public:
 
     // --- Constructors ---
 
-    Line2D() : m_start(), m_end() {}
+    Segment2D() : m_start(), m_end() {}
 
-    Line2D(Vector2D startPoint, Vector2D endPoint) : m_start(startPoint), m_end(endPoint) {}
+    Segment2D(Vector2D startPoint, Vector2D endPoint) : m_start(startPoint), m_end(endPoint) {}
 
-    Line2D(Vector2D startPoint, Vector2D direction, real_t length) : m_start(startPoint), m_end(startPoint + direction.copy().normalize() * length) {}
+    Segment2D(Vector2D startPoint, Vector2D direction, real_t length) : m_start(startPoint), m_end(startPoint + direction.copy().normalize() * length) {}
 
     // --- Geometric Properties ---
 
@@ -72,40 +72,40 @@ public:
 
     // --- Transform / modification ---
 
-    Line2D& translate(const Vector2D &translation)
+    Segment2D& translate(const Vector2D &translation)
     {
         m_start += translation;
         m_end += translation;
         return *this;
     }
 
-    Line2D& rotate(real_t angle, const Vector2D& point)
+    Segment2D& rotate(real_t angle, const Vector2D& point)
     {
         m_start.rotateAround(angle, point);
         m_end.rotateAround(angle, point);
         return *this;
     }
 
-    Line2D& rotate(real_t angle)
+    Segment2D& rotate(real_t angle)
     {
         const Vector2D c = (m_start + m_end) * real_t{0.5};
         return rotate(angle, c);
     }
 
-    Line2D& scale(real_t factor, const Vector2D& point)
+    Segment2D& scale(real_t factor, const Vector2D& point)
     {
         m_start = point + (m_start - point) * factor;
         m_end = point + (m_end - point) * factor;
         return *this;
     }
 
-    Line2D& scale(real_t factor)
+    Segment2D& scale(real_t factor)
     {
         const Vector2D c = (m_start + m_end) * real_t{0.5};
         return scale(factor, c);
     }
 
-    Line2D& transform(const Matrix3x3& matrix)
+    Segment2D& transform(const Matrix3x3& matrix)
     {
         m_start = matrix.transformPoint(m_start);
         m_end = matrix.transformPoint(m_end);
@@ -114,19 +114,19 @@ public:
 
     // --- Lifecycle / Factory Methods ---
 
-    Line2D copy() const
+    Segment2D copy() const
     {
         return *this;
     }
 
     // --- Comparison Operators ---
 
-    bool operator==(const Line2D& other) const
+    bool operator==(const Segment2D& other) const
     {
         return this->m_start == other.m_start && this->m_end == other.m_end;
     }
 
-    bool operator!=(const Line2D& other) const
+    bool operator!=(const Segment2D& other) const
     {
         return !(*this == other);
     }

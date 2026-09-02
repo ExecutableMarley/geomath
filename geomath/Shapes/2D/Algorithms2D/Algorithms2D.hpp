@@ -20,7 +20,7 @@ namespace Math
 
 // Forward declarations
 class Ray2D;
-class Line2D;
+class Segment2D;
 class BBox2D;
 class IBaseShape2D;
 class IFiniteShape2D;
@@ -31,9 +31,6 @@ class Rectangle2D;
 class Polygon2D;
 class ConvexPolygon2D;
 
-//Consider renaming Line2D in the future
-//Segment2D is better
-using Segment2D = Line2D;
 
 struct HitInfo2D
 {
@@ -49,7 +46,7 @@ struct HitInfo2D
 
 bool isPointOnSegment(const Vector2D& point, const Vector2D& segmentStart, const Vector2D& segmentEnd);
 
-bool isPointOnSegment(const Vector2D& point, const Line2D& line);
+bool isPointOnSegment(const Vector2D& point, const Segment2D& segment);
 
 bool isSegmentOnSegment(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2);
 
@@ -170,15 +167,15 @@ bool intersectSegmentWithSegment(const Vector2D& p1, const Vector2D& p2, const V
 
 bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo = nullptr);
 
-bool intersect(const Line2D& line1, const Line2D& line2, HitInfo2D* hitInfo = nullptr);
+bool intersect(const Segment2D& segment1, const Segment2D& segment2, HitInfo2D* hitInfo = nullptr);
 
-bool intersect(const Line2D& line, const BBox2D& bbox, HitInfo2D* hitInfo = nullptr);
+bool intersect(const Segment2D& segment, const BBox2D& bbox, HitInfo2D* hitInfo = nullptr);
 
-bool intersect(const Line2D& line, const Circle2D& circle, HitInfo2D* hitInfo = nullptr);
+bool intersect(const Segment2D& segment, const Circle2D& circle, HitInfo2D* hitInfo = nullptr);
 
-bool intersect(const Line2D& line, const Triangle2D& triangle, HitInfo2D* hitInfo = nullptr);
+bool intersect(const Segment2D& segment, const Triangle2D& triangle, HitInfo2D* hitInfo = nullptr);
 
-bool intersect(const Line2D& line, const IPolygonalShape2D& polygon, HitInfo2D* hitInfo = nullptr);
+bool intersect(const Segment2D& segment, const IPolygonalShape2D& polygon, HitInfo2D* hitInfo = nullptr);
 
 bool intersect(const Segment2D& segment, const IBaseShape2D& shape, HitInfo2D* hitInfo = nullptr);
 

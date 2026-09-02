@@ -40,9 +40,9 @@ bool isPointOnSegment(const Vector2D& point, const Vector2D& segmentStart, const
     return true;
 }
 
-bool isPointOnSegment(const Vector2D& point, const Line2D& line)
+bool isPointOnSegment(const Vector2D& point, const Segment2D& segment)
 {
-    return isPointOnSegment(point, line.m_start, line.m_end);
+    return isPointOnSegment(point, segment.m_start, segment.m_end);
 }
 
 bool isSegmentOnSegment(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2)
@@ -484,7 +484,7 @@ real_t distanceSegmentToSegment(const Vector2D& s1, const Vector2D& s2, const Ve
     return (closestPointOnLine1 - closestPointOnLine2).length();
 }
 
-real_t distance(const Line2D& segment1, const Line2D& segment2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t distance(const Segment2D& segment1, const Segment2D& segment2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     return distanceSegmentToSegment(segment1.m_start, segment1.m_end, segment2.m_start, segment2.m_end, closestPoint1, closestPoint2);
 }
@@ -569,7 +569,7 @@ real_t distance(const Vector2D& point, const Circle2D& circle, Vector2D* closest
     return std::abs(dist - circle.m_radius);
 }
 
-real_t distanceSegmentToEdgeList(const Line2D& seg, std::span<const Vector2D> vertices, bool closed, Vector2D* closestSeg, Vector2D* closestEdge)
+real_t distanceSegmentToEdgeList(const Segment2D& seg, std::span<const Vector2D> vertices, bool closed, Vector2D* closestSeg, Vector2D* closestEdge)
 {
     const size_t n = vertices.size();
     if (n < 2)
@@ -1117,24 +1117,24 @@ bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, c
     return true;
 }
 
-bool intersect(const Line2D& line, const BBox2D& bbox, HitInfo2D* hitInfo)
+bool intersect(const Segment2D& segment, const BBox2D& bbox, HitInfo2D* hitInfo)
 {
-    return intersect(Ray2D(line.m_start, line.deltaVector()), bbox, 0.f, 1.f, hitInfo);
+    return intersect(Ray2D(segment.m_start, segment.deltaVector()), bbox, 0.f, 1.f, hitInfo);
 }
 
-bool intersect(const Line2D& line, const Triangle2D& triangle, HitInfo2D* hitInfo)
+bool intersect(const Segment2D& segment, const Triangle2D& triangle, HitInfo2D* hitInfo)
 {
-    return intersect(Ray2D(line.m_start, line.deltaVector()), triangle, 0.f, 1.f, hitInfo);
+    return intersect(Ray2D(segment.m_start, segment.deltaVector()), triangle, 0.f, 1.f, hitInfo);
 }
 
-bool intersect(const Line2D& line, const IPolygonalShape2D& polygon, HitInfo2D* hitInfo)
+bool intersect(const Segment2D& segment, const IPolygonalShape2D& polygon, HitInfo2D* hitInfo)
 {
-    return(intersect(Ray2D(line.m_start, line.direction()), polygon, 0.0f, line.length(), hitInfo));
+    return(intersect(Ray2D(segment.m_start, segment.direction()), polygon, 0.0f, segment.length(), hitInfo));
 }
 
-bool intersect(const Line2D& line, const Circle2D& circle, HitInfo2D* hitInfo)
+bool intersect(const Segment2D& segment, const Circle2D& circle, HitInfo2D* hitInfo)
 {
-    return intersect(Ray2D(line.m_start, line.deltaVector()), circle, 0.f, 1.f, hitInfo);
+    return intersect(Ray2D(segment.m_start, segment.deltaVector()), circle, 0.f, 1.f, hitInfo);
 }
 
 bool intersect(const Segment2D& segment, const IBaseShape2D& shape, HitInfo2D* hitInfo)
