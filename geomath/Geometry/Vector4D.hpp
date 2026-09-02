@@ -8,6 +8,7 @@
 #include "../CommonMath.hpp"
 #include <math.h>
 #include <ostream>
+#include <format>
 
 namespace Arns
 {
@@ -238,3 +239,17 @@ inline Vector4D operator *(real_t scalar, const Vector4D& vector)
 } // namespace Math
 
 } // namespace Arns
+
+
+
+template <>
+struct std::formatter<Arns::Math::Vector4D>
+{
+    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const Arns::Math::Vector4D& vec, FormatContext& ctx) const
+    {
+        return std::format_to(ctx.out(), "[{:.6f}, {:.6f}, {:.6f}, {:.6f}]", vec.x, vec.y, vec.z, vec.w);
+    }
+};

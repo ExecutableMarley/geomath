@@ -8,6 +8,7 @@
 #include "../CommonMath.hpp"
 #include <math.h>
 #include <ostream>
+#include <format>
 
 namespace Arns
 {
@@ -131,6 +132,14 @@ struct Vector2D
     Vector2D& rotateAround(real_t degree, const Vector2D& point)
     {
         return (*this -= point).rotate(degree) += point;
+    }
+
+    Vector2D& perpendicular()
+    {
+        const real_t tempX = x;
+        x = -y;
+        y = tempX;
+        return *this;
     }
 
     // --- Derived Vectors ---
@@ -262,7 +271,7 @@ struct Vector2D
     // --- Stream Output ---
 
     friend std::ostream& operator<<(std::ostream& os, const Vector2D& vec) {
-        return os << "{" << vec.x << ", " << vec.y << "}";
+        return os << "[" << vec.x << ", " << vec.y << "]";
     }
 };
 
@@ -304,3 +313,17 @@ inline bool isColinear(const Vector2D& a, const Vector2D& b, const Vector2D& c)
 } // namespace Math
 
 } // namespace Arns
+
+
+
+template <>
+struct std::formatter<Arns::Math::Vector2D>
+{
+    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const Arns::Math::Vector2D& vec, FormatContext& ctx) const
+    {
+        return std::format_to(ctx.out(), "[{{:.6f}, {:.6f}}]", vec.x, vec.y);
+    }
+};

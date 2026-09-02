@@ -5,12 +5,13 @@
 
 #pragma once
 
-#include <math.h>
-#include <stdexcept>
-
 #include "CommonMath.hpp"
 #include "IMatrix.hpp"
 #include "Matrix.hpp"
+
+#include <math.h>
+#include <format>
+#include <stdexcept>
 
 namespace Arns
 {
@@ -158,3 +159,32 @@ inline bool operator!=(const IMatrix& lhs, const IMatrix& rhs)
 } // namespace Math
 
 } // namespace Arns
+
+
+
+template <>
+struct std::formatter<Arns::Math::IMatrix>
+{
+    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const Arns::Math::IMatrix& matrix, FormatContext& ctx) const
+    {
+        std::string result = "[";
+        for (size_t i = 0; i < matrix.rows(); ++i)
+        {
+            result += "[";
+            for (size_t j = 0; j < matrix.columns(); ++j)
+            {
+                result += std::to_string(matrix(i, j));
+                if (j < matrix.columns() - 1)
+                    result += ", ";
+            }
+            result += "]";
+            if (i < matrix.rows() - 1)
+                result += ", ";
+        }
+        result += "]";
+        return std::format_to(ctx.out(), "{}", result);
+    }
+};
