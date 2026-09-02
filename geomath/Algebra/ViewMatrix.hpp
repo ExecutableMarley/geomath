@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <math.h>
-
 #include "Geometry/Vector2D.hpp"
 #include "Geometry/Vector3D.hpp"
 #include "Geometry/Vector4D.hpp"
@@ -63,8 +61,8 @@ public:
         const Vector4D clip = transform(world);
         if (clip.w <= 0)
             return false;
-        screen.x = (clip.x / clip.w + 1.0f) * 0.5f * screenWidth;
-        screen.y = (1.0f - clip.y / clip.w) * 0.5f * screenHeight;
+        screen.x = (clip.x / clip.w + 1) * real_t{0.5} * screenWidth;
+        screen.y = (1 - clip.y / clip.w) * real_t{0.5} * screenHeight;
         screen.z = clip.z / clip.w;
         return true;
     }
@@ -74,9 +72,129 @@ public:
         const Vector4D clip = transform(world);
         if (clip.w <= 0)
             return false;
-        screen.x = (clip.x / clip.w + 1.0f) * 0.5f * screenWidth;
-        screen.y = (1.0f - clip.y / clip.w) * 0.5f * screenHeight;
+        screen.x = (clip.x / clip.w + 1) * real_t{0.5} * screenWidth;
+        screen.y = (1 - clip.y / clip.w) * real_t{0.5} * screenHeight;
         return true;
+    }
+
+    static ViewMatrix LookAt(
+        const Vector3D &eye,
+        const Vector3D &target,
+        const Vector3D &up = Vector3D(0, 1, 0))
+    {
+        const Vector3D forward = (target - eye).normalize();
+        const Vector3D right = forward.cross(up).normalize();
+        const Vector3D cameraUp = right.cross(forward).normalize();
+
+        ViewMatrix view;
+
+        view.m_data[0][0] = right.x;
+        view.m_data[0][1] = right.y;
+        view.m_data[0][2] = right.z;
+        view.m_data[0][3] = -right.dot(eye);
+
+        view.m_data[1][0] = cameraUp.x;
+        view.m_data[1][1] = cameraUp.y;
+        view.m_data[1][2] = cameraUp.z;
+        view.m_data[1][3] = -cameraUp.dot(eye);
+
+        view.m_data[2][0] = forward.x;
+        view.m_data[2][1] = forward.y;
+        view.m_data[2][2] = forward.z;
+        view.m_data[2][3] = -forward.dot(eye);
+
+        view.m_data[3][0] = 0;
+        view.m_data[3][1] = 0;
+        view.m_data[3][2] = 0;
+        view.m_data[3][3] = 1;
+
+        return view;
+    }
+
+    static ViewMatrix Perspective(
+        real_t fovRad,
+        real_t aspect,
+        real_t nearPlane,
+        real_t farPlane)
+    {
+        const real_t f =
+            real_t(1) / std::tan(fovRad * real_t(0.5));
+
+        ViewMatrix result{};
+
+        result.m_data[0][0] = f / aspect;
+        result.m_data[0][1] = 0;
+        result.m_data[0][2] = 0;
+        result.m_data[0][3] = 0;
+
+        result.m_data[1][0] = 0;
+        result.m_data[1][1] = f;
+        result.m_data[1][2] = 0;
+        result.m_data[1][3] = 0;
+
+        result.m_data[2][0] = 0;
+        result.m_data[2][1] = 0;
+        result.m_data[2][2] =
+            farPlane / (farPlane - nearPlane);
+        result.m_data[2][3] =
+            -(nearPlane * farPlane) /
+            (farPlane - nearPlane);
+
+        result.m_data[3][0] = 0;
+        result.m_data[3][1] = 0;
+        result.m_data[3][2] = 1;
+        result.m_data[3][3] = 0;
+
+        return result;
+    }
+
+    static ViewMatrix Orthographic(
+        real_t left,
+        real_t right,
+        real_t bottom,
+        real_t top,
+        real_t nearPlane,
+        real_t farPlane)
+    {
+        ViewMatrix result{};
+
+        result.m_data[0][0] =
+            real_t(2) / (right - left);
+
+        result.m_data[0][3] =
+            -(right + left) /
+            (right - left);
+
+        result.m_data[1][1] =
+            real_t(2) / (top - bottom);
+
+        result.m_data[1][3] =
+            -(top + bottom) /
+            (top - bottom);
+
+        result.m_data[2][2] =
+            real_t(1) /
+            (farPlane - nearPlane);
+
+        result.m_data[2][3] =
+            -nearPlane /
+            (farPlane - nearPlane);
+
+        result.m_data[3][3] = 1;
+
+        return result;
+    }
+
+    static ViewMatrix FromEuler(const Vector3D &eye, real_t pitchRad, real_t yawRad, real_t rollRad = 0)
+    {
+        // Calculate forward vector from Yaw and Pitch
+        Vector3D forward;
+        forward.x = cosf(pitchRad) * cosf(yawRad);
+        forward.y = sinf(pitchRad);
+        forward.z = cosf(pitchRad) * sinf(yawRad);
+        forward.normalize();
+
+        return LookAt(eye, eye + forward, Vector3D::unitY());
     }
 };
 
