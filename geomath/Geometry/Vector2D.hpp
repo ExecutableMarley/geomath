@@ -159,6 +159,11 @@ struct Vector2D
         return createPerpendicular().normalize();
     }
 
+    Vector2D reflected(const Vector2D& normal) const
+    {
+        return *this - normal * (2 * dot(normal));
+    }
+
     // --- Conversion ---
 
     operator real_t*()

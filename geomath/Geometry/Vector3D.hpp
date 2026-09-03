@@ -172,6 +172,11 @@ struct Vector3D
         return *this;
     }
 
+    Vector3D reflected(const Vector3D& normal) const
+    {
+        return *this - normal * (2 * dot(normal));
+    }
+
     // --- Conversion ---
 
     operator real_t*()
