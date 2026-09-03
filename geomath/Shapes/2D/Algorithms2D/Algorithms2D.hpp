@@ -36,8 +36,7 @@ struct HitInfo2D
 {
     real_t t;
     Vector2D intersectionPoint;
-    //Todo: Collect more information
-    //Vector2D normal;
+    Vector2D normal;
     //IShape2D* shape;
 };
 

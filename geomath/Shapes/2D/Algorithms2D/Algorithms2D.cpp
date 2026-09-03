@@ -958,6 +958,9 @@ bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2
     {
         hitInfo->t = t;
         hitInfo->intersectionPoint = ray.m_origin + ray.m_direction * t;
+        hitInfo->normal = (p2 - p1).perpendicular().normalize();
+    
+        if (hitInfo->normal.dot(ray.m_direction) > 0) hitInfo->normal = -hitInfo->normal;
     }
 
     return true;
@@ -999,6 +1002,7 @@ bool intersect(const Ray2D& ray, const BBox2D& bbox, real_t t_init_min, real_t t
         real_t hit_t = (t_min > t_init_min) ? t_min : t_max;
         hitInfo->t = hit_t;
         hitInfo->intersectionPoint = ray.m_origin + ray.m_direction * hit_t;
+        hitInfo->normal = bbox.normalAt(hitInfo->intersectionPoint);
     }
 
     return true;
@@ -1065,7 +1069,7 @@ bool intersect(const Ray2D& ray, const Circle2D& circle, real_t t_min, real_t t_
     {
         hitInfo->t = t;
         hitInfo->intersectionPoint = ray.pointAt(t);
-        //Vector2D normal = (hitInfo->intersectionPoint - circle.m_center).normalize();
+        hitInfo->normal = (hitInfo->intersectionPoint - circle.m_center).normalize();
     }
 
     return true;
@@ -1112,6 +1116,9 @@ bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, c
     {
         hitInfo->t = t;
         hitInfo->intersectionPoint = p1 + (p2 - p1) * t;
+        hitInfo->normal = (q2 - q1).perpendicular().normalize();
+
+        if (hitInfo->normal.dot(p2 - p1) > 0) hitInfo->normal = -hitInfo->normal;
     }
 
     return true;
