@@ -99,6 +99,11 @@ public:
         return *this;
     }
 
+    Ray2D reflected(const Vector2D& point, const Vector2D& normal) const
+    {
+        return Ray2D(point, m_direction.reflected(normal));
+    }
+
     // --- Comparison Operators ---
 
     bool operator==(const Ray2D& other) const

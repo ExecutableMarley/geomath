@@ -181,6 +181,29 @@ public:
         return sqrt(maxDistanceSquared(point));
     }
 
+    Vector2D normalAt(const Vector2D& point) const
+    {
+        Vector2D closest = closestPoint(point);
+        Vector2D delta = point - closest;
+
+        if (delta.isZero()) // Point is inside the box
+        {
+            real_t leftDist = std::abs(point.x - m_min.x);
+            real_t rightDist = std::abs(point.x - m_max.x);
+            real_t bottomDist = std::abs(point.y - m_min.y);
+            real_t topDist = std::abs(point.y - m_max.y);
+
+            real_t minDist = std::min({ leftDist, rightDist, bottomDist, topDist });
+
+            if (approximatelyEqual(minDist, leftDist))   return Vector2D(-1,  0);
+            if (approximatelyEqual(minDist, rightDist))  return Vector2D( 1,  0);
+            if (approximatelyEqual(minDist, bottomDist)) return Vector2D( 0, -1);
+            if (approximatelyEqual(minDist, topDist))    return Vector2D( 0,  1);
+        }
+
+        return delta.normalize();
+    }
+
     // --- ---
 
     bool contains(const Vector2D &point) const
