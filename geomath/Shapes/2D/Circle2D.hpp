@@ -167,3 +167,14 @@ public:
 } // namespace Math
 
 } // namespace Arns
+
+
+
+template <>struct std::formatter<Arns::Math::Circle2D> : std::formatter<std::string>
+{
+    template <typename FormatContext>
+    auto format(const Arns::Math::Circle2D& circle, FormatContext& ctx) const
+    {
+        return std::format_to(ctx.out(), "Circle2D(center: [{:.6f}, {:.6f}], radius: {:.6f})", circle.m_center.x, circle.m_center.y, circle.m_radius);
+    }
+};

@@ -127,3 +127,23 @@ inline const IPolygonalShape2D *IFiniteShape2D::polygonal() const
 } // namespace Math
 
 } // namespace Arns
+
+
+
+template <>
+struct std::formatter<Arns::Math::IPolygonalShape2D> : std::formatter<std::string>
+{
+    template <typename FormatContext>
+    auto format(const Arns::Math::IPolygonalShape2D& shape, FormatContext& ctx) const
+    {
+        std::string verticesStr;
+        for (size_t i = 0; i < shape.vertexCount(); ++i)
+        {
+            verticesStr += std::format("{}", shape[i]);
+            if (i < shape.vertexCount() - 1)
+                verticesStr += ", ";
+        }
+
+        return std::format_to(ctx.out(), "PolygonalShape2D(type: {}, vertices: [{}])", shape.type(), verticesStr);
+    }
+};

@@ -224,6 +224,8 @@ public:
         return !(*this == other);
     }
 
+    // --- Static factory Functions ---
+
     static Rectangle2D fromMinMax(const Vector2D &min, const Vector2D &max)
     {
         return Rectangle2D(min, {max.x, min.y},

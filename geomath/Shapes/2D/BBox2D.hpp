@@ -264,3 +264,17 @@ public:
 } // namespace Math
 
 } // namespace Arns
+
+
+
+template <>
+struct std::formatter<Arns::Math::BBox2D>
+{
+    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const Arns::Math::BBox2D& bbox, FormatContext& ctx) const
+    {
+        return std::format_to(ctx.out(), "BBox2D(min: {}, max: {})", bbox.m_min, bbox.m_max);
+    }
+};

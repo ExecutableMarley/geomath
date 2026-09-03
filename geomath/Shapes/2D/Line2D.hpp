@@ -135,3 +135,15 @@ public:
 } // namespace Math
 
 } // namespace Arns
+
+
+
+template <>
+struct std::formatter<Arns::Math::Segment2D> : std::formatter<std::string>
+{
+    template <typename FormatContext>
+    auto format(const Arns::Math::Segment2D& segment, FormatContext& ctx) const
+    {
+        return std::format_to(ctx.out(), "Segment2D(start: {}, end: {})", segment.m_start, segment.m_end);
+    }
+};

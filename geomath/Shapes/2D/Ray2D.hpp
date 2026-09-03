@@ -120,3 +120,15 @@ public:
 } // namespace Math
 
 } // namespace Arns
+
+
+
+template <>
+struct std::formatter<Arns::Math::Ray2D> : std::formatter<std::string>
+{
+    template <typename FormatContext>
+    auto format(const Arns::Math::Ray2D& ray, FormatContext& ctx) const
+    {
+        return std::format_to(ctx.out(), "Ray2D(origin: {}, direction: {})", ray.m_origin, ray.m_direction);
+    }
+};
