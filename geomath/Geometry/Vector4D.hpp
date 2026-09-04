@@ -228,7 +228,7 @@ struct Vector4D
     // --- Stream Output ---
 
     friend std::ostream& operator<<(std::ostream& os, const Vector4D& vec) {
-        return os << "{" << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << "}";
+        return os << "[" << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << "]";
     }
 };
 

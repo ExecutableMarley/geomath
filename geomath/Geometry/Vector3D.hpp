@@ -301,7 +301,7 @@ struct Vector3D
     // --- Stream Output ---
 
     friend std::ostream& operator<<(std::ostream& os, const Vector3D& vec) {
-        return os << "{" << vec.x << ", " << vec.y << ", " << vec.z << "}";
+        return os << "[" << vec.x << ", " << vec.y << ", " << vec.z << "]";
     }
 };
 

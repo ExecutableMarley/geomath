@@ -1,5 +1,6 @@
 #include "../third_party/doctest.h"
 #include "Geometry/Vector3D.hpp"
+#include <sstream>
 
 using namespace Arns::Math;
 
@@ -130,5 +131,38 @@ TEST_SUITE("Vector3D")
 
         CHECK(Arns::Math::dot(Vector3D(1.0f, 2.0f, 3.0f), Vector3D(4.0f, 5.0f, 6.0f)) == doctest::Approx(32.0f));
         CHECK(Arns::Math::cross(Vector3D(1.0f, 0.0f, 0.0f), Vector3D(0.0f, 1.0f, 0.0f)) == Vector3D(0.0f, 0.0f, 1.0f));
+    }
+
+    TEST_CASE("Vector3D stream and format output")
+    {
+        Vector3D vector(1, 2, 3);
+        SUBCASE("Stream output is formatted correctly")
+        {
+            std::ostringstream oss;
+            oss << vector;
+
+            CHECK(oss.str() == "[1, 2, 3]");
+        }
+
+        SUBCASE("std::format output is formatted correctly")
+        {
+            std::string formatted = std::format("{}", vector);
+
+            CHECK(formatted == "[1, 2, 3]");
+        }
+
+        SUBCASE("std::format with precision outputs correctly")
+        {
+            std::string formatted = std::format("{:.2f}", vector);
+
+            CHECK(formatted == "[1.00, 2.00, 3.00]");
+        }
+
+        SUBCASE("to_string outputs correctly")
+        {
+            std::string str = to_string(vector);
+
+            CHECK(str == "[1, 2, 3]");
+        }
     }
 }

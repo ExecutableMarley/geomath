@@ -1,5 +1,6 @@
 #include "../third_party/doctest.h"
 #include "Geometry/Vector2D.hpp"
+#include <sstream>
 
 using namespace Arns::Math;
 
@@ -133,5 +134,38 @@ TEST_SUITE("Vector2D")
         CHECK(isCCW(Vector2D(0.0f, 0.0f), Vector2D(1.0f, 0.0f), Vector2D(0.0f, 1.0f)));
         CHECK(isCW(Vector2D(0.0f, 0.0f), Vector2D(1.0f, 0.0f), Vector2D(0.0f, -1.0f)));
         CHECK(isColinear(Vector2D(0.0f, 0.0f), Vector2D(1.0f, 0.0f), Vector2D(2.0f, 0.0f)));
+    }
+
+    TEST_CASE("Vector2D stream and format output")
+    {
+        Vector2D vector(1, 2);
+        SUBCASE("Stream output is formatted correctly")
+        {
+            std::ostringstream oss;
+            oss << vector;
+
+            CHECK(oss.str() == "[1, 2]");
+        }
+
+        SUBCASE("std::format output is formatted correctly")
+        {
+            std::string formatted = std::format("{}", vector);
+
+            CHECK(formatted == "[1, 2]");
+        }
+
+        SUBCASE("std::format with precision outputs correctly")
+        {
+            std::string formatted = std::format("{:.2f}", vector);
+
+            CHECK(formatted == "[1.00, 2.00]");
+        }
+
+        SUBCASE("to_string outputs correctly")
+        {
+            std::string str = to_string(vector);
+
+            CHECK(str == "[1, 2]");
+        }
     }
 }
