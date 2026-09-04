@@ -11,6 +11,7 @@
 #include <memory>
 
 #include "CommonMath.hpp"
+#include "Formatting/Formatting.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "BBox2D.hpp"
 
@@ -28,6 +29,19 @@ enum ShapeType2D
     SHAPE2D_POLYGON,
     SHAPE2D_CIRCLE
 };
+
+constexpr std::string_view to_string(ShapeType2D type)
+{
+    switch (type)
+    {
+        case SHAPE2D_TRIANGLE: return "Triangle2D";
+        case SHAPE2D_RECTANGLE: return "Rectangle2D";
+        case SHAPE2D_CONVEX_POLYGON: return "ConvexPolygon2D";
+        case SHAPE2D_POLYGON: return "Polygon2D";
+        case SHAPE2D_CIRCLE: return "Circle2D";
+        default: return "UnknownShapeType2D";
+    }
+}
 
 constexpr bool isPolygonalShape(ShapeType2D type)
 {
@@ -124,36 +138,61 @@ inline const IPolygonalShape2D *IFiniteShape2D::polygonal() const
     return dynamic_cast<const IPolygonalShape2D *>(this);
 }
 
-} // namespace Math
-
-} // namespace Arns
-
-template <>
-struct std::formatter<Arns::Math::IPolygonalShape2D> : std::formatter<std::string>
+template <typename T>
+struct PolygonalShapeFormatter
 {
     int precision = 6;
     bool hasPrecision = false;
 
     constexpr auto parse(std::format_parse_context& ctx)
     {
-        return Arns::Math::parse_optional_float_format(ctx, precision, hasPrecision);
+        return parse_optional_float_format(ctx, precision, hasPrecision);
     }
 
     template <typename FormatContext>
-    auto format(const Arns::Math::IPolygonalShape2D& shape, FormatContext& ctx) const
+    auto format(const T& shape, FormatContext& ctx) const
     {
         std::string verticesStr;
+
         for (size_t i = 0; i < shape.vertexCount(); ++i)
         {
             if (hasPrecision)
-                verticesStr += std::format("{:.{}f}", shape[i], precision);
+                verticesStr += std::format(
+                    "[{:.{}f}, {:.{}f}]",
+                    shape[i].x,
+                    precision,
+                    shape[i].y,
+                    precision
+                );
             else
                 verticesStr += std::format("{}", shape[i]);
 
-            if (i < shape.vertexCount() - 1)
+            if (i + 1 < shape.vertexCount())
                 verticesStr += ", ";
         }
 
-        return std::format_to(ctx.out(), "PolygonalShape2D(type: {}, vertices: [{}])", shape.type(), verticesStr);
+        return std::format_to(
+            ctx.out(),
+            "PolygonalShape2D(type: {}, vertices: [{}])",
+            shape.type(),
+            verticesStr
+        );
+    }
+};
+
+
+} // namespace Math
+
+} // namespace Arns
+
+template <>
+struct std::formatter<Arns::Math::ShapeType2D> : std::formatter<std::string_view>
+{
+    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const Arns::Math::ShapeType2D& type, FormatContext& ctx) const
+    {
+        return std::format_to(ctx.out(), "{}", Arns::Math::to_string(type));
     }
 };

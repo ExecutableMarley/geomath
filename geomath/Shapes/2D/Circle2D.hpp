@@ -175,7 +175,8 @@ public:
 
 } // namespace Arns
 
-template <>struct std::formatter<Arns::Math::Circle2D>
+template <>
+struct std::formatter<Arns::Math::Circle2D>
 {
     int precision = 6;
     bool hasPrecision = false;

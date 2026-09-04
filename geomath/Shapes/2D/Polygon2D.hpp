@@ -313,7 +313,26 @@ public:
     }
 };
 
+//Todo: Move IPolygonalShape2D 
+inline std::ostream& operator<<(std::ostream &os, const IPolygonalShape2D &polygon)
+{
+    os << "PolygonalShape2D(";
+    for (size_t i = 0; i < polygon.vertexCount(); ++i)
+    {
+        os << polygon[i];
+        if (i < polygon.vertexCount() - 1)
+            os << ", ";
+    }
+    os << ")";
+    return os;
+}
 
 } // namespace Math
 
 } // namespace Arns
+
+template <>
+struct std::formatter<Arns::Math::Polygon2D>
+    : Arns::Math::PolygonalShapeFormatter<Arns::Math::Polygon2D>
+{
+};

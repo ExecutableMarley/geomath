@@ -236,3 +236,9 @@ public:
 } // namespace Math
 
 } // namespace Arns
+
+template <>
+struct std::formatter<Arns::Math::Rectangle2D>
+    : Arns::Math::PolygonalShapeFormatter<Arns::Math::Rectangle2D>
+{
+};
