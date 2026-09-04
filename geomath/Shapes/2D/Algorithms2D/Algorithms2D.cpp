@@ -138,44 +138,6 @@ bool isPointInShape(const Vector2D& point, const IBaseShape2D& shape)
 
 // Segment inside shape
 
-/*
-bool isSegmentInsideBBox(const Segment2D& segment, const BBox2D& bbox)
-{
-    return isPointInsideBBox(segment.m_start, bbox) && isPointInsideBBox(segment.m_end, bbox);
-}
-
-bool isSegmentInsideTriangle(const Segment2D& segment, const Triangle2D& triangle)
-{
-    return isPointInsideTriangle(segment.m_start, triangle) && isPointInsideTriangle(segment.m_end, triangle);
-}
-
-bool isSegmentInsideRectangle(const Segment2D& segment, const Rectangle2D& rectangle)
-{
-    return isPointInsideRectangle(segment.m_start, rectangle) && isPointInsideRectangle(segment.m_end, rectangle);
-}
-
-bool isSegmentInsideConvexPolygon(const Segment2D& segment, const ConvexPolygon2D& polygon)
-{
-    return isPointInsideConvexPolygon(segment.m_start, polygon) && isPointInsideConvexPolygon(segment.m_end, polygon);
-}
-
-bool isSegmentInsidePolygon(const Segment2D& segment, const Polygon2D& polygon)
-{
-    if (isPointInsidePolygon(segment.m_start, polygon) && isPointInsidePolygon(segment.m_end, polygon))
-    {
-        if (intersect(segment, polygon))
-            return false;
-        return true;
-    }
-    return false;
-}
-
-bool isSegmentInsideCircle(const Segment2D& segment, const Circle2D& circle)
-{
-    return isPointInsideCircle(segment.m_start, circle) && isPointInsideCircle(segment.m_end, circle);
-}
-*/
-
 bool isSegmentInsideShape(const Segment2D& segment, const IBaseShape2D& shape)
 {
     if (isConvexPolygonal(shape.type()) || shape.type() == SHAPE2D_CIRCLE)

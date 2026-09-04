@@ -53,37 +53,9 @@ bool isSegmentOnSegment(const Segment2D& segment1, const Segment2D& segment2);
 
 // --- Point-in-Shape containment
 
-/*
-bool isPointInsideBBox(const Vector2D& point, const BBox2D& bbox);
-
-bool isPointInsideTriangle(const Vector2D& point, const Triangle2D& triangle);
-
-bool isPointInsideRectangle(const Vector2D& point, const Rectangle2D& rectangle);
-
-bool isPointInsideConvexPolygon(const Vector2D& point, const ConvexPolygon2D& polygon);
-
-bool isPointInsidePolygon(const Vector2D& point, const Polygon2D& polygon);
-
-bool isPointInsideCircle(const Vector2D& point, const Circle2D& circle);
-*/
-
 bool isPointInShape(const Segment2D& segment, const IBaseShape2D& shape);
 
 // --- Segment-in-Shape containment
-
-/*
-bool isSegmentInsideBBox(const Segment2D& segment, const BBox2D& bbox);
-
-bool isSegmentInsideTriangle(const Segment2D& segment, const Triangle2D& triangle);
-
-bool isSegmentInsideRectangle(const Segment2D& segment, const Rectangle2D& rectangle);
-
-bool isSegmentInsideConvexPolygon(const Segment2D& segment, const ConvexPolygon2D& polygon);
-
-bool isSegmentInsidePolygon(const Segment2D& segment, const Polygon2D polygon);
-
-bool isSegmentInsideCircle(const Segment2D& segment, const Circle2D& circle);
-*/
 
 bool isSegmentInsideShape(const Segment2D& segment, const IBaseShape2D& shape);
 
