@@ -115,20 +115,36 @@ public:
     {
         return !(*this == other);
     }
+
+    // --- Stream Output ---
+
+    friend std::ostream& operator<<(std::ostream& stream, const Ray2D& ray)
+    {
+        return stream << "Ray2D(origin: [" << ray.m_origin.x << ", " << ray.m_origin.y << "], direction: [" << ray.m_direction.x << ", " << ray.m_direction.y << "])";
+    }
 };
 
 } // namespace Math
 
 } // namespace Arns
 
-
-
 template <>
 struct std::formatter<Arns::Math::Ray2D> : std::formatter<std::string>
 {
+    int precision = 6;
+    bool hasPrecision = false;
+
+    constexpr auto parse(std::format_parse_context& ctx)
+    {
+        return Arns::Math::parse_optional_float_format(ctx, precision, hasPrecision);
+    }
+
     template <typename FormatContext>
     auto format(const Arns::Math::Ray2D& ray, FormatContext& ctx) const
     {
+        if (hasPrecision)
+            return std::format_to(ctx.out(), "Ray2D(origin: [{:.{}f}, {:.{}f}], direction: [{:.{}f}, {:.{}f}])", ray.m_origin.x, precision, ray.m_origin.y, precision, ray.m_direction.x, precision, ray.m_direction.y, precision);
+
         return std::format_to(ctx.out(), "Ray2D(origin: {}, direction: {})", ray.m_origin, ray.m_direction);
     }
 };

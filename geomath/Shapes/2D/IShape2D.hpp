@@ -128,18 +128,28 @@ inline const IPolygonalShape2D *IFiniteShape2D::polygonal() const
 
 } // namespace Arns
 
-
-
 template <>
 struct std::formatter<Arns::Math::IPolygonalShape2D> : std::formatter<std::string>
 {
+    int precision = 6;
+    bool hasPrecision = false;
+
+    constexpr auto parse(std::format_parse_context& ctx)
+    {
+        return Arns::Math::parse_optional_float_format(ctx, precision, hasPrecision);
+    }
+
     template <typename FormatContext>
     auto format(const Arns::Math::IPolygonalShape2D& shape, FormatContext& ctx) const
     {
         std::string verticesStr;
         for (size_t i = 0; i < shape.vertexCount(); ++i)
         {
-            verticesStr += std::format("{}", shape[i]);
+            if (hasPrecision)
+                verticesStr += std::format("{:.{}f}", shape[i], precision);
+            else
+                verticesStr += std::format("{}", shape[i]);
+
             if (i < shape.vertexCount() - 1)
                 verticesStr += ", ";
         }

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../CommonMath.hpp"
+#include "Formatting/Formatting.hpp"
 #include <math.h>
 #include <ostream>
 #include <format>
@@ -328,11 +329,20 @@ inline Vector3D cross(const Vector3D& a, const Vector3D& b)
 template <>
 struct std::formatter<Arns::Math::Vector3D>
 {
-    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+    int precision = 6;
+    bool hasPrecision = false;
+
+    constexpr auto parse(std::format_parse_context& ctx)
+    {
+        return Arns::Math::parse_optional_float_format(ctx, precision, hasPrecision);
+    }
 
     template <typename FormatContext>
     auto format(const Arns::Math::Vector3D& vec, FormatContext& ctx) const
     {
-        return std::format_to(ctx.out(), "[{:.6f}, {:.6f}, {:.6f}]", vec.x, vec.y, vec.z);
+        if (hasPrecision)
+            return std::format_to(ctx.out(), "[{:.{}f}, {:.{}f}, {:.{}f}]", vec.x, precision, vec.y, precision, vec.z, precision);
+
+        return std::format_to(ctx.out(), "[{}, {}, {}]", vec.x, vec.y, vec.z);
     }
 };

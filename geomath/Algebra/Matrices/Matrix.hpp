@@ -105,28 +105,6 @@ public:
 
     //
 
-    friend std::ostream &operator<<(std::ostream &os, const Matrix &mat)
-    {
-        if (mat.rows() == 0 || mat.columns() == 0) {
-            return os << "[] (Empty Matrix)";
-        }
-
-        for (size_t i = 0; i < mat.rows(); ++i) {
-            os << "[ ";
-            for (size_t j = 0; j < mat.columns(); ++j) {
-                os << std::setw(8) << mat(i, j);
-                if (j < mat.columns() - 1) {
-                    os << " ";
-                }
-            }
-            os << " ]";
-
-            if (i < mat.rows() - 1) {
-                os << "\n";
-            }
-        }
-        return os;
-    }
 };
 
 } // namespace Math

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../CommonMath.hpp"
+#include "../Formatting/Formatting.hpp"
 
 #include <cmath>
 #include <cstdint>
@@ -170,6 +171,13 @@ public:
         return a.numerator != b.numerator || a.denominator != b.denominator;
     }
 
+    // --- Stream Output ---
+
+    friend std::ostream& operator<<(std::ostream& stream, const Fraction& fraction)
+    {
+        return stream << "[" << fraction.numerator << "/" << fraction.denominator << "]";
+    }
+
     static Fraction fromFixedDecimal(double decimal, int maxPrecision)
     {
         int64_t num = floor(decimal * maxPrecision);
@@ -243,3 +251,21 @@ public:
 } // namespace Math
 
 } // namespace Arns
+
+template <>
+struct std::formatter<Arns::Math::Fraction>
+{
+    constexpr auto parse(std::format_parse_context& context)
+    {
+        auto iterator = context.begin();
+        if (iterator != context.end() && *iterator != '}')
+            throw std::format_error("Invalid Fraction format specification");
+        return iterator;
+    }
+
+    template <typename FormatContext>
+    auto format(const Arns::Math::Fraction& fraction, FormatContext& context) const
+    {
+        return std::format_to(context.out(), "{}/{}", fraction.numerator, fraction.denominator);
+    }
+};

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../CommonMath.hpp"
+#include "Formatting/Formatting.hpp"
 #include <math.h>
 #include <ostream>
 #include <format>
@@ -324,11 +325,20 @@ inline bool isColinear(const Vector2D& a, const Vector2D& b, const Vector2D& c)
 template <>
 struct std::formatter<Arns::Math::Vector2D>
 {
-    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+    int precision = 6;
+    bool hasPrecision = false;
+
+    constexpr auto parse(std::format_parse_context& ctx)
+    {
+        return Arns::Math::parse_optional_float_format(ctx, precision, hasPrecision);
+    }
 
     template <typename FormatContext>
     auto format(const Arns::Math::Vector2D& vec, FormatContext& ctx) const
     {
-        return std::format_to(ctx.out(), "[{{:.6f}, {:.6f}}]", vec.x, vec.y);
+        if (hasPrecision)
+            return std::format_to(ctx.out(), "[{:.{}f}, {:.{}f}]", vec.x, precision, vec.y, precision);
+
+        return std::format_to(ctx.out(), "[{}, {}]", vec.x, vec.y);
     }
 };

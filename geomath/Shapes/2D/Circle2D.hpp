@@ -162,19 +162,35 @@ public:
     {
         return !(*this == other);
     }
+
+    // --- Stream Output ---
+
+    friend std::ostream& operator<<(std::ostream& stream, const Circle2D& circle)
+    {
+        return stream << "Circle2D(center: [" << circle.m_center.x << ", " << circle.m_center.y << "], radius: " << circle.m_radius << ")";
+    }
 };
 
 } // namespace Math
 
 } // namespace Arns
 
-
-
-template <>struct std::formatter<Arns::Math::Circle2D> : std::formatter<std::string>
+template <>struct std::formatter<Arns::Math::Circle2D>
 {
+    int precision = 6;
+    bool hasPrecision = false;
+
+    constexpr auto parse(std::format_parse_context& ctx)
+    {
+        return Arns::Math::parse_optional_float_format(ctx, precision, hasPrecision);
+    }
+
     template <typename FormatContext>
     auto format(const Arns::Math::Circle2D& circle, FormatContext& ctx) const
     {
-        return std::format_to(ctx.out(), "Circle2D(center: [{:.6f}, {:.6f}], radius: {:.6f})", circle.m_center.x, circle.m_center.y, circle.m_radius);
+        if (hasPrecision)
+            return std::format_to(ctx.out(), "Circle2D(center: [{:.{}f}, {:.{}f}], radius: {:.{}f})", circle.m_center.x, precision, circle.m_center.y, precision, circle.m_radius, precision);
+
+        return std::format_to(ctx.out(), "Circle2D(center: [{}, {}], radius: {})", circle.m_center.x, circle.m_center.y, circle.m_radius);
     }
 };

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "CommonMath.hpp"
+#include "Formatting/Formatting.hpp"
 #include "Geometry/Vector3D.hpp"
 #include "Algebra/Matrices/Matrix3x3.hpp"
 #include "Algebra/Matrices/Matrix4x4.hpp"
@@ -48,16 +49,16 @@ public:
 
     bool isNormalized() const
     {
-        return m_pitch >= -180 && m_pitch <= 180 && m_yaw >= -180 && m_yaw <= 180 && m_roll >= -180 && m_roll <= 180;
+        return m_pitch >= real_t(-180) && m_pitch <= real_t(180) && m_yaw >= real_t(-180) && m_yaw <= real_t(180) && m_roll >= real_t(-180) && m_roll <= real_t(180);
     }
 
     // --- Transform / modification ---
 
     EulerAngles& normalize()
     {
-        m_pitch = wrapValue(m_pitch, -180.f, 180.f);
-        m_yaw   = wrapValue(m_yaw,   -180.f, 180.f);
-        m_roll  = wrapValue(m_roll,  -180.f, 180.f);
+        m_pitch = wrapValue(m_pitch, real_t(-180), real_t(180));
+        m_yaw   = wrapValue(m_yaw,   real_t(-180), real_t(180));
+        m_roll  = wrapValue(m_roll,  real_t(-180), real_t(180));
         return *this;
     }
 
@@ -150,7 +151,7 @@ public:
         return !approximatelyEqual(m_pitch, other.m_pitch) || !approximatelyEqual(m_yaw, other.m_yaw) || !approximatelyEqual(m_roll, other.m_roll);
     }
 
-    // Conversion between EulerAngles and Matrix
+    // --- Conversion between EulerAngles and Matrix ---
 
     Matrix3x3 toMatrix3x3() const
     {
@@ -165,8 +166,36 @@ public:
             Matrix4x4::createRotationYRads(degToRad(m_yaw)) * 
             Matrix4x4::createRotationZRads(degToRad(m_roll));
     }
+
+    // --- Stream Output ---
+
+    friend std::ostream& operator<<(std::ostream& stream, const EulerAngles& angles)
+    {
+        return stream << "[" << angles.m_pitch << ", " << angles.m_yaw << ", " << angles.m_roll << "]";
+    }
 };
 
 } // namespace Math
 
 } // namespace Arns
+
+template <>
+struct std::formatter<Arns::Math::EulerAngles>
+{
+    int precision = 6;
+    bool hasPrecision = false;
+
+    constexpr auto parse(std::format_parse_context& context)
+    {
+        return Arns::Math::parse_optional_float_format(context, precision, hasPrecision);
+    }
+
+    template <typename FormatContext>
+    auto format(const Arns::Math::EulerAngles& angles, FormatContext& context) const
+    {
+        if (hasPrecision)
+            return std::format_to(context.out(), "[{:.{}f}, {:.{}f}, {:.{}f}]", angles.m_pitch, precision, angles.m_yaw, precision, angles.m_roll, precision);
+
+        return std::format_to(context.out(), "[{}, {}, {}]", angles.m_pitch, angles.m_yaw, angles.m_roll);
+    }
+};

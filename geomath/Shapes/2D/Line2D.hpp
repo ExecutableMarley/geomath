@@ -130,20 +130,36 @@ public:
     {
         return !(*this == other);
     }
+
+    // --- Stream Output ---
+
+    friend std::ostream& operator<<(std::ostream& stream, const Segment2D& segment)
+    {
+        return stream << "Segment2D(start: [" << segment.m_start.x << ", " << segment.m_start.y << "], end: [" << segment.m_end.x << ", " << segment.m_end.y << "])";
+    }
 };
 
 } // namespace Math
 
 } // namespace Arns
 
-
-
 template <>
 struct std::formatter<Arns::Math::Segment2D> : std::formatter<std::string>
 {
+    int precision = 6;
+    bool hasPrecision = false;
+
+    constexpr auto parse(std::format_parse_context& ctx)
+    {
+        return Arns::Math::parse_optional_float_format(ctx, precision, hasPrecision);
+    }
+
     template <typename FormatContext>
     auto format(const Arns::Math::Segment2D& segment, FormatContext& ctx) const
     {
+        if (hasPrecision)
+            return std::format_to(ctx.out(), "Segment2D(start: [{:.{}f}, {:.{}f}], end: [{:.{}f}, {:.{}f}])", segment.m_start.x, precision, segment.m_start.y, precision, segment.m_end.x, precision, segment.m_end.y, precision);
+
         return std::format_to(ctx.out(), "Segment2D(start: {}, end: {})", segment.m_start, segment.m_end);
     }
 };

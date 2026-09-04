@@ -6,6 +6,7 @@
 #pragma once
 
 #include "CommonMath.hpp"
+#include "Formatting/Formatting.hpp"
 #include "Geometry/Vector3D.hpp"
 #include "Matrices/Matrix3x3.hpp"
 #include "Matrices/Matrix4x4.hpp"
@@ -212,8 +213,36 @@ struct Quaternion
             0, 0, 0, 1
         );
     }
+
+    // --- Stream Output ---
+
+    friend std::ostream& operator<<(std::ostream& stream, const Quaternion& quaternion)
+    {
+        return stream << "[" << quaternion.x << ", " << quaternion.y << ", " << quaternion.z << ", " << quaternion.w << "]";
+    }
 };
 
 } // namespace Math
 
 } // namespace Arns
+
+template <>
+struct std::formatter<Arns::Math::Quaternion>
+{
+    int precision = 6;
+    bool hasPrecision = false;
+
+    constexpr auto parse(std::format_parse_context& context)
+    {
+        return Arns::Math::parse_optional_float_format(context, precision, hasPrecision);
+    }
+
+    template <typename FormatContext>
+    auto format(const Arns::Math::Quaternion& quaternion, FormatContext& context) const
+    {
+        if (hasPrecision)
+            return std::format_to(context.out(), "[{:.{}f}, {:.{}f}, {:.{}f}, {:.{}f}]", quaternion.x, precision, quaternion.y, precision, quaternion.z, precision, quaternion.w, precision);
+
+        return std::format_to(context.out(), "[{}, {}, {}, {}]", quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+    }
+};

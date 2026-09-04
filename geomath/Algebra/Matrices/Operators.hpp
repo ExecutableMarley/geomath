@@ -162,6 +162,35 @@ inline bool operator!=(const IMatrix& lhs, const IMatrix& rhs)
 
 
 
+inline std::ostream& operator<<(std::ostream &os, const Arns::Math::IMatrix &matrix)
+{
+    if (matrix.rows() == 0 || matrix.columns() == 0) {
+        return os << "[] (Empty Matrix)";
+    }
+
+    os << "[";
+
+    for (size_t i = 0; i < matrix.rows(); ++i) {
+        os << "[ ";
+        for (size_t j = 0; j < matrix.columns(); ++j) {
+            os << std::setw(8) << matrix(i, j);
+            if (j < matrix.columns() - 1) {
+                os << " ";
+            }
+        }
+        os << " ]";
+
+        if (i < matrix.rows() - 1) {
+            os << ",";
+        }
+    }
+
+    os << "]";
+
+    return os;
+}
+
+
 template <>
 struct std::formatter<Arns::Math::IMatrix>
 {

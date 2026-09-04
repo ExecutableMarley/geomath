@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../CommonMath.hpp"
+#include "Formatting/Formatting.hpp"
 #include <math.h>
 #include <ostream>
 #include <format>
@@ -245,11 +246,20 @@ inline Vector4D operator *(real_t scalar, const Vector4D& vector)
 template <>
 struct std::formatter<Arns::Math::Vector4D>
 {
-    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+    int precision = 6;
+    bool hasPrecision = false;
+
+    constexpr auto parse(std::format_parse_context& ctx)
+    {
+        return Arns::Math::parse_optional_float_format(ctx, precision, hasPrecision);
+    }
 
     template <typename FormatContext>
     auto format(const Arns::Math::Vector4D& vec, FormatContext& ctx) const
     {
-        return std::format_to(ctx.out(), "[{:.6f}, {:.6f}, {:.6f}, {:.6f}]", vec.x, vec.y, vec.z, vec.w);
+        if (hasPrecision)
+            return std::format_to(ctx.out(), "[{:.{}f}, {:.{}f}, {:.{}f}, {:.{}f}]", vec.x, precision, vec.y, precision, vec.z, precision, vec.w, precision);
+
+        return std::format_to(ctx.out(), "[{}, {}, {}, {}]", vec.x, vec.y, vec.z, vec.w);
     }
 };
