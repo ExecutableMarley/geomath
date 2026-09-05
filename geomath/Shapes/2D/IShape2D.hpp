@@ -43,6 +43,12 @@ constexpr std::string_view to_string(ShapeType2D type)
     }
 }
 
+inline std::ostream& operator<<(std::ostream& os, ShapeType2D type)
+{
+    os << to_string(type);
+    return os;
+}
+
 constexpr bool isPolygonalShape(ShapeType2D type)
 {
     switch (type)

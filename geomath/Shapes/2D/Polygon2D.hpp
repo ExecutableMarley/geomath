@@ -316,14 +316,14 @@ public:
 //Todo: Move IPolygonalShape2D 
 inline std::ostream& operator<<(std::ostream &os, const IPolygonalShape2D &polygon)
 {
-    os << "PolygonalShape2D(";
+    os << "PolygonalShape2D(type: " << polygon.type() << ", vertices: [";
     for (size_t i = 0; i < polygon.vertexCount(); ++i)
     {
         os << polygon[i];
         if (i < polygon.vertexCount() - 1)
             os << ", ";
     }
-    os << ")";
+    os << "])";
     return os;
 }
 
