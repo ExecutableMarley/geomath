@@ -1,5 +1,6 @@
 #include "test_shape2D_utility.hpp"
 #include "Shapes/2D/Circle2D.hpp"
+#include <sstream>
 
 TEST_CASE("Circle2D is not polygonal")
 {
@@ -136,5 +137,39 @@ TEST_CASE("Circle2D bounding box")
         CHECK(bbox.width()  == doctest::Approx(real_t{6}));
         CHECK(bbox.height() == doctest::Approx(real_t{6}));
         CHECK(bbox.centroid() == circle.centroid());
+    }
+}
+
+TEST_CASE("Circle2D stream and format output")
+{
+    Circle2D circle(Vector2D{1, 2}, real_t{3.0});
+
+    SUBCASE("Stream output is formatted correctly")
+    {
+        std::ostringstream oss;
+        oss << circle;
+
+        CHECK(oss.str() == "Circle2D(center: [1, 2], radius: 3)");
+    }
+
+    SUBCASE("std::format output is formatted correctly")
+    {
+        std::string formatted = std::format("{}", circle);
+
+        CHECK(formatted == "Circle2D(center: [1, 2], radius: 3)");
+    }
+
+    SUBCASE("std::format with precision outputs correctly")
+    {
+        std::string formatted = std::format("{:.2f}", circle);
+
+        CHECK(formatted == "Circle2D(center: [1.00, 2.00], radius: 3.00)");
+    }
+
+    SUBCASE("to_string outputs correctly")
+    {
+        std::string str = to_string(circle);
+
+        CHECK(str == "Circle2D(center: [1, 2], radius: 3)");
     }
 }

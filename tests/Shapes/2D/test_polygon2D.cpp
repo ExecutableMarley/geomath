@@ -1,5 +1,6 @@
 #include "test_shape2D_utility.hpp"
 #include "Shapes/2D/Polygon2D.hpp"
+#include <sstream>
 
 TEST_CASE("Polygon2D polygonal interface")
 {
@@ -257,5 +258,39 @@ TEST_CASE("Polygon2D bounding box")
         BBox2D bbox = emptyPoly.boundingBox();
         CHECK(bbox.m_min == Vector2D{0, 0});
         CHECK(bbox.m_max == Vector2D{0, 0});
+    }
+}
+
+TEST_CASE("Polygonal2D stream and format output")
+{
+    Polygon2D poly({Vector2D{1, 2}, Vector2D{3, 4}, Vector2D{5, 6}});
+
+    SUBCASE("Stream output is formatted correctly")
+    {
+        std::ostringstream oss;
+        oss << poly;
+
+        CHECK(oss.str() == "PolygonalShape2D(type: Polygon2D, vertices: [[1, 2], [3, 4], [5, 6]])");
+    }
+    
+    SUBCASE("std::format output is formatted correctly")
+    {
+        std::string formatted = std::format("{}", poly);
+
+        CHECK(formatted == "PolygonalShape2D(type: Polygon2D, vertices: [[1, 2], [3, 4], [5, 6]])");
+    }
+
+    SUBCASE("std::format with precision outputs correctly")
+    {
+        std::string formatted = std::format("{:.2f}", poly);
+
+        CHECK(formatted == "PolygonalShape2D(type: Polygon2D, vertices: [[1.00, 2.00], [3.00, 4.00], [5.00, 6.00]])");
+    }
+
+    SUBCASE("to_string outputs correctly")
+    {
+        std::string str = to_string(poly);
+
+        CHECK(str == "PolygonalShape2D(type: Polygon2D, vertices: [[1, 2], [3, 4], [5, 6]])");
     }
 }
