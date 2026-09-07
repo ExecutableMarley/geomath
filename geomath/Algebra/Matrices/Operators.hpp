@@ -157,14 +157,7 @@ inline bool operator!=(const IMatrix& lhs, const IMatrix& rhs)
     return !(lhs == rhs);
 }
 
-
-} // namespace geomath
-
-} // namespace Arns
-
-
-
-inline std::ostream& operator<<(std::ostream &os, const Arns::geomath::IMatrix &matrix)
+inline std::ostream& operator<<(std::ostream &os, const geomath::IMatrix &matrix)
 {
     if (matrix.rows() == 0 || matrix.columns() == 0) {
         return os << "[] (Empty Matrix)";
@@ -191,6 +184,10 @@ inline std::ostream& operator<<(std::ostream &os, const Arns::geomath::IMatrix &
 
     return os;
 }
+
+} // namespace geomath
+
+} // namespace Arns
 
 
 template <>
