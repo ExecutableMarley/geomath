@@ -2,7 +2,7 @@
 
 #include "../../third_party/doctest.h"
 #include "CommonMath.hpp"
-#include "Shapes/2D/IShape2D.hpp"
+#include "Shapes/2D/Interfaces/IPolygonalShape2D.hpp"
 
 using namespace Arns::geomath;
 

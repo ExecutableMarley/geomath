@@ -4,7 +4,7 @@
 #include <vector>
 #include <functional>
 
-#include "../IShape2D.hpp"
+#include "../Interfaces/IFiniteShape2D.hpp"
 #include "../BBox2D.hpp"
 
 namespace Arns

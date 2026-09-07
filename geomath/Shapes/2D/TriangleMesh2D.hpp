@@ -7,7 +7,7 @@
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "BBox2D.hpp"
-#include "IShape2D.hpp"
+#include "Interfaces/IFiniteShape2D.hpp"
 #include "Triangle2D.hpp"
 
 namespace Arns
