@@ -24,7 +24,7 @@ No external dependencies or additional steps are required.
 #include "geomath.hpp"
 #include <iostream>
 
-using namespace Arns::Math;
+using namespace geomath;
 
 int main() {
     // 1. Geometric Intersections
@@ -51,6 +51,21 @@ int main() {
     
     return 0;
 }
+
+```
+
+## Development and Testing
+
+Prerequisites: CMake, C++20 compiler or newer. Run Basic tests from empty directory:
+
+```bash
+
+git clone https://github.com/ExecutableMarley/geomath.git
+cd geomath
+
+cmake -B build
+cmake --build build
+ctest --test-dir build --output-on-failure
 
 ```
 
