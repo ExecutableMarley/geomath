@@ -14,7 +14,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class EulerAngles
@@ -175,23 +175,23 @@ public:
     }
 };
 
-} // namespace Math
+} // namespace geomath
 
 } // namespace Arns
 
 template <>
-struct std::formatter<Arns::Math::EulerAngles>
+struct std::formatter<geomath::EulerAngles>
 {
     int precision = 6;
     bool hasPrecision = false;
 
     constexpr auto parse(std::format_parse_context& context)
     {
-        return Arns::Math::parse_optional_float_format(context, precision, hasPrecision);
+        return geomath::parse_optional_float_format(context, precision, hasPrecision);
     }
 
     template <typename FormatContext>
-    auto format(const Arns::Math::EulerAngles& angles, FormatContext& context) const
+    auto format(const geomath::EulerAngles& angles, FormatContext& context) const
     {
         if (hasPrecision)
             return std::format_to(context.out(), "[{:.{}f}, {:.{}f}, {:.{}f}]", angles.m_pitch, precision, angles.m_yaw, precision, angles.m_roll, precision);

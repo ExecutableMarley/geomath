@@ -9,10 +9,10 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
-bool intersects(const Line2D& line1, const Line2D& line2, Vector2D* intersection)
+bool intersects(const Segment2D& line1, const Segment2D& line2, Vector2D* intersection)
 {
     const Vector2D line1Delta = line1.deltaVector();
     const Vector2D line2Delta = line2.deltaVector();
@@ -35,12 +35,12 @@ bool intersects(const Line2D& line1, const Line2D& line2, Vector2D* intersection
     return false;
 }
 
-bool intersects(const Line2D& line, const BBox2D& rectangle, Vector2D* intersection)
+bool intersects(const Segment2D& line, const BBox2D& rectangle, Vector2D* intersection)
 {
-    Line2D top(rectangle.m_min, Vector2D(rectangle.m_max.x, rectangle.m_min.y));
-    Line2D right(Vector2D(rectangle.m_max.x, rectangle.m_min.y), rectangle.m_max);
-    Line2D bottom(rectangle.m_max, Vector2D(rectangle.m_min.x, rectangle.m_max.y));
-    Line2D left(Vector2D(rectangle.m_min.x, rectangle.m_max.y), rectangle.m_min);
+    Segment2D top(rectangle.m_min, Vector2D(rectangle.m_max.x, rectangle.m_min.y));
+    Segment2D right(Vector2D(rectangle.m_max.x, rectangle.m_min.y), rectangle.m_max);
+    Segment2D bottom(rectangle.m_max, Vector2D(rectangle.m_min.x, rectangle.m_max.y));
+    Segment2D left(Vector2D(rectangle.m_min.x, rectangle.m_max.y), rectangle.m_min);
 
     if (intersects(line, top, intersection))
         return true;
@@ -57,11 +57,11 @@ bool intersects(const Line2D& line, const BBox2D& rectangle, Vector2D* intersect
     return false;
 }
 
-bool intersects(const Line2D& line, const Triangle2D& triangle, Vector2D* intersection)
+bool intersects(const Segment2D& line, const Triangle2D& triangle, Vector2D* intersection)
 {
-    Line2D edge1(triangle.m_a, triangle.m_b);
-    Line2D edge2(triangle.m_b, triangle.m_c);
-    Line2D edge3(triangle.m_c, triangle.m_a);
+    Segment2D edge1(triangle.m_a, triangle.m_b);
+    Segment2D edge2(triangle.m_b, triangle.m_c);
+    Segment2D edge3(triangle.m_c, triangle.m_a);
 
     if (intersects(line, edge1, intersection))
         return true;
@@ -75,12 +75,12 @@ bool intersects(const Line2D& line, const Triangle2D& triangle, Vector2D* inters
     return false;
 }
 
-bool intersects(const Line2D& line, const Rectangle2D& rectangle, Vector2D* intersection)
+bool intersects(const Segment2D& line, const Rectangle2D& rectangle, Vector2D* intersection)
 {
-    Line2D line1(rectangle.m_a, rectangle.m_b);
-    Line2D line2(rectangle.m_b, rectangle.m_c);
-    Line2D line3(rectangle.m_c, rectangle.m_d);
-    Line2D line4(rectangle.m_d, rectangle.m_a);
+    Segment2D line1(rectangle.m_a, rectangle.m_b);
+    Segment2D line2(rectangle.m_b, rectangle.m_c);
+    Segment2D line3(rectangle.m_c, rectangle.m_d);
+    Segment2D line4(rectangle.m_d, rectangle.m_a);
 
     if (intersects(line, line1, intersection))
         return true;
@@ -97,7 +97,7 @@ bool intersects(const Line2D& line, const Rectangle2D& rectangle, Vector2D* inte
     return false;
 }
 
-bool intersects(const Line2D& line, const Circle2D& circle, Vector2D* intersection)
+bool intersects(const Segment2D& line, const Circle2D& circle, Vector2D* intersection)
 {
     const Vector2D lineDelta = line.deltaVector();
     const Vector2D f = line.m_start - circle.m_center;
@@ -133,11 +133,11 @@ bool intersects(const Line2D& line, const Circle2D& circle, Vector2D* intersecti
     return false;
 }
 
-bool intersects(const Line2D& line, const Polygon2D& polygon, Vector2D* intersection)
+bool intersects(const Segment2D& line, const Polygon2D& polygon, Vector2D* intersection)
 {
     for (size_t i = 0; i < polygon.m_vertices.size(); i++)
     {
-        Line2D edge(polygon.m_vertices[i], polygon.m_vertices[(i + 1) % polygon.m_vertices.size()]);
+        Segment2D edge(polygon.m_vertices[i], polygon.m_vertices[(i + 1) % polygon.m_vertices.size()]);
         if (intersects(line, edge, intersection))
             return true;
     }

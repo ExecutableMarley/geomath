@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <cstdint>
 
-using namespace Arns::Math;
+using namespace Arns::geomath;
 
 // ============================================================================
 // Approximations

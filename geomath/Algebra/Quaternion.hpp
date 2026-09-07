@@ -14,7 +14,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 struct Quaternion
@@ -222,23 +222,23 @@ struct Quaternion
     }
 };
 
-} // namespace Math
+} // namespace geomath
 
 } // namespace Arns
 
 template <>
-struct std::formatter<Arns::Math::Quaternion>
+struct std::formatter<geomath::Quaternion>
 {
     int precision = 6;
     bool hasPrecision = false;
 
     constexpr auto parse(std::format_parse_context& context)
     {
-        return Arns::Math::parse_optional_float_format(context, precision, hasPrecision);
+        return geomath::parse_optional_float_format(context, precision, hasPrecision);
     }
 
     template <typename FormatContext>
-    auto format(const Arns::Math::Quaternion& quaternion, FormatContext& context) const
+    auto format(const geomath::Quaternion& quaternion, FormatContext& context) const
     {
         if (hasPrecision)
             return std::format_to(context.out(), "[{:.{}f}, {:.{}f}, {:.{}f}, {:.{}f}]", quaternion.x, precision, quaternion.y, precision, quaternion.z, precision, quaternion.w, precision);

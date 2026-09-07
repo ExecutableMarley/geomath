@@ -16,7 +16,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class Matrix3x3 : public IMatrix

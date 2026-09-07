@@ -15,7 +15,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 // Forward declarations

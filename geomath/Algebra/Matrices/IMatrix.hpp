@@ -13,7 +13,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class IMatrix
@@ -84,6 +84,6 @@ public:
 };
 
 
-} // namespace Math
+} // namespace geomath
 
-} // namespace Arns
+}

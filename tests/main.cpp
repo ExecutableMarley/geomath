@@ -3,7 +3,7 @@
 
 #include "Math.hpp"
 
-using namespace Arns::Math;
+using namespace geomath;
 
 TEST_CASE("ReadMe example")
 {

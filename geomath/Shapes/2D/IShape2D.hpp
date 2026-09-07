@@ -18,7 +18,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 enum ShapeType2D
@@ -187,18 +187,18 @@ struct PolygonalShapeFormatter
 };
 
 
-} // namespace Math
+} // namespace geomath
 
 } // namespace Arns
 
 template <>
-struct std::formatter<Arns::Math::ShapeType2D> : std::formatter<std::string_view>
+struct std::formatter<geomath::ShapeType2D> : std::formatter<std::string_view>
 {
     constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
 
     template <typename FormatContext>
-    auto format(const Arns::Math::ShapeType2D& type, FormatContext& ctx) const
+    auto format(const geomath::ShapeType2D& type, FormatContext& ctx) const
     {
-        return std::format_to(ctx.out(), "{}", Arns::Math::to_string(type));
+        return std::format_to(ctx.out(), "{}", geomath::to_string(type));
     }
 };

@@ -2,7 +2,7 @@
 #include "Geometry/Vector3D.hpp"
 #include <sstream>
 
-using namespace Arns::Math;
+using namespace Arns::geomath;
 
 TEST_SUITE("Vector3D")
 {
@@ -129,8 +129,8 @@ TEST_SUITE("Vector3D")
         CHECK(Vector3D::min(Vector3D(4.0f, 2.0f, 7.0f), Vector3D(1.0f, 5.0f, 3.0f)) == Vector3D(1.0f, 2.0f, 3.0f));
         CHECK(Vector3D::max(Vector3D(4.0f, 2.0f, 7.0f), Vector3D(1.0f, 5.0f, 3.0f)) == Vector3D(4.0f, 5.0f, 7.0f));
 
-        CHECK(Arns::Math::dot(Vector3D(1.0f, 2.0f, 3.0f), Vector3D(4.0f, 5.0f, 6.0f)) == doctest::Approx(32.0f));
-        CHECK(Arns::Math::cross(Vector3D(1.0f, 0.0f, 0.0f), Vector3D(0.0f, 1.0f, 0.0f)) == Vector3D(0.0f, 0.0f, 1.0f));
+        CHECK(Arns::geomath::dot(Vector3D(1.0f, 2.0f, 3.0f), Vector3D(4.0f, 5.0f, 6.0f)) == doctest::Approx(32.0f));
+        CHECK(Arns::geomath::cross(Vector3D(1.0f, 0.0f, 0.0f), Vector3D(0.0f, 1.0f, 0.0f)) == Vector3D(0.0f, 0.0f, 1.0f));
     }
 
     TEST_CASE("Vector3D stream and format output")

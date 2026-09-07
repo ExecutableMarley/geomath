@@ -13,7 +13,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class Plane

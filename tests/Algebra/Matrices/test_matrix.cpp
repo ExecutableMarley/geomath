@@ -4,7 +4,7 @@
 #include "Algebra/Matrices/Matrix4x4.hpp"
 #include "Algebra/Matrices/Operators.hpp"
 
-using namespace Arns::Math;
+using namespace Arns::geomath;
 
 TEST_SUITE("Matrix")
 {

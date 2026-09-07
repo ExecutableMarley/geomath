@@ -14,7 +14,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 enum ShapeType3D

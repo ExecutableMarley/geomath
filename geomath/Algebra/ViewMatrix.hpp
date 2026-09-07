@@ -15,7 +15,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class ViewMatrix : public Matrix4x4

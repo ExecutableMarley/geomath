@@ -15,7 +15,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class Cylinder : public IFiniteShape3D

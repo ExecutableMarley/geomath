@@ -2,7 +2,7 @@
 
 #include "Geometry/Vector2D.hpp"
 
-using namespace Arns::Math;
+using namespace Arns::geomath;
 
 TEST_CASE("Vector2D addition")
 {

@@ -14,7 +14,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 
@@ -350,3 +350,5 @@ inline T safe_sub(T a, T b)
 } // namespace Math
 
 } // namespace Arns
+
+namespace geomath = Arns::geomath;

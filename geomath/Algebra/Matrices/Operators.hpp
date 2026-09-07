@@ -13,10 +13,11 @@
 #include <format>
 #include <stdexcept>
 
+
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 // Unary operators
@@ -156,13 +157,14 @@ inline bool operator!=(const IMatrix& lhs, const IMatrix& rhs)
     return !(lhs == rhs);
 }
 
-} // namespace Math
+
+} // namespace geomath
 
 } // namespace Arns
 
 
 
-inline std::ostream& operator<<(std::ostream &os, const Arns::Math::IMatrix &matrix)
+inline std::ostream& operator<<(std::ostream &os, const Arns::geomath::IMatrix &matrix)
 {
     if (matrix.rows() == 0 || matrix.columns() == 0) {
         return os << "[] (Empty Matrix)";
@@ -192,12 +194,12 @@ inline std::ostream& operator<<(std::ostream &os, const Arns::Math::IMatrix &mat
 
 
 template <>
-struct std::formatter<Arns::Math::IMatrix>
+struct std::formatter<geomath::IMatrix>
 {
     constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
 
     template <typename FormatContext>
-    auto format(const Arns::Math::IMatrix& matrix, FormatContext& ctx) const
+    auto format(const geomath::IMatrix& matrix, FormatContext& ctx) const
     {
         std::string result = "[";
         for (size_t i = 0; i < matrix.rows(); ++i)

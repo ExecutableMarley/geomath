@@ -17,7 +17,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 real_t distancePointToLine(const Vector3D& point, const Vector3D& lineStart, const Vector3D& lineEnd, Vector3D* closestPoint)

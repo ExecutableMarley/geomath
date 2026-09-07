@@ -11,7 +11,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class ISpatialIndex2D

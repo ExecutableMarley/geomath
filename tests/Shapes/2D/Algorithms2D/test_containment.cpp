@@ -12,7 +12,7 @@
 #include "Shapes/2D/Circle2D.hpp"
 
 
-using namespace Arns::Math;
+using namespace Arns::geomath;
 
 // ============================================================================
 // TRIANGLE2D CONTAINMENT TESTS

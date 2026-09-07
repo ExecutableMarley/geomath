@@ -14,7 +14,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 struct Vector3D
@@ -114,9 +114,9 @@ struct Vector3D
 
     Vector3D& clamp(const Vector3D& min, const Vector3D& max)
     {
-        x = Arns::Math::clamp(x, min.x, max.x);
-        y = Arns::Math::clamp(y, min.y, max.y);
-        z = Arns::Math::clamp(z, min.z, max.z);
+        x = Arns::geomath::clamp(x, min.x, max.x);
+        y = Arns::geomath::clamp(y, min.y, max.y);
+        z = Arns::geomath::clamp(z, min.z, max.z);
         return *this;
     }
 
@@ -320,25 +320,25 @@ inline Vector3D cross(const Vector3D& a, const Vector3D& b)
     return a.cross(b);
 }
 
-} // namespace Math
+} // namespace geomath
 
 } // namespace Arns
 
 
 
 template <>
-struct std::formatter<Arns::Math::Vector3D>
+struct std::formatter<geomath::Vector3D>
 {
     int precision = 6;
     bool hasPrecision = false;
 
     constexpr auto parse(std::format_parse_context& ctx)
     {
-        return Arns::Math::parse_optional_float_format(ctx, precision, hasPrecision);
+        return geomath::parse_optional_float_format(ctx, precision, hasPrecision);
     }
 
     template <typename FormatContext>
-    auto format(const Arns::Math::Vector3D& vec, FormatContext& ctx) const
+    auto format(const geomath::Vector3D& vec, FormatContext& ctx) const
     {
         if (hasPrecision)
             return std::format_to(ctx.out(), "[{:.{}f}, {:.{}f}, {:.{}f}]", vec.x, precision, vec.y, precision, vec.z, precision);

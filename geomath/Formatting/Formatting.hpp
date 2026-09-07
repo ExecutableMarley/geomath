@@ -6,7 +6,7 @@
 #include <string>
 #include <type_traits>
 
-namespace Arns::Math
+namespace Arns::geomath
 {
 
 

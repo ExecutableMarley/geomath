@@ -8,7 +8,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 //[Predicates]

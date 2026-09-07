@@ -14,7 +14,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 struct Vector4D
@@ -84,10 +84,10 @@ struct Vector4D
 
     Vector4D& clamp(const Vector4D& min, const Vector4D& max)
     {
-        x = Arns::Math::clamp(x, min.x, max.x);
-        y = Arns::Math::clamp(y, min.y, max.y);
-        z = Arns::Math::clamp(z, min.z, max.z);
-        w = Arns::Math::clamp(w, min.w, max.w);
+        x = Arns::geomath::clamp(x, min.x, max.x);
+        y = Arns::geomath::clamp(y, min.y, max.y);
+        z = Arns::geomath::clamp(z, min.z, max.z);
+        w = Arns::geomath::clamp(w, min.w, max.w);
         return *this;
     }
 
@@ -237,25 +237,25 @@ inline Vector4D operator *(real_t scalar, const Vector4D& vector)
     return vector * scalar;
 }
 
-} // namespace Math
+} // namespace geomath
 
 } // namespace Arns
 
 
 
 template <>
-struct std::formatter<Arns::Math::Vector4D>
+struct std::formatter<geomath::Vector4D>
 {
     int precision = 6;
     bool hasPrecision = false;
 
     constexpr auto parse(std::format_parse_context& ctx)
     {
-        return Arns::Math::parse_optional_float_format(ctx, precision, hasPrecision);
+        return geomath::parse_optional_float_format(ctx, precision, hasPrecision);
     }
 
     template <typename FormatContext>
-    auto format(const Arns::Math::Vector4D& vec, FormatContext& ctx) const
+    auto format(const geomath::Vector4D& vec, FormatContext& ctx) const
     {
         if (hasPrecision)
             return std::format_to(ctx.out(), "[{:.{}f}, {:.{}f}, {:.{}f}, {:.{}f}]", vec.x, precision, vec.y, precision, vec.z, precision, vec.w, precision);

@@ -1,7 +1,7 @@
 #include "../third_party/doctest.h"
 #include "Algebra/Fraction.hpp"
 
-using namespace Arns::Math;
+using namespace Arns::geomath;
 
 TEST_SUITE("Fraction")
 {

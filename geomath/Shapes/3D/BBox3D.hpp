@@ -12,7 +12,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class BBox3D

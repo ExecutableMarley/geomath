@@ -16,7 +16,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class Capsule : public IFiniteShape3D

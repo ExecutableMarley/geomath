@@ -15,7 +15,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class Sphere : public IFiniteShape3D

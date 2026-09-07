@@ -16,7 +16,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class ConvexPolygon2D : public Polygon2D

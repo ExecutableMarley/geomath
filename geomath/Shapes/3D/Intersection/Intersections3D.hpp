@@ -18,7 +18,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 bool intersects(const Line3D &line1, const Line3D &line2, Vector3D *intersection = nullptr);

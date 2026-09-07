@@ -11,7 +11,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class Fraction
@@ -248,12 +248,12 @@ public:
     }
 };
 
-} // namespace Math
+} // namespace geomath
 
 } // namespace Arns
 
 template <>
-struct std::formatter<Arns::Math::Fraction>
+struct std::formatter<geomath::Fraction>
 {
     constexpr auto parse(std::format_parse_context& context)
     {
@@ -264,7 +264,7 @@ struct std::formatter<Arns::Math::Fraction>
     }
 
     template <typename FormatContext>
-    auto format(const Arns::Math::Fraction& fraction, FormatContext& context) const
+    auto format(const geomath::Fraction& fraction, FormatContext& context) const
     {
         return std::format_to(context.out(), "{}/{}", fraction.numerator, fraction.denominator);
     }

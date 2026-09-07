@@ -4,7 +4,7 @@
 #include "CommonMath.hpp"
 #include "Shapes/2D/IShape2D.hpp"
 
-using namespace Arns::Math;
+using namespace Arns::geomath;
 
 template <typename ShapeT>
 void check_is_polygonal(const IFiniteShape2D& shape, size_t expectedVertexCount)

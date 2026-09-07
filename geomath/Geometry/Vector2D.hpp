@@ -14,7 +14,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 struct Vector2D
@@ -113,8 +113,8 @@ struct Vector2D
 
     Vector2D& clamp(const Vector2D& min, const Vector2D& max)
     {
-        x = Arns::Math::clamp(x, min.x, max.x);
-        y = Arns::Math::clamp(y, min.y, max.y);
+        x = Arns::geomath::clamp(x, min.x, max.x);
+        y = Arns::geomath::clamp(y, min.y, max.y);
         return *this;
     }
 
@@ -316,25 +316,25 @@ inline bool isColinear(const Vector2D& a, const Vector2D& b, const Vector2D& c)
     return approximatelyZero(orient2D(a,b,c));
 }
 
-} // namespace Math
+} // namespace geomath
 
 } // namespace Arns
 
 
 
 template <>
-struct std::formatter<Arns::Math::Vector2D>
+struct std::formatter<geomath::Vector2D>
 {
     int precision = 6;
     bool hasPrecision = false;
 
     constexpr auto parse(std::format_parse_context& ctx)
     {
-        return Arns::Math::parse_optional_float_format(ctx, precision, hasPrecision);
+        return geomath::parse_optional_float_format(ctx, precision, hasPrecision);
     }
 
     template <typename FormatContext>
-    auto format(const Arns::Math::Vector2D& vec, FormatContext& ctx) const
+    auto format(const geomath::Vector2D& vec, FormatContext& ctx) const
     {
         if (hasPrecision)
             return std::format_to(ctx.out(), "[{:.{}f}, {:.{}f}]", vec.x, precision, vec.y, precision);

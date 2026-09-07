@@ -12,7 +12,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class Ray3D

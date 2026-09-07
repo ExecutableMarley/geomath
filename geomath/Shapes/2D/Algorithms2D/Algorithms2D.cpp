@@ -22,7 +22,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 bool isPointOnSegment(const Vector2D& point, const Vector2D& segmentStart, const Vector2D& segmentEnd)

@@ -21,7 +21,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class Triangle2D : public IPolygonalShape2D
@@ -203,12 +203,12 @@ public:
     }
 };
 
-} // namespace Math
+} // namespace geomath
 
 } // namespace Arns
 
 template <>
-struct std::formatter<Arns::Math::Triangle2D>
-    : Arns::Math::PolygonalShapeFormatter<Arns::Math::Triangle2D>
+struct std::formatter<geomath::Triangle2D>
+    : geomath::PolygonalShapeFormatter<geomath::Triangle2D>
 {
 };

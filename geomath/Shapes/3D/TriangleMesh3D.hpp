@@ -20,7 +20,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 // Todo: Should have the same structure as TriangleMesh2D
@@ -209,7 +209,7 @@ public:
             const Vector3D &b = m_vertices[m_indices[i + 1]];
             const Vector3D &c = m_vertices[m_indices[i + 2]];
 
-            if (Arns::Math::intersects(line, Triangle3D(a, b, c)))
+            if (geomath::intersects(line, Triangle3D(a, b, c)))
                 return true;
         }
         return false;

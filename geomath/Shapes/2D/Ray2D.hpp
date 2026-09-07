@@ -14,7 +14,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class Ray2D
@@ -124,23 +124,23 @@ public:
     }
 };
 
-} // namespace Math
+} // namespace geomath
 
 } // namespace Arns
 
 template <>
-struct std::formatter<Arns::Math::Ray2D> : std::formatter<std::string>
+struct std::formatter<geomath::Ray2D> : std::formatter<std::string>
 {
     int precision = 6;
     bool hasPrecision = false;
 
     constexpr auto parse(std::format_parse_context& ctx)
     {
-        return Arns::Math::parse_optional_float_format(ctx, precision, hasPrecision);
+        return geomath::parse_optional_float_format(ctx, precision, hasPrecision);
     }
 
     template <typename FormatContext>
-    auto format(const Arns::Math::Ray2D& ray, FormatContext& ctx) const
+    auto format(const geomath::Ray2D& ray, FormatContext& ctx) const
     {
         if (hasPrecision)
             return std::format_to(ctx.out(), "Ray2D(origin: [{:.{}f}, {:.{}f}], direction: [{:.{}f}, {:.{}f}])", ray.m_origin.x, precision, ray.m_origin.y, precision, ray.m_direction.x, precision, ray.m_direction.y, precision);

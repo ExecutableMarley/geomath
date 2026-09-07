@@ -2,7 +2,7 @@
 #include "Geometry/Vector2D.hpp"
 #include <sstream>
 
-using namespace Arns::Math;
+using namespace Arns::geomath;
 
 TEST_SUITE("Vector2D")
 {
@@ -129,8 +129,8 @@ TEST_SUITE("Vector2D")
         CHECK(Vector2D::min(Vector2D(4.0f, 2.0f), Vector2D(1.0f, 5.0f)) == Vector2D(1.0f, 2.0f));
         CHECK(Vector2D::max(Vector2D(4.0f, 2.0f), Vector2D(1.0f, 5.0f)) == Vector2D(4.0f, 5.0f));
 
-        CHECK(Arns::Math::dot(Vector2D(1.0f, 2.0f), Vector2D(3.0f, 4.0f)) == doctest::Approx(11.0f));
-        CHECK(Arns::Math::cross(Vector2D(1.0f, 2.0f), Vector2D(3.0f, 4.0f)) == doctest::Approx(-2.0f));
+        CHECK(Arns::geomath::dot(Vector2D(1.0f, 2.0f), Vector2D(3.0f, 4.0f)) == doctest::Approx(11.0f));
+        CHECK(Arns::geomath::cross(Vector2D(1.0f, 2.0f), Vector2D(3.0f, 4.0f)) == doctest::Approx(-2.0f));
         CHECK(isCCW(Vector2D(0.0f, 0.0f), Vector2D(1.0f, 0.0f), Vector2D(0.0f, 1.0f)));
         CHECK(isCW(Vector2D(0.0f, 0.0f), Vector2D(1.0f, 0.0f), Vector2D(0.0f, -1.0f)));
         CHECK(isColinear(Vector2D(0.0f, 0.0f), Vector2D(1.0f, 0.0f), Vector2D(2.0f, 0.0f)));

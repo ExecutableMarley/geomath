@@ -15,7 +15,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class BBox2D
@@ -261,23 +261,23 @@ public:
     }
 };
 
-} // namespace Math
+} // namespace geomath
 
 } // namespace Arns
 
 template <>
-struct std::formatter<Arns::Math::BBox2D>
+struct std::formatter<geomath::BBox2D>
 {
     int precision = 6;
     bool hasPrecision = false;
 
     constexpr auto parse(std::format_parse_context& ctx)
     {
-        return Arns::Math::parse_optional_float_format(ctx, precision, hasPrecision);
+        return geomath::parse_optional_float_format(ctx, precision, hasPrecision);
     }
 
     template <typename FormatContext>
-    auto format(const Arns::Math::BBox2D& bbox, FormatContext& ctx) const
+    auto format(const geomath::BBox2D& bbox, FormatContext& ctx) const
     {
         if (hasPrecision)
             return std::format_to(ctx.out(), "BBox2D(min: {:.{}f}, max: {:.{}f})", bbox.m_min, precision, bbox.m_max, precision);

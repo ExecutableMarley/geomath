@@ -20,7 +20,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class Polygon2D : public IPolygonalShape2D
@@ -327,12 +327,12 @@ inline std::ostream& operator<<(std::ostream &os, const IPolygonalShape2D &polyg
     return os;
 }
 
-} // namespace Math
+} // namespace geomath
 
 } // namespace Arns
 
 template <>
-struct std::formatter<Arns::Math::Polygon2D>
-    : Arns::Math::PolygonalShapeFormatter<Arns::Math::Polygon2D>
+struct std::formatter<geomath::Polygon2D>
+    : geomath::PolygonalShapeFormatter<geomath::Polygon2D>
 {
 };

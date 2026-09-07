@@ -19,7 +19,7 @@
 namespace Arns
 {
 
-namespace Math
+namespace geomath
 {
 
 class Circle2D : public IFiniteShape2D
@@ -176,18 +176,18 @@ public:
 } // namespace Arns
 
 template <>
-struct std::formatter<Arns::Math::Circle2D>
+struct std::formatter<geomath::Circle2D>
 {
     int precision = 6;
     bool hasPrecision = false;
 
     constexpr auto parse(std::format_parse_context& ctx)
     {
-        return Arns::Math::parse_optional_float_format(ctx, precision, hasPrecision);
+        return geomath::parse_optional_float_format(ctx, precision, hasPrecision);
     }
 
     template <typename FormatContext>
-    auto format(const Arns::Math::Circle2D& circle, FormatContext& ctx) const
+    auto format(const geomath::Circle2D& circle, FormatContext& ctx) const
     {
         if (hasPrecision)
             return std::format_to(ctx.out(), "Circle2D(center: [{:.{}f}, {:.{}f}], radius: {:.{}f})", circle.m_center.x, precision, circle.m_center.y, precision, circle.m_radius, precision);
