@@ -7,6 +7,10 @@ target_sources(geomath_tests PRIVATE
     ${TEST_SOURCES}
 )
 
+# doctest forward-declares std::tuple in some builds. use the real STL headers on MSVC
+# to avoid warning C5285/N5014 on the Windows runner.
+target_compile_definitions(geomath_tests PRIVATE DOCTEST_CONFIG_USE_STD_HEADERS)
+
 target_link_libraries(geomath_tests PRIVATE Geomath)
 
 # Register doctest binary
