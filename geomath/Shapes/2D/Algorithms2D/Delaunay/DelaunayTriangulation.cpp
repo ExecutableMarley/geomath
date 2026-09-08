@@ -91,11 +91,8 @@ bool isDelaunay(const TriangleMesh2D& mesh)
 
         Vector2D center;
         real_t radius2;
-        circumcircleSquared(A, B, C, center, radius2);
-
-        // Skip degenerate triangles
-        if (radius2 < 0)
-            continue;
+        if (!circumcircleSquared(A, B, C, center, radius2))
+            return false;
 
         // Check all other vertices
         for (size_t i = 0; i < verts.size(); ++i)
