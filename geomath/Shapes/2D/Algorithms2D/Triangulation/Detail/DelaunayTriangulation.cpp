@@ -1,4 +1,4 @@
-#include "DelaunayTriangulation.hpp"
+#include "../Triangulation.hpp"
 
 #include <numeric>
 #include <assert.h>
@@ -150,15 +150,15 @@ public:
 
 private:
     std::tuple<std::size_t, std::size_t, std::size_t>
-        find_seed_triangle(const std::vector<Vector2D>& points);
+        find_seed_triangle(const std::span<const Vector2D> points);
 
-    void init_hull(const std::vector<Vector2D>& points,
+    void init_hull(const std::span<const Vector2D> points,
         std::size_t i0, std::size_t i1, std::size_t i2);
 
-    void insert_point_into_hull(const std::vector<Vector2D>& points,
-        size_t i, size_t start);
+    void insert_point_into_hull(const std::span<const Vector2D> points,
+        std::size_t i, std::size_t start);
 
-    void insert_points(const std::vector<Vector2D>& points,
+    void insert_points(const std::span<const Vector2D> points,
         const std::vector<std::size_t>& sorted_ids,
         std::size_t i0, std::size_t i1, std::size_t i2);
 
@@ -167,7 +167,7 @@ public:
     @brief Builds a Delaunay triangulation for the given point set.
     @param inputPoints Array of 2D points to triangulate.
     */
-    explicit Delaunator(const std::vector<Vector2D>& inputPoints);
+    explicit Delaunator(const std::span<const Vector2D> inputPoints);
 
     //[Retrieval Method's]
 
@@ -187,7 +187,7 @@ public:
         return triangleTriplets;
     }
 
-    TriangleMesh2D getTriangleMesh(const std::vector<Vector2D>& inputPoints)
+    TriangleMesh2D getTriangleMesh(const std::span<const Vector2D> inputPoints)
     {
         return TriangleMesh2D(inputPoints, getTriangleTriplets());
     }
@@ -203,7 +203,7 @@ private:
 
     [[nodiscard]] std::size_t find_hull_start(const Vector2D& point) const noexcept;
 
-    std::size_t legalize(const std::vector<Vector2D>& inputPoints, std::size_t a);
+    std::size_t legalize(const std::span<const Vector2D> inputPoints, std::size_t a);
     std::size_t add_triangle(std::size_t i0, std::size_t i1, std::size_t i2,
         std::size_t a, std::size_t b, std::size_t c);
     void link(std::size_t a, std::size_t b);
@@ -251,7 +251,7 @@ std::size_t Delaunator::find_hull_start(const Vector2D& point) const noexcept
 }
 
 std::tuple<std::size_t, std::size_t, std::size_t>
-Delaunator::find_seed_triangle(const std::vector<Vector2D>& points)
+Delaunator::find_seed_triangle(const std::span<const Vector2D> points)
 {
     const std::size_t n = points.size();
 
@@ -301,7 +301,7 @@ Delaunator::find_seed_triangle(const std::vector<Vector2D>& points)
     return { i0, i1, i2 };
 }
 
-void Delaunator::init_hull(const std::vector<Vector2D>& points,
+void Delaunator::init_hull(const std::span<const Vector2D> points,
     std::size_t i0, std::size_t i1, std::size_t i2)
 {
     const std::size_t n = points.size();
@@ -334,7 +334,7 @@ void Delaunator::init_hull(const std::vector<Vector2D>& points,
     add_triangle(i0, i1, i2, INVALID_INDEX, INVALID_INDEX, INVALID_INDEX);
 }
 
-void Delaunator::insert_point_into_hull(const std::vector<Vector2D>& points,
+void Delaunator::insert_point_into_hull(const std::span<const Vector2D> points,
     size_t i, size_t start)
 {
     size_t e = start;
@@ -393,7 +393,7 @@ void Delaunator::insert_point_into_hull(const std::vector<Vector2D>& points,
     m_hash[hash_key(points[e])] = e;
 }
 
-void Delaunator::insert_points(const std::vector<Vector2D>& points,
+void Delaunator::insert_points(const std::span<const Vector2D> points,
     const std::vector<std::size_t>& sorted_ids,
     std::size_t i0, std::size_t i1, std::size_t i2)
 {
@@ -416,7 +416,7 @@ void Delaunator::insert_points(const std::vector<Vector2D>& points,
     }
 }
 
-Delaunator::Delaunator(const std::vector<Vector2D>& inputPoints)
+Delaunator::Delaunator(const std::span<const Vector2D> inputPoints)
 {
     // --- Validation ---
     const std::size_t n = inputPoints.size();
@@ -449,7 +449,7 @@ Delaunator::Delaunator(const std::vector<Vector2D>& inputPoints)
     insert_points(inputPoints, m_ids, i0, i1, i2);
 }
 
-std::size_t Delaunator::legalize(const std::vector<Vector2D>& inputPoints, std::size_t a)
+std::size_t Delaunator::legalize(const std::span<const Vector2D> inputPoints, std::size_t a)
 {
     std::size_t stackIndex = 0;
     std::size_t currentEdgeIndex = a;
@@ -585,7 +585,7 @@ void Delaunator::link(const std::size_t a, const std::size_t b)
     }
 }
 
-TriangleMesh2D fastDelaunayTriangulation(const std::vector<Vector2D>& points)
+TriangleMesh2D delaunay(const std::span<const Vector2D> points)
 {
     if (points.size() < 3)
         return TriangleMesh2D(points, {});

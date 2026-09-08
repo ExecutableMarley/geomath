@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdexcept>
 #include <vector>
+#include <span>
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
@@ -40,15 +41,23 @@ struct TriangleIndices
 class TriangleMesh2D
 {
 public:
-    std::vector <Vector2D> m_vertices;
-    std::vector <TriangleIndices> m_triangles;
+    std::vector<Vector2D> m_vertices;
+    std::vector<TriangleIndices> m_triangles;
 
     // --- Constructors ---
 
     TriangleMesh2D() : m_vertices(), m_triangles() {};
 
-    TriangleMesh2D(const std::vector<Vector2D>& vertices, const std::vector<TriangleIndices>& triangles) :
-        m_vertices(vertices), m_triangles(triangles) {}
+    TriangleMesh2D(const std::span<const Vector2D>& vertices, const std::span<const TriangleIndices>& triangles) :
+        m_vertices(vertices.begin(), vertices.end()), m_triangles(triangles.begin(), triangles.end()) {}
+
+    TriangleMesh2D(
+        std::span<const Vector2D> vertices,
+        std::initializer_list<TriangleIndices> triangles)
+        : m_vertices(vertices.begin(), vertices.end()),
+          m_triangles(triangles)
+    {
+    }
 
     bool validate() const
     {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <span>
 
 #include "Geometry/Vector2D.hpp"
 #include "Shapes/2D/TriangleMesh2D.hpp"
@@ -10,15 +11,6 @@ namespace Arns
 
 namespace geomath
 {
-
-//[Predicates]
-
-//[DelaunayAlgorithm]
-
-bool isDelaunay(const TriangleMesh2D& mesh);
-
-TriangleMesh2D fastDelaunayTriangulation(const std::vector<Vector2D>& points);
-
 
 } // namespace Math
 
