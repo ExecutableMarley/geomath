@@ -3,6 +3,7 @@
 
 # Build executables and temporary files
 build/
+build-*/
 Testing/
 
 # 
