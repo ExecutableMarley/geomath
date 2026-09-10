@@ -12,7 +12,7 @@ using namespace Arns::geomath;
 
 TEST_CASE("approximatelyZero(float)")
 {
-    constexpr float eps = FloatAbsEpsilon;
+    constexpr float eps = RealTraits<float>::absEpsilon;
 
     CHECK(approximatelyZero(0.0f));
     CHECK(approximatelyZero(+eps * 0.5f));
@@ -27,7 +27,7 @@ TEST_CASE("approximatelyZero(float)")
 
 TEST_CASE("approximatelyZero(double)")
 {
-    constexpr double eps = DoubleAbsEpsilon;
+    constexpr double eps = RealTraits<double>::absEpsilon;
 
     CHECK(approximatelyZero(0.0));
     CHECK(approximatelyZero(+eps * 0.5));
@@ -43,7 +43,7 @@ TEST_CASE("approximatelyZero(double)")
 TEST_CASE("approximatelyEqual - absolute epsilon near zero (float)")
 {
     float a = 0.0f;
-    float b = FloatAbsEpsilon * 0.9f;
+    float b = RealTraits<float>::absEpsilon * 0.9f;
 
     CHECK(approximatelyEqual(a, b));
     CHECK(approximatelyEqual(b, a));
@@ -52,7 +52,7 @@ TEST_CASE("approximatelyEqual - absolute epsilon near zero (float)")
 TEST_CASE("approximatelyEqual - absolute epsilon near zero (double)")
 {
     double a = 0.0;
-    double b = DoubleAbsEpsilon * 0.9;
+    double b = RealTraits<double>::absEpsilon * 0.9;
 
     CHECK(approximatelyEqual(a, b));
     CHECK(approximatelyEqual(b, a));
@@ -61,7 +61,7 @@ TEST_CASE("approximatelyEqual - absolute epsilon near zero (double)")
 TEST_CASE("approximatelyEqual - relative epsilon large magnitude (float)")
 {
     float a = 1e6f;
-    float b = a + a * FloatRelEpsilon * 0.9f;
+    float b = a + a * RealTraits<float>::relEpsilon * 0.9f;
 
     CHECK(approximatelyEqual(a, b));
     CHECK(approximatelyEqual(b, a));
@@ -70,7 +70,7 @@ TEST_CASE("approximatelyEqual - relative epsilon large magnitude (float)")
 TEST_CASE("approximatelyEqual - relative epsilon large magnitude (double)")
 {
     double a = 1e12;
-    double b = a + a * DoubleRelEpsilon * 0.9;
+    double b = a + a * RealTraits<double>::relEpsilon * 0.9;
 
     CHECK(approximatelyEqual(a, b));
     CHECK(approximatelyEqual(b, a));

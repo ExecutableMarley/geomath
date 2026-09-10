@@ -8,8 +8,11 @@
 #include <math.h>
 #include <cmath>
 #include <algorithm>
+#include <concepts>
+#include <limits>
 #include <numbers>
 #include <stdexcept>
+#include <type_traits>
 
 namespace Arns
 {
@@ -17,32 +20,76 @@ namespace Arns
 namespace geomath
 {
 
-
+/*
 constexpr float FloatRelEpsilon = 1e-5f;
 constexpr float FloatAbsEpsilon = 1e-6f;
 constexpr double DoubleRelEpsilon = 1e-10;
 constexpr double DoubleAbsEpsilon = 1e-12;
+constexpr long double LongDoubleRelEpsilon = 1e-15L;
+constexpr long double LongDoubleAbsEpsilon = 1e-18L;
+*/
 
-using real_t = float;
+#ifndef GEOMATH_REAL_TYPE
+#define GEOMATH_REAL_TYPE float
+#endif
+
+using real_t = GEOMATH_REAL_TYPE;
+
+static_assert(std::is_same_v<real_t, float> ||
+              std::is_same_v<real_t, double> ||
+              std::is_same_v<real_t, long double>,
+              "GEOMATH_REAL_TYPE must be float, double, or long double");
+
+template <typename T>
+struct RealTraits;
+
+template <>
+struct RealTraits<float>
+{
+    static constexpr float relEpsilon = 1e-5f;
+    static constexpr float absEpsilon = 1e-6f;
+};
+
+template <>
+struct RealTraits<double>
+{
+    static constexpr double relEpsilon = 1e-10;
+    static constexpr double absEpsilon = 1e-12;
+};
+
+template <>
+struct RealTraits<long double>
+{
+    static constexpr long double relEpsilon = 1e-15L;
+    static constexpr long double absEpsilon = 1e-18L;
+};
+
+constexpr real_t RelEpsilon = RealTraits<real_t>::relEpsilon;
+constexpr real_t AbsEpsilon = RealTraits<real_t>::absEpsilon;
 
 constexpr real_t PI = std::numbers::pi_v<real_t>;
 
 constexpr real_t T_MAX = std::numeric_limits<real_t>::max();
 constexpr real_t T_MIN = std::numeric_limits<real_t>::min();
 
-inline bool approximatelyZero(float value, float absEpsilon = FloatAbsEpsilon)
+inline bool approximatelyZero(float value, float absEpsilon = RealTraits<float>::absEpsilon)
 {
     return fabs(value) < absEpsilon;
 }
 
-inline bool approximatelyZero(double value, double absEpsilon = DoubleAbsEpsilon)
+inline bool approximatelyZero(double value, double absEpsilon = RealTraits<double>::absEpsilon)
 {
     return fabs(value) < absEpsilon;
+}
+
+inline bool approximatelyZero(long double value, long double absEpsilon = RealTraits<long double>::absEpsilon)
+{
+    return std::fabs(value) < absEpsilon;
 }
 
 inline bool approximatelyEqual(float a, float b, 
-                                float absEpsilon = FloatAbsEpsilon,
-                                float relEpsilon = FloatRelEpsilon)
+                                float absEpsilon = RealTraits<float>::absEpsilon,
+                                float relEpsilon = RealTraits<float>::relEpsilon)
 {
     float diff = std::fabs(a - b);
     if (diff <= absEpsilon)
@@ -52,8 +99,8 @@ inline bool approximatelyEqual(float a, float b,
 }
 
 inline bool approximatelyEqual(double a, double b, 
-                                double absEpsilon = DoubleAbsEpsilon,
-                                double relEpsilon = DoubleRelEpsilon)
+                                double absEpsilon = RealTraits<double>::absEpsilon,
+                                double relEpsilon = RealTraits<double>::relEpsilon)
 {
     double diff = std::fabs(a - b);
     if (diff <= absEpsilon)
@@ -62,9 +109,20 @@ inline bool approximatelyEqual(double a, double b,
     return diff <= relEpsilon * std::max(std::fabs(a), std::fabs(b));
 }
 
+inline bool approximatelyEqual(long double a, long double b,
+                                long double absEpsilon = RealTraits<long double>::absEpsilon,
+                                long double relEpsilon = RealTraits<long double>::relEpsilon)
+{
+    long double diff = std::fabs(a - b);
+    if (diff <= absEpsilon)
+        return true;
+
+    return diff <= relEpsilon * std::max(std::fabs(a), std::fabs(b));
+}
+
 inline bool approximatelyGreater(float a, float b,
-                                    float absEpsilon = FloatAbsEpsilon,
-                                    float relEpsilon = FloatRelEpsilon)
+                                    float absEpsilon = RealTraits<float>::absEpsilon,
+                                    float relEpsilon = RealTraits<float>::relEpsilon)
 {
     if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
     {
@@ -74,8 +132,19 @@ inline bool approximatelyGreater(float a, float b,
 }
 
 inline bool approximatelyGreater(double a, double b,
-                                    double absEpsilon = DoubleRelEpsilon,
-                                    double relEpsilon = DoubleAbsEpsilon)
+                                    double absEpsilon = RealTraits<double>::absEpsilon,
+                                    double relEpsilon = RealTraits<double>::relEpsilon)
+{
+    if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
+    {
+        return false;
+    }
+    return a > b;
+}
+
+inline bool approximatelyGreater(long double a, long double b,
+                                  long double absEpsilon = RealTraits<long double>::absEpsilon,
+                                  long double relEpsilon = RealTraits<long double>::relEpsilon)
 {
     if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
     {
@@ -85,8 +154,8 @@ inline bool approximatelyGreater(double a, double b,
 }
 
 inline bool approximatelyLess(float a, float b,
-                                float absEpsilon = FloatAbsEpsilon,
-                                float relEpsilon = FloatRelEpsilon)
+                                float absEpsilon = RealTraits<float>::absEpsilon,
+                                float relEpsilon = RealTraits<float>::relEpsilon)
 {
     if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
     {
@@ -96,8 +165,8 @@ inline bool approximatelyLess(float a, float b,
 }
 
 inline bool approximatelyLess(double a, double b,
-                                double absEpsilon = DoubleRelEpsilon,
-                                double relEpsilon = DoubleAbsEpsilon)
+                                double absEpsilon = RealTraits<double>::absEpsilon,
+                                double relEpsilon = RealTraits<double>::relEpsilon)
 {
     if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
     {
@@ -106,42 +175,73 @@ inline bool approximatelyLess(double a, double b,
     return a < b;
 }
 
-inline bool approximatelyZeroAbs(float value, float absEpsilon = FloatAbsEpsilon)
+inline bool approximatelyLess(long double a, long double b,
+                               long double absEpsilon = RealTraits<long double>::absEpsilon,
+                               long double relEpsilon = RealTraits<long double>::relEpsilon)
+{
+    if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
+    {
+        return false;
+    }
+    return a < b;
+}
+
+inline bool approximatelyZeroAbs(float value, float absEpsilon = RealTraits<float>::absEpsilon)
 {
     return fabs(value) < absEpsilon;
 }
 
-inline bool approximatelyZeroAbs(double value, double absEpsilon = DoubleAbsEpsilon)
+inline bool approximatelyZeroAbs(double value, double absEpsilon = RealTraits<double>::absEpsilon)
 {
     return fabs(value) < absEpsilon;
 }
 
-inline bool approximatelyEqualAbs(float a, float b, float absEpsilon = FloatAbsEpsilon)
+inline bool approximatelyZeroAbs(long double value, long double absEpsilon = RealTraits<long double>::absEpsilon)
+{
+    return std::fabs(value) < absEpsilon;
+}
+
+inline bool approximatelyEqualAbs(float a, float b, float absEpsilon = RealTraits<float>::absEpsilon)
 {
     return approximatelyZero(a - b, absEpsilon);
 }
 
-inline bool approximatelyEqualAbs(double a, double b, double absEpsilon = DoubleAbsEpsilon)
+inline bool approximatelyEqualAbs(double a, double b, double absEpsilon = RealTraits<double>::absEpsilon)
 {
     return approximatelyZero(a - b, absEpsilon);
 }
 
-inline bool approximatelyGreaterAbs(float a, float b, float absEpsilon = FloatAbsEpsilon)
+inline bool approximatelyEqualAbs(long double a, long double b, long double absEpsilon = RealTraits<long double>::absEpsilon)
+{
+    return approximatelyZero(a - b, absEpsilon);
+}
+
+inline bool approximatelyGreaterAbs(float a, float b, float absEpsilon = RealTraits<float>::absEpsilon)
 {
     return (a - b) > absEpsilon;
 }
 
-inline bool approximatelyGreaterAbs(double a, double b, double absEpsilon = DoubleAbsEpsilon)
+inline bool approximatelyGreaterAbs(double a, double b, double absEpsilon = RealTraits<double>::absEpsilon)
 {
     return (a - b) > absEpsilon;
 }
 
-inline bool approximatelyLessAbs(float a, float b, float epsilon = FloatAbsEpsilon)
+inline bool approximatelyGreaterAbs(long double a, long double b, long double absEpsilon = RealTraits<long double>::absEpsilon)
+{
+    return (a - b) > absEpsilon;
+}
+
+inline bool approximatelyLessAbs(float a, float b, float epsilon = RealTraits<float>::absEpsilon)
 {
     return (b - a) > epsilon;
 }
 
-inline bool approximatelyLessAbs(double a, double b, double epsilon = DoubleAbsEpsilon)
+inline bool approximatelyLessAbs(double a, double b, double epsilon = RealTraits<double>::absEpsilon)
+{
+    return (b - a) > epsilon;
+}
+
+inline bool approximatelyLessAbs(long double a, long double b, long double epsilon = RealTraits<long double>::absEpsilon)
 {
     return (b - a) > epsilon;
 }
