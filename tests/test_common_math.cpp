@@ -82,6 +82,16 @@ TEST_CASE("approximatelyEqual - clearly unequal")
     CHECK_FALSE(approximatelyEqual(1.0, 1.1));
 }
 
+TEST_CASE("active real_t epsilon values")
+{
+    const real_t nearZero = AbsEpsilon * real_t{0.5};
+    const real_t clearlyPositive = AbsEpsilon * real_t{2};
+
+    CHECK(approximatelyZero(nearZero));
+    CHECK(approximatelyGreater(clearlyPositive, real_t{0}));
+    CHECK(approximatelyLess(real_t{0}, clearlyPositive));
+}
+
 // ============================================================================
 // 
 // ============================================================================

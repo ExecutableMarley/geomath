@@ -9,7 +9,7 @@ TEST_CASE("ReadMe example")
 {
     // 1. Geometric Intersections
     Triangle2D triangle({1, 0}, {0, 0}, {0, 1});
-    Circle2D circle(Vector2D(-1, 0), 1.0f);
+    Circle2D circle(Vector2D(-1, 0), 1);
 
     SUBCASE("Triangle-Circle Intersection") {
         bool collides = intersect(triangle, circle);
@@ -18,7 +18,7 @@ TEST_CASE("ReadMe example")
 
     // 2. Method Chaining 
     SUBCASE("Triangle scaling and perimeter") {
-        Triangle2D scaled = triangle.copy().scale(2.0f);
+        Triangle2D scaled = triangle.copy().scale(2);
         real_t p = scaled.perimeter();
 
         // Expected perimeter = original perimeter * 2

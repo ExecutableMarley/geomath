@@ -69,12 +69,12 @@ TEST_CASE("Triangle2D vertex access and geometry")
 
     SUBCASE("Area calculation")
     {
-        CHECK(tri.area() == doctest::Approx(6.0f));
+        CHECK(tri.area() == doctest::Approx(real_t{6}));
     }
 
     SUBCASE("Perimeter calculation")
     {
-        real_t expected = 4.0f + 2.0f * std::sqrt(13.0f);
+        real_t expected = real_t{4} + real_t{2} * std::sqrt(real_t{13});
         CHECK(tri.perimeter() == doctest::Approx(expected));
     }
 
@@ -107,7 +107,7 @@ TEST_CASE("Triangle2D transformations")
         tri.rotate(real_t{90});
 
         CHECK(tri.centroid() == originalCentroid);
-        CHECK(tri.area() == doctest::Approx(6.0f));
+        CHECK(tri.area() == doctest::Approx(real_t{6}));
     }
 
     SUBCASE("Rotate around arbitrary point")
@@ -115,9 +115,9 @@ TEST_CASE("Triangle2D transformations")
         Vector2D pivot{0, 0};
         tri.rotate(real_t{90}, pivot);
 
-        CHECK(tri.a().x == doctest::Approx(0.0f));
-        CHECK(tri.a().y == doctest::Approx(0.0f));
-        CHECK(tri.area() == doctest::Approx(6.0f));
+        CHECK(tri.a().x == doctest::Approx(real_t{0}));
+        CHECK(tri.a().y == doctest::Approx(real_t{0}));
+        CHECK(tri.area() == doctest::Approx(real_t{6}));
     }
 
     SUBCASE("Scale around centroid")
@@ -126,7 +126,7 @@ TEST_CASE("Triangle2D transformations")
         tri.scale(real_t{2.0});
 
         CHECK(tri.centroid() == originalCentroid);
-        CHECK(tri.area() == doctest::Approx(24.0f));
+        CHECK(tri.area() == doctest::Approx(real_t{24}));
     }
 
     SUBCASE("Scale around arbitrary point")
@@ -137,14 +137,14 @@ TEST_CASE("Triangle2D transformations")
         CHECK(tri.a() == Vector2D{0, 0});
         CHECK(tri.b() == Vector2D{8, 0});
         CHECK(tri.c() == Vector2D{4, 6});
-        CHECK(tri.area() == doctest::Approx(24.0f));
+        CHECK(tri.area() == doctest::Approx(real_t{24}));
     }
 
     SUBCASE("Scale by 0.5")
     {
         tri.scale(real_t{0.5});
 
-        CHECK(tri.area() == doctest::Approx(1.5f));
+        CHECK(tri.area() == doctest::Approx(real_t{1.5}));
     }
 }
 

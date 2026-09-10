@@ -111,7 +111,7 @@ TEST_CASE("Polygon2D convexity and geometry")
             Vector2D{2, 0},
             Vector2D{0, 2}
         });
-        CHECK(tri.area() == doctest::Approx(2.0f));
+        CHECK(tri.area() == doctest::Approx(real_t{2.0}));
     }
 
     SUBCASE("Area calculation - square")
@@ -122,7 +122,7 @@ TEST_CASE("Polygon2D convexity and geometry")
             Vector2D{2, 2},
             Vector2D{0, 2}
         });
-        CHECK(square.area() == doctest::Approx(4.0f));
+        CHECK(square.area() == doctest::Approx(real_t{4.0}));
     }
 
     SUBCASE("Perimeter calculation - square")
@@ -133,7 +133,7 @@ TEST_CASE("Polygon2D convexity and geometry")
             Vector2D{3, 3},
             Vector2D{0, 3}
         });
-        CHECK(square.perimeter() == doctest::Approx(12.0f));
+        CHECK(square.perimeter() == doctest::Approx(real_t{12.0}));
     }
 
     SUBCASE("Centroid calculation")
@@ -183,7 +183,7 @@ TEST_CASE("Polygon2D transformations")
         Vector2D originalCentroid = poly.centroid();
         poly.scale(real_t{2.0});
         CHECK(poly.centroid() == originalCentroid);
-        CHECK(poly.area() == doctest::Approx(16.0f));
+        CHECK(poly.area() == doctest::Approx(real_t{16.0}));
     }
 
     SUBCASE("Scale around arbitrary point")

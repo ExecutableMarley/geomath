@@ -53,7 +53,7 @@ TEST_CASE("isDelaunay rejects non-Delaunay edge diagonal selection")
     const std::vector<Vector2D> vertices{
         {0, -2},
         {1,  0},
-        {0,  0.25f},
+        {0,  real_t{0.25}},
         {-1, 0}
     };
 
@@ -162,11 +162,11 @@ TEST_CASE("delaunay processes structured grid")
 TEST_CASE("delaunay handles near-collinear points under perturbation")
 {
     const std::vector<Vector2D> points{
-        {0.0, 0.0},
-        {1.0, 1e-9},   // Tiny epsilon deviation from y = 0
-        {2.0, -1e-9},
-        {3.0, 0.0},
-        {1.5, 1.0}     // One clearly off-line point to force triangulation
+        {0, 0},
+        {1, real_t{1e-9}},   // Tiny epsilon deviation from y = 0
+        {2, real_t{-1e-9}},
+        {3, 0},
+        {real_t{1.5}, 1}     // One clearly off-line point to force triangulation
     };
 
     const TriangleMesh2D mesh = delaunay(points);
@@ -179,11 +179,11 @@ TEST_CASE("delaunay handles near-collinear points under perturbation")
 TEST_CASE("delaunay ignores or safely handles duplicate points")
 {
     const std::vector<Vector2D> points{
-        {0.0, 0.0},
-        {1.0, 0.0},
-        {0.0, 1.0},
-        {0.0, 0.0},  // Exact duplicate of point 0
-        {1.0, 0.0}   // Exact duplicate of point 1
+           {0, 0},
+           {1, 0},
+           {0, 1},
+           {0, 0},  // Exact duplicate of point 0
+           {1, 0}   // Exact duplicate of point 1
     };
 
     const TriangleMesh2D mesh = delaunay(points);
@@ -195,11 +195,11 @@ TEST_CASE("delaunay ignores or safely handles duplicate points")
 TEST_CASE("delaunay correctly flips edges for interior point")
 {
     const std::vector<Vector2D> points{
-        {-2.0, -2.0},
-        { 2.0, -2.0},
-        { 2.0,  2.0},
-        {-2.0,  2.0},
-        { 0.0,  0.0}   // Center point forces 4 radial triangles
+        {-2, -2},
+        { 2, -2},
+        { 2,  2},
+        {-2,  2},
+        { 0,  0}   // Center point forces 4 radial triangles
     };
 
     const TriangleMesh2D mesh = delaunay(points);

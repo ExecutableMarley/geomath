@@ -65,23 +65,23 @@ TEST_CASE("Rectangle2D vertex access and geometry")
 
     SUBCASE("Width and height")
     {
-        CHECK(rect.width() == doctest::Approx(4.0f));
-        CHECK(rect.height() == doctest::Approx(3.0f));
+        CHECK(rect.width() == doctest::Approx(real_t{4}));
+        CHECK(rect.height() == doctest::Approx(real_t{3}));
     }
 
     SUBCASE("Area calculation")
     {
-        CHECK(rect.area() == doctest::Approx(12.0f));
+        CHECK(rect.area() == doctest::Approx(real_t{12}));
     }
 
     SUBCASE("Perimeter calculation")
     {
-        CHECK(rect.perimeter() == doctest::Approx(14.0f));
+        CHECK(rect.perimeter() == doctest::Approx(real_t{14}));
     }
 
     SUBCASE("Centroid")
     {
-        CHECK(rect.centroid() == Vector2D{2, 1.5f});
+        CHECK(rect.centroid() == Vector2D{2, real_t{1.5}});
     }
 }
 
@@ -90,7 +90,7 @@ TEST_CASE("Rectangle2D constructors")
     SUBCASE("Constructor from 4 vertices")
     {
         Rectangle2D rect({Vector2D{0, 0}, Vector2D{5, 0}, Vector2D{5, 3}, Vector2D{0, 3}});
-        CHECK(rect.area() == doctest::Approx(15.0f));
+        CHECK(rect.area() == doctest::Approx(real_t{15}));
     }
 
     SUBCASE("Constructor from position, width, height")
@@ -100,15 +100,15 @@ TEST_CASE("Rectangle2D constructors")
         CHECK(rect.b() == Vector2D{5, 2});
         CHECK(rect.c() == Vector2D{5, 5});
         CHECK(rect.d() == Vector2D{1, 5});
-        CHECK(rect.area() == doctest::Approx(12.0f));
+        CHECK(rect.area() == doctest::Approx(real_t{12}));
     }
 
     SUBCASE("fromMinMax static factory")
     {
         Rectangle2D rect = Rectangle2D::fromMinMax(Vector2D{1, 2}, Vector2D{5, 5});
         CHECK(rect.a() == Vector2D{1, 2});
-        CHECK(rect.width() == doctest::Approx(4.0f));
-        CHECK(rect.height() == doctest::Approx(3.0f));
+        CHECK(rect.width() == doctest::Approx(real_t{4}));
+        CHECK(rect.height() == doctest::Approx(real_t{3}));
     }
 }
 
@@ -125,7 +125,7 @@ TEST_CASE("Rectangle2D transformations")
     {
         rect.translate(Vector2D{2, -1});
         CHECK(rect.a() == Vector2D{2, -1});
-        CHECK(rect.area() == doctest::Approx(12.0f));
+        CHECK(rect.area() == doctest::Approx(real_t{12}));
     }
 
     SUBCASE("Rotate around centroid")
@@ -133,13 +133,13 @@ TEST_CASE("Rectangle2D transformations")
         Vector2D originalCentroid = rect.centroid();
         rect.rotate(real_t{90});
         CHECK(rect.centroid() == originalCentroid);
-        CHECK(rect.area() == doctest::Approx(12.0f));
+        CHECK(rect.area() == doctest::Approx(real_t{12}));
     }
 
     SUBCASE("Rotate around arbitrary point")
     {
         rect.rotate(real_t{90}, Vector2D{0, 0});
-        CHECK(rect.area() == doctest::Approx(12.0f));
+        CHECK(rect.area() == doctest::Approx(real_t{12}));
     }
 
     SUBCASE("Scale around centroid")
@@ -147,7 +147,7 @@ TEST_CASE("Rectangle2D transformations")
         Vector2D originalCentroid = rect.centroid();
         rect.scale(real_t{2.0});
         CHECK(rect.centroid() == originalCentroid);
-        CHECK(rect.area() == doctest::Approx(48.0f));
+        CHECK(rect.area() == doctest::Approx(real_t{48}));
     }
 
     SUBCASE("Scale around arbitrary point")
@@ -155,9 +155,9 @@ TEST_CASE("Rectangle2D transformations")
         rect.scale(real_t{0.5}, Vector2D{0, 0});
         CHECK(rect.a() == Vector2D{0, 0});
         CHECK(rect.b() == Vector2D{2, 0});
-        CHECK(rect.c() == Vector2D{2, 1.5f});
-        CHECK(rect.d() == Vector2D{0, 1.5f});
-        CHECK(rect.area() == doctest::Approx(3.0f));
+        CHECK(rect.c() == Vector2D{2, real_t{1.5}});
+        CHECK(rect.d() == Vector2D{0, real_t{1.5}});
+        CHECK(rect.area() == doctest::Approx(real_t{3}));
     }
 }
 

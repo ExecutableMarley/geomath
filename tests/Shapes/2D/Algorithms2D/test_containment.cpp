@@ -38,13 +38,13 @@ TEST_CASE("Triangle2D point containment")
     SUBCASE("Point on edge should be contained")
     {
         CHECK(triangle.contains(Vector2D{2, 0}));
-        CHECK(triangle.contains(Vector2D{1, 1.5}));
+        CHECK(triangle.contains(Vector2D{1, real_t{1.5}}));
     }
 
     SUBCASE("Point inside triangle should be contained")
     {
         CHECK(triangle.contains(Vector2D{2, 1}));
-        CHECK(triangle.contains(Vector2D{1, 0.5}));
+        CHECK(triangle.contains(Vector2D{1, real_t{0.5}}));
     }
 
     SUBCASE("Point outside triangle should not be contained")
@@ -62,7 +62,7 @@ TEST_CASE("Triangle2D segment containment")
 
     SUBCASE("Segment completely inside triangle should be contained")
     {
-        Segment2D segment(Vector2D{1, 0.5}, Vector2D{3, 0.5});
+        Segment2D segment(Vector2D{1, real_t{0.5}}, Vector2D{3, real_t{0.5}});
         CHECK(triangle.contains(segment));
     }
 
@@ -144,22 +144,22 @@ TEST_CASE("Rectangle2D point containment")
     SUBCASE("Point on edge should be contained")
     {
         CHECK(rect.contains(Vector2D{2, 0}));    // on bottom edge
-        CHECK(rect.contains(Vector2D{4, 1.5})); // on right edge
+        CHECK(rect.contains(Vector2D{4, real_t{1.5}})); // on right edge
         CHECK(rect.contains(Vector2D{2, 3}));    // on top edge
-        CHECK(rect.contains(Vector2D{0, 1.5})); // on left edge
+        CHECK(rect.contains(Vector2D{0, real_t{1.5}})); // on left edge
     }
 
     SUBCASE("Point inside rectangle should be contained")
     {
-        CHECK(rect.contains(Vector2D{2, 1.5}));
+        CHECK(rect.contains(Vector2D{2, real_t{1.5}}));
         CHECK(rect.contains(Vector2D{1, 1}));
         CHECK(rect.contains(Vector2D{3, 2}));
     }
 
     SUBCASE("Point outside rectangle should not be contained")
     {
-        CHECK(!rect.contains(Vector2D{-1, 1.5}));
-        CHECK(!rect.contains(Vector2D{5, 1.5}));
+        CHECK(!rect.contains(Vector2D{-1, real_t{1.5}}));
+        CHECK(!rect.contains(Vector2D{5, real_t{1.5}}));
         CHECK(!rect.contains(Vector2D{2, -1}));
         CHECK(!rect.contains(Vector2D{2, 4}));
     }
@@ -188,13 +188,13 @@ TEST_CASE("Rectangle2D segment containment")
 
     SUBCASE("Segment from inside to outside should not be contained")
     {
-        Segment2D segment(Vector2D{2, 1.5}, Vector2D{5, 1.5});
+        Segment2D segment(Vector2D{2, real_t{1.5}}, Vector2D{5, real_t{1.5}});
         CHECK(!rect.contains(segment));
     }
 
     SUBCASE("Segment completely outside should not be contained")
     {
-        Segment2D segment(Vector2D{5, 1.5}, Vector2D{6, 1.5});
+        Segment2D segment(Vector2D{5, real_t{1.5}}, Vector2D{6, real_t{1.5}});
         CHECK(!rect.contains(segment));
     }
 }
@@ -244,7 +244,7 @@ TEST_CASE("Rectangle2D shape containment")
 
     SUBCASE("Circle inside rectangle should be contained")
     {
-        Circle2D circle(Vector2D{3, 2}, 1.0);
+        Circle2D circle(Vector2D{3, 2}, real_t{1});
         CHECK(rect.contains(circle));
     }
 }
@@ -255,7 +255,7 @@ TEST_CASE("Rectangle2D shape containment")
 
 TEST_CASE("Circle2D point containment")
 {
-    Circle2D circle(Vector2D{2, 2}, 2.0);
+    Circle2D circle(Vector2D{2, 2}, real_t{2});
 
     SUBCASE("Point at center should be contained")
     {
@@ -272,7 +272,7 @@ TEST_CASE("Circle2D point containment")
 
     SUBCASE("Point inside circle should be contained")
     {
-        CHECK(circle.contains(Vector2D{2, 2.5}));
+        CHECK(circle.contains(Vector2D{2, real_t{2.5}}));
         CHECK(circle.contains(Vector2D{3, 2}));
         CHECK(circle.contains(Vector2D{1, 1}));
     }
@@ -287,7 +287,7 @@ TEST_CASE("Circle2D point containment")
 
 TEST_CASE("Circle2D segment containment")
 {
-    Circle2D circle(Vector2D{0, 0}, 3.0);
+    Circle2D circle(Vector2D{0, 0}, real_t{3});
 
     SUBCASE("Segment inside circle should be contained")
     {
@@ -316,35 +316,35 @@ TEST_CASE("Circle2D segment containment")
 
 TEST_CASE("Circle2D shape containment")
 {
-    Circle2D circle(Vector2D{0, 0}, 5.0);
+    Circle2D circle(Vector2D{0, 0}, real_t{5});
 
     SUBCASE("Smaller circle inside should be contained")
     {
-        Circle2D smaller(Vector2D{0, 0}, 2.0);
+        Circle2D smaller(Vector2D{0, 0}, real_t{2});
         CHECK(circle.contains(smaller));
     }
 
     SUBCASE("Concentric smaller circle should be contained")
     {
-        Circle2D concentric(Vector2D{0, 0}, 3.0);
+        Circle2D concentric(Vector2D{0, 0}, real_t{3});
         CHECK(circle.contains(concentric));
     }
 
     SUBCASE("Identical circle should be contained")
     {
-        Circle2D identical(Vector2D{0, 0}, 5.0);
+        Circle2D identical(Vector2D{0, 0}, real_t{5});
         CHECK(circle.contains(identical));
     }
 
     SUBCASE("Circle outside should not be contained")
     {
-        Circle2D outside(Vector2D{7, 0}, 2.0);
+        Circle2D outside(Vector2D{7, 0}, real_t{2});
         CHECK(!circle.contains(outside));
     }
 
     SUBCASE("Overlapping circle should not be contained")
     {
-        Circle2D overlapping(Vector2D{4, 0}, 2.0);
+        Circle2D overlapping(Vector2D{4, 0}, real_t{2});
         CHECK(!circle.contains(overlapping));
     }
 
@@ -377,7 +377,7 @@ TEST_CASE("Polygon2D point containment")
         Vector2D{0, 0},
         Vector2D{4, 0},
         Vector2D{5, 2},
-        Vector2D{2.5, 4},
+        Vector2D{real_t{2.5}, 4},
         Vector2D{-1, 2}
     };
     Polygon2D polygon(vertices);
@@ -398,7 +398,7 @@ TEST_CASE("Polygon2D point containment")
 
     SUBCASE("Point inside polygon should be contained")
     {
-        CHECK(polygon.contains(Vector2D{2, 1.5}));
+        CHECK(polygon.contains(Vector2D{2, real_t{1.5}}));
     }
 
     SUBCASE("Point outside polygon should not be contained")
@@ -562,13 +562,13 @@ TEST_CASE("ConvexPolygon2D shape containment")
 
     SUBCASE("Circle inside should be contained")
     {
-        Circle2D circle(Vector2D{4, 3}, 1.5);
+        Circle2D circle(Vector2D{4, 3}, real_t{1.5});
         CHECK(convex.contains(circle));
     }
 
     SUBCASE("Shape extending outside should not be contained")
     {
-        Triangle2D triangle(Vector2D{7, 1}, Vector2D{10, 1}, Vector2D{8.5, 3});
+        Triangle2D triangle(Vector2D{7, 1}, Vector2D{10, 1}, Vector2D{real_t{8.5}, 3});
         CHECK(!convex.contains(triangle));
     }
 }

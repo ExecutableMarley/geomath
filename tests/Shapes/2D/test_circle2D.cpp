@@ -133,7 +133,7 @@ TEST_CASE("Circle2D bounding box")
         BBox2D bbox = circle.boundingBox();
 
         CHECK(bbox.m_min == Vector2D{-2, -1});
-        CHECK(bbox.m_max == Vector2D{4 ,  5});
+        CHECK(bbox.m_max == Vector2D{ 4,  5});
         CHECK(bbox.width()  == doctest::Approx(real_t{6}));
         CHECK(bbox.height() == doctest::Approx(real_t{6}));
         CHECK(bbox.centroid() == circle.centroid());

@@ -9,7 +9,7 @@ TEST_CASE("Segment2D constructors and geometry")
 		Segment2D segment;
 		CHECK(segment.m_start == Vector2D{0, 0});
 		CHECK(segment.m_end == Vector2D{0, 0});
-		CHECK(segment.length() == doctest::Approx(0.0f));
+		CHECK(segment.length() == doctest::Approx(real_t{0}));
 	}
 
 	SUBCASE("Endpoint constructor")
@@ -18,9 +18,9 @@ TEST_CASE("Segment2D constructors and geometry")
 
 		CHECK(segment.origin() == Vector2D{1, 2});
 		CHECK(segment.deltaVector() == Vector2D{3, 4});
-		CHECK(segment.length() == doctest::Approx(5.0f));
-		CHECK(segment.direction() == Vector2D{0.6f, 0.8f});
-		CHECK(segment.normal() == Vector2D{0.8f, -0.6f});
+		CHECK(segment.length() == doctest::Approx(real_t{5}));
+		CHECK(segment.direction() == Vector2D{real_t{0.6}, real_t{0.8}});
+		CHECK(segment.normal() == Vector2D{real_t{0.8}, real_t{-0.6}});
 	}
 
 	SUBCASE("Direction and length constructor")
@@ -29,17 +29,17 @@ TEST_CASE("Segment2D constructors and geometry")
 
 		CHECK(segment.m_start == Vector2D{1, 2});
 		CHECK(segment.m_end == Vector2D{4, 6});
-		CHECK(segment.length() == doctest::Approx(5.0f));
+		CHECK(segment.length() == doctest::Approx(real_t{5}));
 	}
 
 	SUBCASE("Point and closest parameter")
 	{
 		Segment2D segment(Vector2D{0, 0}, Vector2D{4, 0});
 
-		CHECK(segment.pointAt(0.0f) == Vector2D{0, 0});
-		CHECK(segment.pointAt(0.5f) == Vector2D{2, 0});
-		CHECK(segment.pointAt(1.0f) == Vector2D{4, 0});
-		CHECK(segment.closestParameter(Vector2D{2, 3}) == doctest::Approx(0.5f));
+		CHECK(segment.pointAt(real_t{0}) == Vector2D{0, 0});
+		CHECK(segment.pointAt(real_t{0.5}) == Vector2D{2, 0});
+		CHECK(segment.pointAt(real_t{1}) == Vector2D{4, 0});
+		CHECK(segment.closestParameter(Vector2D{2, 3}) == doctest::Approx(real_t{0.5}));
 	}
 }
 
@@ -65,8 +65,8 @@ TEST_CASE("Segment2D transformations and comparison")
 	{
 		segment.rotate(real_t{90}, Vector2D{0, 0});
 		CHECK(segment.m_start == Vector2D{0, 0});
-		CHECK(segment.m_end.x == doctest::Approx(-2.0f));
-		CHECK(segment.m_end.y == doctest::Approx(2.0f));
+		CHECK(segment.m_end.x == doctest::Approx(real_t{-2}));
+		CHECK(segment.m_end.y == doctest::Approx(real_t{2}));
 	}
 
 	SUBCASE("Transform")

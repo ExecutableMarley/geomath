@@ -60,12 +60,12 @@ TEST_CASE("ray hits primitive")
     SUBCASE("Triangle")
     {
         Triangle2D tri({15, -1}, {18, 1}, {18, -1});
-        checkHit(ray, tri, {true, {16.5, 0.0}, 16.5});
+        checkHit(ray, tri, {true, {real_t{16.5}, 0}, real_t{16.5}});
     }
 
     SUBCASE("Rectangle")
     {
-        auto rect = Rectangle2D::fromMinMax({10.0, -1.0}, {14.0, 1.0});
+        auto rect = Rectangle2D::fromMinMax({10, -1}, {14, 1});
         checkHit(ray, rect, {true, {10, 0}, 10});
     }
 
@@ -188,7 +188,7 @@ TEST_CASE("ray picks closest hit")
         5
     });
 
-    Circle2D circ({11.0, 0.0}, 1.0);
+    Circle2D circ({11, 0}, real_t{1});
     checkHit(ray, circ, {
         true, 
         {10, 0}, 
@@ -221,17 +221,17 @@ TEST_CASE("BBox2D touching edge")
 TEST_CASE("BBox2D and IPolygonalShape2D intersection")
 {
     BBox2D bbox(Vector2D(0, 0), Vector2D(3, 3));
-    Triangle2D triangle(Vector2D(1, 1), Vector2D(2, 1), Vector2D(1.5, 2));
+    Triangle2D triangle(Vector2D(1, 1), Vector2D(2, 1), Vector2D(real_t{1.5}, 2));
     CHECK(intersect(bbox, triangle) == true);
 
-    Triangle2D triangle2(Vector2D(4, 4), Vector2D(5, 4), Vector2D(4.5, 5));
+    Triangle2D triangle2(Vector2D(4, 4), Vector2D(5, 4), Vector2D(real_t{4.5}, 5));
     CHECK(intersect(bbox, triangle2) == false);
 }
 
 TEST_CASE("BBox2D fully contains triangle")
 {
     BBox2D bbox(Vector2D(0, 0), Vector2D(5, 5));
-    Triangle2D tri(Vector2D(1, 1), Vector2D(2, 1), Vector2D(1.5, 2));
+    Triangle2D tri(Vector2D(1, 1), Vector2D(2, 1), Vector2D(real_t{1.5}, 2));
 
     CHECK(intersect(bbox, tri) == true);
 }
@@ -247,7 +247,7 @@ TEST_CASE("Triangle fully contains bbox corner")
 TEST_CASE("BBox2D and Circle2D intersection")
 {
     BBox2D bbox(Vector2D(0, 0), Vector2D(2, 2));
-    Circle2D circle(Vector2D(1, 1), 0.5);
+    Circle2D circle(Vector2D(1, 1), real_t{0.5});
     CHECK(intersect(bbox, circle) == true);
 
     Circle2D circle2(Vector2D(5, 5), 1);
@@ -265,7 +265,7 @@ TEST_CASE("Circle touching bbox edge")
 TEST_CASE("Zero-size bbox")
 {
     BBox2D b(Vector2D(1, 1), Vector2D(1, 1)); // point
-    Circle2D c(Vector2D(1, 1), 0.1);
+    Circle2D c(Vector2D(1, 1), real_t{0.1});
 
     CHECK(intersect(b, c) == true);
 }
@@ -273,7 +273,7 @@ TEST_CASE("Zero-size bbox")
 TEST_CASE("Circle inside triangle")
 {
     Triangle2D tri(Vector2D(0, 0), Vector2D(4, 0), Vector2D(2, 4));
-    Circle2D c(Vector2D(2, 1), 0.5);
+    Circle2D c(Vector2D(2, 1), real_t{0.5});
 
     CHECK(intersect(tri, c) == true);
 }
@@ -284,7 +284,7 @@ TEST_CASE("IPolygonalShape2D intersection")
     Triangle2D t2(Vector2D(1, 1), Vector2D(3, 1), Vector2D(2, 3));
     CHECK(intersect(t1, t2) == true);
 
-    Triangle2D t3(Vector2D(3, 3), Vector2D(4, 3), Vector2D(3.5, 4));
+    Triangle2D t3(Vector2D(3, 3), Vector2D(4, 3), Vector2D(real_t{3.5}, 4));
     CHECK(intersect(t1, t3) == false);
 }
 
@@ -299,7 +299,7 @@ TEST_CASE("Degenerate triangle (collinear)")
 TEST_CASE("IPolygonalShape2D and Circle2D intersection")
 {
     Triangle2D triangle(Vector2D(0, 0), Vector2D(2, 0), Vector2D(1, 2));
-    Circle2D circle(Vector2D(1, 1), 0.5);
+    Circle2D circle(Vector2D(1, 1), real_t{0.5});
     CHECK(intersect(triangle, circle) == true);
 
     Circle2D circle2(Vector2D(5, 5), 1);
@@ -319,7 +319,7 @@ TEST_CASE("Circle2D intersection")
 TEST_CASE("IFiniteShape2D intersection")
 {
     Triangle2D t(Vector2D(0, 0), Vector2D(2, 0), Vector2D(1, 2));
-    Circle2D c(Vector2D(1, 1), 0.5);
+    Circle2D c(Vector2D(1, 1), real_t{0.5});
     CHECK(intersect(static_cast<const IFiniteShape2D&>(t), static_cast<const IFiniteShape2D&>(c)) == true);
 
     Circle2D c2(Vector2D(5, 5), 1);

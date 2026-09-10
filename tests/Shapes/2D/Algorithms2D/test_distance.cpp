@@ -24,11 +24,11 @@ TEST_CASE("distance point-segment")
     Vector2D closest;
 
     real_t d1 = distance(Vector2D(0, 0), seg, &closest);
-    CHECK(doctest::Approx(d1) == real_t{1.0});
+        CHECK(doctest::Approx(d1) == real_t{1});
     CHECK(closest == Vector2D(1, 0));
 
     real_t dInside = distance(Vector2D(1, 0.5), seg, &closest);
-    CHECK(doctest::Approx(dInside) == real_t{0.0});
+    CHECK(doctest::Approx(dInside) == real_t{0});
     CHECK(closest == Vector2D(1, 0.5));
 }
 
@@ -38,11 +38,11 @@ TEST_CASE("distance point-bbox")
     Vector2D closest;
 
     real_t d1 = distance(Vector2D(2, 3), bbox, &closest);
-    CHECK(doctest::Approx(d1) == std::sqrt(real_t{5.0}));
+    CHECK(doctest::Approx(d1) == std::sqrt(real_t{5}));
     CHECK(closest == Vector2D(1, 1));
 
     real_t dInside = distance(Vector2D(0.5, 0.5), bbox, &closest);
-    CHECK(doctest::Approx(dInside) == real_t{0.0});
+        CHECK(doctest::Approx(dInside) == real_t{0});
     CHECK(closest == Vector2D(0.5, 0.5));
 }
 
@@ -56,15 +56,15 @@ TEST_CASE("distance point-polygon and point-circle")
     CHECK(closest == Vector2D(1, 1));
 
     real_t dOutside = distance(Vector2D(3, 3), tri, &closest);
-    CHECK(doctest::Approx(dOutside) == std::sqrt(real_t{8.0}));
+    CHECK(doctest::Approx(dOutside) == std::sqrt(real_t{8}));
 
-    Circle2D circle(Vector2D(2, 0), 1.0);
+    Circle2D circle(Vector2D(2, 0), real_t{1});
     real_t dc1 = distance(Vector2D(0,0), circle, &closest);
-    CHECK(doctest::Approx(dc1) == real_t{1.0});
+    CHECK(doctest::Approx(dc1) == real_t{1});
     CHECK(closest == Vector2D(1, 0));
 
     real_t dcInside = distance(Vector2D(2, 0), circle, &closest);
-    CHECK(doctest::Approx(dcInside) == real_t{0.0});
+    CHECK(doctest::Approx(dcInside) == real_t{0});
     CHECK(closest == Vector2D(2, 0));
 }
 
@@ -81,7 +81,7 @@ TEST_CASE("distance segment-segment")
 
     Segment2D c(Vector2D(0.5, -1), Vector2D(0.5, 1));
     real_t d0 = distance(a, c, &c1, &c2);
-    CHECK(doctest::Approx(d0) == real_t{0.0});
+        CHECK(doctest::Approx(d0) == real_t{0});
 }
 
 TEST_CASE("distance segment-bbox")
@@ -91,13 +91,13 @@ TEST_CASE("distance segment-bbox")
     Vector2D c1, c2;
 
     real_t d = distance(seg, bbox, &c1, &c2);
-    CHECK(doctest::Approx(d) == std::sqrt(real_t{2.0}));
+    CHECK(doctest::Approx(d) == std::sqrt(real_t{2}));
     CHECK(c1 == Vector2D(2, 2));
     CHECK(c2 == Vector2D(1, 1));
 
     Segment2D seg2(Vector2D(0.5, 0.5), Vector2D(0.5, -1.0));
-    real_t d0 = distance(seg2, bbox, &c1, &c2);
-    CHECK(doctest::Approx(d0) == 0.0f);
+        real_t d0 = distance(seg2, bbox, &c1, &c2);
+        CHECK(doctest::Approx(d0) == real_t{0});
 }
 
 TEST_CASE("distance segment-polygon and segment-circle")
@@ -107,12 +107,12 @@ TEST_CASE("distance segment-polygon and segment-circle")
     Vector2D c1, c2;
 
     real_t d = distance(seg, tri, &c1, &c2);
-    CHECK(doctest::Approx(d) == std::sqrt(real_t{10.0}));
+    CHECK(doctest::Approx(d) == std::sqrt(real_t{10}));
 
-    Circle2D circle(Vector2D(0, 0), 1.0);
+    Circle2D circle(Vector2D(0, 0), real_t{1});
     Segment2D seg2(Vector2D(2, 0), Vector2D(3, 0));
     real_t d2 = distance(seg2, circle, &c1, &c2);
-    CHECK(doctest::Approx(d2) == real_t{1.0});
+        CHECK(doctest::Approx(d2) == real_t{1});
     CHECK(c2 == Vector2D(1, 0));
 }
 

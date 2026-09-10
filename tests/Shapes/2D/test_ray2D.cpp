@@ -22,10 +22,10 @@ TEST_CASE("Ray2D constructors and geometry")
 
 	SUBCASE("Point and closest parameter calculations")
 	{
-		CHECK(ray.pointAt(0.0f) == Vector2D{1, 2});
-		CHECK(ray.pointAt(0.5f) == Vector2D{2.5f, 4.0f});
-		CHECK(ray.pointAt(1.0f) == Vector2D{4, 6});
-		CHECK(ray.closestParameter(Vector2D{4, 6}) == doctest::Approx(1.0f));
+		CHECK(ray.pointAt(real_t{0}) == Vector2D{1, 2});
+		CHECK(ray.pointAt(real_t{0.5}) == Vector2D{real_t{2.5}, 4});
+		CHECK(ray.pointAt(real_t{1}) == Vector2D{4, 6});
+		CHECK(ray.closestParameter(Vector2D{4, 6}) == doctest::Approx(real_t{1}));
 	}
 }
 
