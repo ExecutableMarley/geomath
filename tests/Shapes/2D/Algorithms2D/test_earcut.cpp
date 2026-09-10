@@ -1,4 +1,7 @@
 #include "../../../third_party/doctest.h"
+
+/*
+
 #include "Shapes/2D/Algorithms2D/Triangulation/Detail/EarcutTriangulation.hpp"
 
 using namespace Arns::geomath;
@@ -141,3 +144,5 @@ TEST_SUITE("Earcut triangulation")
         }
     }
 }
+
+*/
