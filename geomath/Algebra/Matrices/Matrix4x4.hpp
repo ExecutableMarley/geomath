@@ -145,41 +145,41 @@ public:
 
     bool inverse(Matrix4x4 &out) const
     {
-        const float a00 = m_data[0][0];
-        const float a01 = m_data[0][1];
-        const float a02 = m_data[0][2];
-        const float a03 = m_data[0][3];
+        const real_t a00 = m_data[0][0];
+        const real_t a01 = m_data[0][1];
+        const real_t a02 = m_data[0][2];
+        const real_t a03 = m_data[0][3];
 
-        const float a10 = m_data[1][0];
-        const float a11 = m_data[1][1];
-        const float a12 = m_data[1][2];
-        const float a13 = m_data[1][3];
+        const real_t a10 = m_data[1][0];
+        const real_t a11 = m_data[1][1];
+        const real_t a12 = m_data[1][2];
+        const real_t a13 = m_data[1][3];
 
-        const float a20 = m_data[2][0];
-        const float a21 = m_data[2][1];
-        const float a22 = m_data[2][2];
-        const float a23 = m_data[2][3];
+        const real_t a20 = m_data[2][0];
+        const real_t a21 = m_data[2][1];
+        const real_t a22 = m_data[2][2];
+        const real_t a23 = m_data[2][3];
 
-        const float a30 = m_data[3][0];
-        const float a31 = m_data[3][1];
-        const float a32 = m_data[3][2];
-        const float a33 = m_data[3][3];
+        const real_t a30 = m_data[3][0];
+        const real_t a31 = m_data[3][1];
+        const real_t a32 = m_data[3][2];
+        const real_t a33 = m_data[3][3];
 
-        const float b00 = a00 * a11 - a01 * a10;
-        const float b01 = a00 * a12 - a02 * a10;
-        const float b02 = a00 * a13 - a03 * a10;
-        const float b03 = a01 * a12 - a02 * a11;
-        const float b04 = a01 * a13 - a03 * a11;
-        const float b05 = a02 * a13 - a03 * a12;
+        const real_t b00 = a00 * a11 - a01 * a10;
+        const real_t b01 = a00 * a12 - a02 * a10;
+        const real_t b02 = a00 * a13 - a03 * a10;
+        const real_t b03 = a01 * a12 - a02 * a11;
+        const real_t b04 = a01 * a13 - a03 * a11;
+        const real_t b05 = a02 * a13 - a03 * a12;
 
-        const float b06 = a20 * a31 - a21 * a30;
-        const float b07 = a20 * a32 - a22 * a30;
-        const float b08 = a20 * a33 - a23 * a30;
-        const float b09 = a21 * a32 - a22 * a31;
-        const float b10 = a21 * a33 - a23 * a31;
-        const float b11 = a22 * a33 - a23 * a32;
+        const real_t b06 = a20 * a31 - a21 * a30;
+        const real_t b07 = a20 * a32 - a22 * a30;
+        const real_t b08 = a20 * a33 - a23 * a30;
+        const real_t b09 = a21 * a32 - a22 * a31;
+        const real_t b10 = a21 * a33 - a23 * a31;
+        const real_t b11 = a22 * a33 - a23 * a32;
 
-        const float det =
+        const real_t det =
             b00 * b11 -
             b01 * b10 +
             b02 * b09 +
@@ -190,7 +190,7 @@ public:
         if (approximatelyZero(det))
             return false;
 
-        const float invDet = 1.0f / det;
+        const real_t invDet = real_t{1} / det;
 
         out(0, 0) = (a11 * b11 - a12 * b10 + a13 * b09)  * invDet;
         out(0, 1) = (-a01 * b11 + a02 * b10 - a03 * b09) * invDet;
