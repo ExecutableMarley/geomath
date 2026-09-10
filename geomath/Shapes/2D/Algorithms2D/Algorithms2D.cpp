@@ -392,7 +392,7 @@ real_t distancePointToSegment(const Vector2D& point, const Vector2D& segmentStar
         if (closestPoint) *closestPoint = segmentStart;
         return (point - segmentStart).length();
     }
-    real_t t = std::clamp(s.dot(r) / rDotR, 0.0f, 1.0f);
+    real_t t = std::clamp(s.dot(r) / rDotR, real_t{0}, real_t{1});
     const Vector2D projection = segmentStart + r * t;
     if (closestPoint)
         *closestPoint = projection;
@@ -428,11 +428,11 @@ real_t distanceSegmentToSegment(const Vector2D& s1, const Vector2D& s2, const Ve
 
     const real_t d = lengthSquared1 * lengthSquared2 - c * c;
 
-    real_t t = d != 0 ? (b * c - a * lengthSquared2) / d : 0.0f; 
-    real_t u = d != 0 ? (lengthSquared1 * b - c * a) / d : 0.0f;
+    real_t t = d != 0 ? (b * c - a * lengthSquared2) / d : real_t{0};
+    real_t u = d != 0 ? (lengthSquared1 * b - c * a) / d : real_t{0};
 
-    t = clamp(t, 0.0f, 1.0f);
-    u = clamp(u, 0.0f, 1.0f);
+    t = clamp(t, real_t{0}, real_t{1});
+    u = clamp(u, real_t{0}, real_t{1});
 
     const Vector2D closestPointOnLine1 = s1 + delta1 * t;
     const Vector2D closestPointOnLine2 = k1 + delta2 * u;
@@ -1069,8 +1069,8 @@ bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, c
     if (!intersectParams(p1, p2 - p1, q1, q2 - q1, t, u))
         return false;
 
-    if (!approximatelyGreater(t, 0.f) || !approximatelyLess(t, 1.f) ||
-        !approximatelyGreater(u, 0.f) || !approximatelyLess(u, 1.f))
+    if (!approximatelyGreater(t, real_t{0}) || !approximatelyLess(t, real_t{1}) ||
+        !approximatelyGreater(u, real_t{0}) || !approximatelyLess(u, real_t{1}))
         return false;
 
     if (hitInfo)

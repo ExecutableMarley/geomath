@@ -251,7 +251,7 @@ public:
         real_t resultW = m_data[2][0] * other.x + m_data[2][1] * other.y + m_data[2][2];
 
         // Normalization
-        if (!approximatelyZero(resultW) && !approximatelyEqual(resultW, 1.0f))
+        if (!approximatelyZero(resultW) && !approximatelyEqual(resultW, real_t{1}))
             return Vector2D(resultX / resultW, resultY / resultW);
         return Vector2D(resultX, resultY);
     }
