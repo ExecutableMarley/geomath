@@ -11,3 +11,9 @@ target_include_directories(Geomath INTERFACE
 )
 
 target_compile_features(Geomath INTERFACE cxx_std_20)
+
+if(DEFINED GEOMATH_REAL_TYPE)
+    target_compile_definitions(Geomath INTERFACE
+        GEOMATH_REAL_TYPE=${GEOMATH_REAL_TYPE}
+    )
+endif()

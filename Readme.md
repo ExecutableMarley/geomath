@@ -17,6 +17,17 @@ Simply add the amalgamated header & source file into your project and compile. T
 
 No external dependencies or additional steps are required.
 
+### Selecting the real type
+
+`real_t` defaults to `float`. The supported types are `float`, `double`, and
+`long double`
+
+For an amalgamated build, define GEOMATH_REAL_TYPE consistently in your IDE/CMake configuration.
+
+For CMake builds, set GEOMATH_REAL_TYPE when configuring the project:
+
+`cmake -B build -DGEOMATH_REAL_TYPE="double"`.
+
 ## Example Usage
 
 ```cpp
@@ -40,8 +51,7 @@ int main() {
                        .scale(2.0f)
                        .perimeter();
 
-    // real_t is the type that is internally used. 
-    // Can be set to float or double
+    // real_t is the type that is internally used.
     std::cout << "Scaled perimeter: " << p << std::endl;
 
     // 3. Algebraic Types
