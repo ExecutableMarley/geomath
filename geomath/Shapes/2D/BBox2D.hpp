@@ -157,8 +157,8 @@ public:
 
     real_t minDistanceSquared(const Vector2D& point) const
     {
-        real_t dx = std::max(0.0f, std::max(m_min.x - point.x, point.x - m_max.x));
-        real_t dy = std::max(0.0f, std::max(m_min.y - point.y, point.y - m_max.y));
+        real_t dx = std::max(real_t{0}, std::max(m_min.x - point.x, point.x - m_max.x));
+        real_t dy = std::max(real_t{0}, std::max(m_min.y - point.y, point.y - m_max.y));
         return dx * dx + dy * dy;
     }
 
