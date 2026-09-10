@@ -124,7 +124,7 @@ inline bool approximatelyGreater(float a, float b,
                                     float absEpsilon = RealTraits<float>::absEpsilon,
                                     float relEpsilon = RealTraits<float>::relEpsilon)
 {
-    if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
+    if (approximatelyEqual(a, b, absEpsilon, relEpsilon))
     {
         return false;
     }
@@ -135,7 +135,7 @@ inline bool approximatelyGreater(double a, double b,
                                     double absEpsilon = RealTraits<double>::absEpsilon,
                                     double relEpsilon = RealTraits<double>::relEpsilon)
 {
-    if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
+    if (approximatelyEqual(a, b, absEpsilon, relEpsilon))
     {
         return false;
     }
@@ -146,7 +146,7 @@ inline bool approximatelyGreater(long double a, long double b,
                                   long double absEpsilon = RealTraits<long double>::absEpsilon,
                                   long double relEpsilon = RealTraits<long double>::relEpsilon)
 {
-    if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
+    if (approximatelyEqual(a, b, absEpsilon, relEpsilon))
     {
         return false;
     }
@@ -157,7 +157,7 @@ inline bool approximatelyLess(float a, float b,
                                 float absEpsilon = RealTraits<float>::absEpsilon,
                                 float relEpsilon = RealTraits<float>::relEpsilon)
 {
-    if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
+    if (approximatelyEqual(a, b, absEpsilon, relEpsilon))
     {
         return false;
     }
@@ -168,7 +168,7 @@ inline bool approximatelyLess(double a, double b,
                                 double absEpsilon = RealTraits<double>::absEpsilon,
                                 double relEpsilon = RealTraits<double>::relEpsilon)
 {
-    if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
+    if (approximatelyEqual(a, b, absEpsilon, relEpsilon))
     {
         return false;
     }
@@ -179,7 +179,7 @@ inline bool approximatelyLess(long double a, long double b,
                                long double absEpsilon = RealTraits<long double>::absEpsilon,
                                long double relEpsilon = RealTraits<long double>::relEpsilon)
 {
-    if (approximatelyEqual(a, b, relEpsilon, absEpsilon))
+    if (approximatelyEqual(a, b, absEpsilon, relEpsilon))
     {
         return false;
     }
