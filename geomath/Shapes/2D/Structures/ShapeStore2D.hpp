@@ -6,6 +6,10 @@
 
 #include "../Interfaces/IFiniteShape2D.hpp"
 #include "../BBox2D.hpp"
+#include "../Triangle2D.hpp"
+#include "../Rectangle2D.hpp"
+#include "../Polygon2D.hpp"
+#include "../Circle2D.hpp"
 
 namespace Arns
 {

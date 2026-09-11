@@ -1,8 +1,17 @@
+/*
+ * Copyright (c) Marley Arns
+ * Licensed under the MIT License.
+*/
+
+#pragma once
+
+#include "CommonMath.hpp"
 #include "../../BBox2D.hpp"
 #include "../ISpatialIndex2D.hpp"
 
 #include <cassert>
 #include <queue>
+
 
 namespace Arns
 {
@@ -10,16 +19,39 @@ namespace Arns
 namespace geomath
 {
 
-struct RTreeEntry
+using RTreeNodeIndex = size_t;
+
+struct RTreeLeafEntry
 {
     BBox2D bounds;
-    size_t elementIndex;
+    ShapeID shape;
 };
+
+struct RTreeChildEntry
+{
+    BBox2D bounds;
+    RTreeNodeIndex child;
+};
+
+struct RTreeDistanceEntryCompare
+{
+    bool operator()(const std::pair<real_t, ShapeID>& left,
+        const std::pair<real_t, ShapeID>& right) const
+    {
+        return left.first < right.first;
+    }
+};
+
+using RTreeDistanceQueue = std::priority_queue<
+    std::pair<real_t, ShapeID>,
+    std::vector<std::pair<real_t, ShapeID>>,
+    RTreeDistanceEntryCompare>;
 
 struct RTreeNode
 {
     bool isLeaf = false;
-    std::vector<RTreeEntry> entries;
+    std::vector<RTreeLeafEntry> leafEntries;
+    std::vector<RTreeChildEntry> childEntries;
 };
 
 struct RTreeFilter
@@ -41,7 +73,7 @@ public:
     void build(const std::vector<std::pair<BBox2D, ShapeID>>& elementBoundsWithIndices);
 
     // Dynamic insertion
-    void insert(const BBox2D& elementBound, ShapeID elementIndex) {}
+    void insert(ShapeID shapeIndex, const BBox2D& bounds) override {}
 
     // Reset method
     void clear()
@@ -51,22 +83,23 @@ public:
     }
 
     // Range search
-    void rangeQuery(const BBox2D& query, std::vector<ShapeID>& result) const;
-
-    void rangeQuery(const BBox2D& query, std::vector<ShapeID>& result, const std::vector<bool>& inclusionMask) const;
-
-    void rangeSearchWithFilter(const RTreeFilter& filter, const BBox2D& query,
-        std::vector<ShapeID>& result, const std::vector<bool>& inclusionMask) const;
+    void query_range(const BBox2D& query, const ShapeCallback& callback,
+        const ShapeFilter& filter = {}) const override;
 
     // k-nearest Neighbours with k = 1
-    ShapeID nearestNeighbour(const Vector2D& queryPoint) const;
-
-    ShapeID nearestNeighbour(const Vector2D& queryPoint, const std::vector<bool>& inclusionMask) const;
+    ShapeID query_nearest(const Vector2D& queryPoint, const ShapeFilter& filter = {}) const override;
 
     // k-Nearest Neighbours
-    void kNearest(const Vector2D& queryPoint, size_t k, std::vector<ShapeID>& result) const;
+    void query_knn(const Vector2D& queryPoint, size_t k, const ShapeCallback& callback,
+        const ShapeFilter& filter = {}) const override;
 
-    void kNearest(const Vector2D& queryPoint, size_t k, std::vector<ShapeID>& result, const std::vector<bool>& inclusionMask) const;
+    // Point query
+    void query_point(const Vector2D& point, const ShapeCallback& callback,
+        const ShapeFilter& filter = {}) const override;
+
+    // Ray query
+    void query_ray(const Ray2D& ray, real_t t_min, real_t t_max, const RayHitCallback& callback,
+        const ShapeFilter& filter = {}) const override;
 
     RTreeFilter createFilter(const BBox2D& region, size_t maxDepth) const;
 
@@ -87,9 +120,10 @@ private:
     }
 
     // Returns the index of subtree root
-    size_t buildRecursive(std::vector<RTreeEntry>& currentElements, int axis);
+    size_t buildRecursive(std::vector<RTreeLeafEntry>& currentElements, int axis);
 
-    static BBox2D calculateMBR(const std::vector<RTreeEntry>& entries)
+    template <typename Entry>
+    static BBox2D calculateMBR(const std::vector<Entry>& entries)
     {
         if (entries.empty())
             return BBox2D();
@@ -102,18 +136,23 @@ private:
 
     BBox2D calculateNodeMBR(size_t nodeIndex) const
     {
-        return calculateMBR(_nodes[nodeIndex].entries);
+        const RTreeNode& node = _nodes[nodeIndex];
+        return node.isLeaf ? calculateMBR(node.leafEntries) : calculateMBR(node.childEntries);
     }
 
     // Recursive helper for range search
-    void rangeSearchRecursive(size_t nodeIndex, const BBox2D& query, std::vector<ShapeID>& result) const;
+    void rangeSearchRecursive(size_t nodeIndex, const BBox2D& query, const ShapeCallback& callback,
+        const ShapeFilter& filter) const;
 
-    void rangeSearchRecursive(size_t nodeIndex, const BBox2D& query, std::vector<ShapeID>& result, const std::vector<bool>& inclusionMask) const;
+    void pointSearchRecursive(size_t nodeIndex, const Vector2D& point,
+        const ShapeCallback& callback, const ShapeFilter& filter) const;
+
+    void raySearchRecursive(size_t nodeIndex, const Ray2D& ray, real_t t_min, real_t t_max,
+        const ShapeFilter& filter, std::vector<std::pair<real_t, ShapeID>>& hits) const;
 
     // retrieve k final results from priority queue
-    void extractKNearestResults(size_t k,
-        std::priority_queue<std::pair<double, size_t>>& queue_to_explore,
-        std::vector<ShapeID>& result) const;
+    void extractKNearestResults(size_t k, RTreeDistanceQueue& queue_to_explore,
+        const ShapeCallback& callback) const;
 
     void collectFilterNodes(size_t nodeIndex,
         const BBox2D& region,

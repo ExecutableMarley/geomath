@@ -6,6 +6,7 @@
 
 #include "../Interfaces/IFiniteShape2D.hpp"
 #include "../BBox2D.hpp"
+#include "../Ray2D.hpp"
 #include "ShapeStore2D.hpp"
 
 namespace Arns
@@ -39,28 +40,24 @@ public:
 
     //[Query]
 
-    virtual void rangeQuery(const BBox2D& queryArea, std::vector<ShapeID>& results) const = 0;
+    using ShapeFilter = std::function<bool(const ShapeID&)>;
+    using ShapeCallback = std::function<void(const ShapeID&)>;
+    using RayHitCallback = std::function<bool(ShapeID id, real_t t)>;
 
-    virtual void rangeQuery(const BBox2D& query, std::vector<ShapeID>& result, const std::vector<bool>& inclusionMask) const = 0;
+    virtual void query_range(const BBox2D& queryArea, const ShapeCallback& callback,
+        const ShapeFilter& filter = {}) const = 0;
 
-    virtual ShapeID nearestNeighbour(const Vector2D& queryPoint) const = 0;
+    virtual ShapeID query_nearest(const Vector2D& queryPoint, const ShapeFilter& filter = {}) const = 0;
 
-    virtual ShapeID nearestNeighbour(const Vector2D& queryPoint, const std::vector<bool>& inclusionMask) const = 0;
+    virtual void query_knn(const Vector2D& queryPoint, size_t k, const ShapeCallback& callback,
+        const ShapeFilter& filter = {}) const = 0;
 
-    virtual void kNearest(const Vector2D& queryPoint, size_t k, std::vector<ShapeID>& results) const = 0;
+    virtual void query_point(const Vector2D& point, const ShapeCallback& callback,
+        const ShapeFilter& filter = {}) const = 0;
 
-    virtual void kNearest(const Vector2D& queryPoint, size_t k, std::vector<ShapeID>& results, const std::vector<bool>& inclusionMask) const = 0;
+    virtual void query_ray(const Ray2D& ray, real_t t_min, real_t t_max, const RayHitCallback& callback,
+        const ShapeFilter& filter = {}) const = 0;
 
-    using CandidateCallback = std::function<bool(ShapeID)>;
-
-    virtual void queryRange(const BBox2D& queryArea, const CandidateCallback& callback) const = 0;
-    virtual void queryNearest(const Vector2D& queryPoint, const CandidateCallback& callback) const = 0;
-
-    //virtual void bboxIntersectionQuery(const BBox2D& box, std::vector<size_t>& results) const = 0;
-
-    //virtual void shapeIntersectionQuery(const IFiniteShape2D& shape, const ShapeStore& shapeStore, std::vector<size_t>& results) const = 0;
-
-    //virtual void pointContainmentQuery(const Vector2D& point, const ShapeStore& shapeStore, std::vector<size_t>& results) const = 0;
 
     //Ray trace query
 

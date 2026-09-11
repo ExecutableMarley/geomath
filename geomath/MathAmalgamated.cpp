@@ -31,6 +31,7 @@
 //2D
 #include "Shapes/2D/Algorithms2D/Algorithms2D.cpp"
 
+#include "Shapes/2D/Structures/Spatial/RTree.cpp"
 #include "Shapes/2D/Algorithms2D/Triangulation/Detail/DelaunayTriangulation.cpp"
 
 //3D
