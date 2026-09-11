@@ -73,6 +73,15 @@ public:
     void addTriangle(const Triangle2D& triangle);
 
     void addTriangle(const Vector2D& a, const Vector2D& b, const Vector2D& c);
+
+    Triangle2D getTriangle(size_t index) const
+    {
+        if (index >= m_triangles.size())
+            throw std::out_of_range("Triangle index out of range");
+
+        const TriangleIndices& triIndices = m_triangles[index];
+        return Triangle2D(m_vertices[triIndices.v0], m_vertices[triIndices.v1], m_vertices[triIndices.v2]);
+    }
 };
 
 
