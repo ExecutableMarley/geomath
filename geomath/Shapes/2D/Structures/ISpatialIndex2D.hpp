@@ -19,7 +19,7 @@ class ISpatialIndex2D
 {
 public:
 
-    //Building/Clearing
+    //--- [Building/Clearing] ---
 
     virtual void build(const std::vector<std::pair<BBox2D, ShapeID>>& shapeBounds) = 0;
 
@@ -32,13 +32,11 @@ public:
 
     virtual void clear() = 0;
 
-    //Updating
+    //--- [Updating] ---
 
+    //--- [Rebalancing/Optimizing] ---
 
-    //Rebalancing/Optimizing
-
-
-    //[Query]
+    //--- [Query] ---
 
     using ShapeFilter = std::function<bool(const ShapeID&)>;
     using ShapeCallback = std::function<void(const ShapeID&)>;

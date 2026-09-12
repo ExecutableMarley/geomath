@@ -932,9 +932,11 @@ bool intersect(const Ray2D& ray, const Segment2D& segment, real_t t_min, real_t 
     return intersectRayWithSegment(ray, segment.m_start, segment.m_end, t_min, t_max, hitInfo);
 }
 
-bool intersect(const Ray2D& ray, const BBox2D& bbox, real_t t_init_min, real_t t_init_max, HitInfo2D* hitInfo)
+bool rayBoundsInterval(const Ray2D& ray, const BBox2D& bbox, real_t t_min, real_t t_max, real_t& t_enter, real_t& t_exit)
 {
-    real_t t_min = t_init_min; real_t t_max = t_init_max;
+    t_enter = t_min;
+    t_exit = t_max;
+
     for (int i = 0; i < 2; i++)
     {
         if (approximatelyZero(ray.m_direction[i]))
@@ -944,23 +946,33 @@ bool intersect(const Ray2D& ray, const BBox2D& bbox, real_t t_init_min, real_t t
             continue;
         }
 
-        real_t invD = 1.0f / ray.m_direction[i];
+        real_t invD = real_t{1} / ray.m_direction[i];
         real_t t0 = (bbox.m_min[i] - ray.m_origin[i]) * invD;
         real_t t1 = (bbox.m_max[i] - ray.m_origin[i]) * invD;
 
-        if (invD < 0.0f)
+        if (invD < real_t{0})
             std::swap(t0, t1);
         
-        t_min = t0 > t_min ? t0 : t_min;
-        t_max = t1 < t_max ? t1 : t_max;
+        t_enter = t0 > t_enter ? t0 : t_enter;
+        t_exit = t1 < t_exit ? t1 : t_exit;
 
-        if (t_max <= t_min)
+        if (t_exit <= t_enter)
             return false;
     }
 
+    return true;
+}
+
+bool intersect(const Ray2D& ray, const BBox2D& bbox, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+{
+    real_t t_enter;
+    real_t t_exit;
+    if (!rayBoundsInterval(ray, bbox, t_min, t_max, t_enter, t_exit))
+        return false;
+
     if (hitInfo)
     {
-        real_t hit_t = (t_min > t_init_min) ? t_min : t_max;
+        real_t hit_t = (t_enter > t_min) ? t_enter : t_exit;
         hitInfo->t = hit_t;
         hitInfo->intersectionPoint = ray.m_origin + ray.m_direction * hit_t;
         hitInfo->normal = bbox.normalAt(hitInfo->intersectionPoint);

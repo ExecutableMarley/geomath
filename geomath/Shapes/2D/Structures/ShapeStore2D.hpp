@@ -47,6 +47,13 @@ struct ShapeObject
     bool isAlive;
 };
 
+class IShapeResolver2D
+{
+public:
+    virtual const IFiniteShape2D* resolve(ShapeID id) const = 0;
+    virtual ~IShapeResolver2D() = default;
+};
+
 template <typename T>
 class SlotVector2D
 {
@@ -131,7 +138,7 @@ private:
     std::vector<uint32_t> _free;
 };
 
-class ShapeStore2D
+class ShapeStore2D : public IShapeResolver2D
 {
 public:
     ShapeID add(const Triangle2D& t)
@@ -314,6 +321,8 @@ public:
         }
         return nullptr;
     }
+
+    const IFiniteShape2D* resolve(ShapeID id) const override { return get(id); }
 
 private:
     SlotVector2D<Circle2D>    _circles;

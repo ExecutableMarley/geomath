@@ -124,6 +124,8 @@ bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2
 
 bool intersect(const Ray2D& ray, const Segment2D& segment, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
 
+bool rayBoundsInterval(const Ray2D& ray, const BBox2D& bbox, real_t t_min, real_t t_max, real_t& t_enter, real_t& t_exit);
+
 bool intersect(const Ray2D& ray, const BBox2D& bbox, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
 
 bool intersect(const Ray2D& ray, const IPolygonalShape2D& polygon, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
