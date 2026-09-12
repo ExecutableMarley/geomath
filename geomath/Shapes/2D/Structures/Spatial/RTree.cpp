@@ -14,6 +14,35 @@ namespace Arns
 namespace geomath
 {
 
+namespace
+{
+
+struct RTreeRayQueueEntry
+{
+    real_t t;
+    size_t nodeIndex;
+    ShapeID shape;
+    bool isNode;
+    size_t sequence;
+};
+
+struct RTreeRayQueueCompare
+{
+    bool operator()(const RTreeRayQueueEntry& left, const RTreeRayQueueEntry& right) const
+    {
+        if (left.t != right.t)
+            return left.t > right.t;
+        return left.sequence > right.sequence;
+    }
+};
+
+using RTreeRayQueue = std::priority_queue<
+    RTreeRayQueueEntry,
+    std::vector<RTreeRayQueueEntry>,
+    RTreeRayQueueCompare>;
+
+}
+
 void RTree::build(const std::vector<std::pair<BBox2D, ShapeID>>& elementBoundsWithIndices)
 {
     clear();
@@ -328,34 +357,6 @@ void RTree::query_point(const Vector2D& point, const ShapeCallback& callback,
     pointSearchRecursive(_rootIndex, point, callback, filter);
 }
 
-// Todo: This will collect all hits. Optimize later or offer a specialized version
-void RTree::raySearchRecursive(size_t nodeIndex, const Ray2D& ray, real_t t_min, real_t t_max,
-    const ShapeFilter& filter, std::vector<std::pair<real_t, ShapeID>>& hits) const
-{
-    const RTreeNode& node = _nodes[nodeIndex];
-
-    if (node.isLeaf)
-    {
-        for (const auto& entry : node.leafEntries)
-        {
-            if (filter && !filter(entry.shape))
-                continue;
-
-            HitInfo2D hitInfo;
-            if (intersect(ray, entry.bounds, t_min, t_max, &hitInfo))
-                hits.emplace_back(hitInfo.t, entry.shape);
-        }
-        return;
-    }
-
-    for (const auto& entry : node.childEntries)
-    {
-        HitInfo2D hitInfo;
-        if (intersect(ray, entry.bounds, t_min, t_max, &hitInfo))
-            raySearchRecursive(entry.child, ray, t_min, t_max, filter, hits);
-    }
-}
-
 // Ray query
 void RTree::query_ray(const Ray2D& ray, real_t t_min, real_t t_max, const RayHitCallback& callback,
     const ShapeFilter& filter) const
@@ -363,23 +364,49 @@ void RTree::query_ray(const Ray2D& ray, real_t t_min, real_t t_max, const RayHit
     if (!callback || _rootIndex == InvalidNode)
         return;
 
-    HitInfo2D rootHit;
-    if (!intersect(ray, _rootBounds, t_min, t_max, &rootHit))
+    real_t rootEnter;
+    real_t rootExit;
+    if (!rayBoundsInterval(ray, _rootBounds, t_min, t_max, rootEnter, rootExit))
         return;
 
-    std::vector<std::pair<real_t, ShapeID>> hits;
-    raySearchRecursive(_rootIndex, ray, t_min, t_max, filter, hits);
+    RTreeRayQueue candidates;
+    size_t sequence = 0;
+    candidates.push({ rootEnter, _rootIndex, ShapeID::invalid(), true, sequence++ });
 
-    std::stable_sort(hits.begin(), hits.end(),
-        [](const auto& left, const auto& right)
-        {
-            return left.first < right.first;
-        });
-
-    for (const auto& [hitT, shape] : hits)
+    while (!candidates.empty())
     {
-        if (!callback(shape, hitT))
-            break;
+        const RTreeRayQueueEntry candidate = candidates.top();
+        candidates.pop();
+
+        if (!candidate.isNode)
+        {
+            if (!callback(candidate.shape, candidate.t))
+                return;
+            continue;
+        }
+
+        const RTreeNode& node = _nodes[candidate.nodeIndex];
+        if (node.isLeaf)
+        {
+            for (const auto& entry : node.leafEntries)
+            {
+                if (filter && !filter(entry.shape))
+                    continue;
+
+                HitInfo2D hitInfo;
+                if (intersect(ray, entry.bounds, t_min, t_max, &hitInfo))
+                    candidates.push({ hitInfo.t, InvalidNode, entry.shape, false, sequence++ });
+            }
+            continue;
+        }
+
+        for (const auto& entry : node.childEntries)
+        {
+            real_t childEnter;
+            real_t childExit;
+            if (rayBoundsInterval(ray, entry.bounds, t_min, t_max, childEnter, childExit))
+                candidates.push({ childEnter, entry.child, ShapeID::invalid(), true, sequence++ });
+        }
     }
 }
 

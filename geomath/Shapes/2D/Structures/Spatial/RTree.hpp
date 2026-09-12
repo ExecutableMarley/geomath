@@ -82,6 +82,17 @@ public:
         this->_nodes.clear();
     }
 
+    //
+
+    size_t size() const
+    {
+        return _nodes.size();
+    }
+
+
+
+    //--- [Query] ---
+
     // Range search
     void query_range(const BBox2D& query, const ShapeCallback& callback,
         const ShapeFilter& filter = {}) const override;
@@ -100,6 +111,9 @@ public:
     // Ray query
     void query_ray(const Ray2D& ray, real_t t_min, real_t t_max, const RayHitCallback& callback,
         const ShapeFilter& filter = {}) const override;
+
+    void query_ray(const Ray2D& ray, real_t t_min, real_t t_max, const IShapeResolver2D& resolver,
+        const RayHitCallback& callback, const ShapeFilter& filter = {}) const;
 
     RTreeFilter createFilter(const BBox2D& region, size_t maxDepth) const;
 
@@ -146,9 +160,6 @@ private:
 
     void pointSearchRecursive(size_t nodeIndex, const Vector2D& point,
         const ShapeCallback& callback, const ShapeFilter& filter) const;
-
-    void raySearchRecursive(size_t nodeIndex, const Ray2D& ray, real_t t_min, real_t t_max,
-        const ShapeFilter& filter, std::vector<std::pair<real_t, ShapeID>>& hits) const;
 
     // retrieve k final results from priority queue
     void extractKNearestResults(size_t k, RTreeDistanceQueue& queue_to_explore,
