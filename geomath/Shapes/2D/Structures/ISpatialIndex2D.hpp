@@ -38,9 +38,9 @@ public:
 
     //--- [Query] ---
 
-    using ShapeFilter = std::function<bool(const ShapeID&)>;
-    using ShapeCallback = std::function<void(const ShapeID&)>;
-    using RayHitCallback = std::function<bool(ShapeID id, real_t t)>;
+    using ShapeFilter    = std::function<bool(const ShapeID& id)>;
+    using ShapeCallback  = std::function<bool(const ShapeID& id)>;
+    using RayHitCallback = std::function<bool(const ShapeID& id, real_t t)>;
 
     virtual void query_range(const BBox2D& queryArea, const ShapeCallback& callback,
         const ShapeFilter& filter = {}) const = 0;

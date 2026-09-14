@@ -155,10 +155,10 @@ private:
     }
 
     // Recursive helper for range search
-    void rangeSearchRecursive(size_t nodeIndex, const BBox2D& query, const ShapeCallback& callback,
+    bool rangeSearchRecursive(size_t nodeIndex, const BBox2D& query, const ShapeCallback& callback,
         const ShapeFilter& filter) const;
 
-    void pointSearchRecursive(size_t nodeIndex, const Vector2D& point,
+    bool pointSearchRecursive(size_t nodeIndex, const Vector2D& point,
         const ShapeCallback& callback, const ShapeFilter& filter) const;
 
     // retrieve k final results from priority queue

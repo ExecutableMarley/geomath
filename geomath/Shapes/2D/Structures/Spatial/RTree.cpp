@@ -124,8 +124,8 @@ size_t RTree::buildRecursive(std::vector<RTreeLeafEntry>& currentElements, int a
 
 // --- Queries ---
 
-void RTree::query_range(const BBox2D& query, const ShapeCallback& callback,
-    const ShapeFilter& filter) const
+void RTree::query_range(const BBox2D& query, 
+    const ShapeCallback& callback, const ShapeFilter& filter) const
 {
     if (!callback)
         return;
@@ -140,7 +140,7 @@ void RTree::query_range(const BBox2D& query, const ShapeCallback& callback,
     rangeSearchRecursive(_rootIndex, query, callback, filter);
 }
 
-void RTree::rangeSearchRecursive(size_t nodeIndex, const BBox2D& query,
+bool RTree::rangeSearchRecursive(size_t nodeIndex, const BBox2D& query,
     const ShapeCallback& callback, const ShapeFilter& filter) const
 {
     const RTreeNode& node = _nodes[nodeIndex];
@@ -148,45 +148,53 @@ void RTree::rangeSearchRecursive(size_t nodeIndex, const BBox2D& query,
     if (node.isLeaf)
     {
         // Check elements directly
-        for (const auto& entry : node.leafEntries)
+        for (const auto &entry : node.leafEntries)
         {
             if (entry.bounds.intersects(query) && (!filter || filter(entry.shape)))
-                callback(entry.shape);
+                if (!callback(entry.shape))
+                    return false;
         }
     }
     else
     {
         // Recursive search children
-        for (const auto& entry : node.childEntries)
+        for (const auto &entry : node.childEntries)
         {
             if (entry.bounds.intersects(query))
             {
-                rangeSearchRecursive(entry.child, query, callback, filter);
+                if (!rangeSearchRecursive(entry.child, query, callback, filter))
+                    return false;
             }
         }
     }
+
+    return true;
 }
 
-void RTree::pointSearchRecursive(size_t nodeIndex, const Vector2D& point,
-    const ShapeCallback& callback, const ShapeFilter& filter) const
+bool RTree::pointSearchRecursive(size_t nodeIndex, const Vector2D &point,
+    const ShapeCallback &callback, const ShapeFilter &filter) const
 {
-    const RTreeNode& node = _nodes[nodeIndex];
+    const RTreeNode &node = _nodes[nodeIndex];
 
     if (node.isLeaf)
     {
-        for (const auto& entry : node.leafEntries)
+        for (const auto &entry : node.leafEntries)
         {
             if (entry.bounds.contains(point) && (!filter || filter(entry.shape)))
-                callback(entry.shape);
+                if (!callback(entry.shape))
+                    return false;
         }
-        return;
+        return true;
     }
 
-    for (const auto& entry : node.childEntries)
+    for (const auto &entry : node.childEntries)
     {
         if (entry.bounds.contains(point))
-            pointSearchRecursive(entry.child, point, callback, filter);
+            if (!pointSearchRecursive(entry.child, point, callback, filter))
+                return false;
     }
+
+    return true;
 }
 
 ShapeID RTree::query_nearest(const Vector2D& queryPoint, const ShapeFilter& filter) const
@@ -249,8 +257,8 @@ ShapeID RTree::query_nearest(const Vector2D& queryPoint, const ShapeFilter& filt
     return nearestShape;
 }
 
-void RTree::query_knn(const Vector2D& queryPoint, size_t k, const ShapeCallback& callback,
-    const ShapeFilter& filter) const
+void RTree::query_knn(const Vector2D& queryPoint, size_t k,
+    const ShapeCallback& callback, const ShapeFilter& filter) const
 {
     if (!callback || k == 0 || _rootIndex == InvalidNode)
     {
@@ -342,7 +350,10 @@ void RTree::extractKNearestResults(size_t k,
 
     // Take k results (min check not required atm)
     for (size_t i = 0; i < std::min(k, tempResults.size()); ++i)
-        callback(tempResults[i].second);
+    {
+        if (!callback(tempResults[i].second))
+            return;
+    }
 }
 
 // --- Queries for Point and Ray ---
@@ -358,8 +369,8 @@ void RTree::query_point(const Vector2D& point, const ShapeCallback& callback,
 }
 
 // Ray query
-void RTree::query_ray(const Ray2D& ray, real_t t_min, real_t t_max, const RayHitCallback& callback,
-    const ShapeFilter& filter) const
+void RTree::query_ray(const Ray2D& ray, real_t t_min, real_t t_max, 
+    const RayHitCallback& callback, const ShapeFilter& filter) const
 {
     if (!callback || _rootIndex == InvalidNode)
         return;
