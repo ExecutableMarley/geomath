@@ -56,10 +56,10 @@ struct RTreeFilter
     std::vector<BBox2D> bounds;
 };
 
-class RTree : public ISpatialIndex2D
+class RTree2D : public ISpatialIndex2D
 {
 public:
-    RTree(size_t maxEntries = 8, size_t minEntries = 3)
+    RTree2D(size_t maxEntries = 8, size_t minEntries = 3)
         : _maxEntries(maxEntries), _minEntries(minEntries), _rootIndex(std::numeric_limits<size_t>::max()) {
         assert(_minEntries <= _maxEntries && _minEntries >= 1);
     }

@@ -43,7 +43,7 @@ using RTreeRayQueue = std::priority_queue<
 
 }
 
-void RTree::build(const std::span<SpatialEntry> elementBoundsWithIndices)
+void RTree2D::build(const std::span<SpatialEntry> elementBoundsWithIndices)
 {
     this->clear();
 
@@ -60,7 +60,7 @@ void RTree::build(const std::span<SpatialEntry> elementBoundsWithIndices)
     _rootBounds = calculateNodeMBR(_rootIndex);
 }
 
-size_t RTree::buildRecursive(const std::span<SpatialEntry> currentElements, int axis)
+size_t RTree2D::buildRecursive(const std::span<SpatialEntry> currentElements, int axis)
 {
     // Base Case
     if (currentElements.size() <= _maxEntries)
@@ -116,7 +116,7 @@ size_t RTree::buildRecursive(const std::span<SpatialEntry> currentElements, int 
 
 // --- Queries ---
 
-void RTree::query_range(const BBox2D& query, 
+void RTree2D::query_range(const BBox2D& query, 
     const ShapeCallback& callback, const ShapeFilter& filter) const
 {
     if (!callback)
@@ -132,7 +132,7 @@ void RTree::query_range(const BBox2D& query,
     rangeSearchRecursive(_rootIndex, query, callback, filter);
 }
 
-bool RTree::rangeSearchRecursive(size_t nodeIndex, const BBox2D& query,
+bool RTree2D::rangeSearchRecursive(size_t nodeIndex, const BBox2D& query,
     const ShapeCallback& callback, const ShapeFilter& filter) const
 {
     const RTreeNode& node = _nodes[nodeIndex];
@@ -163,7 +163,7 @@ bool RTree::rangeSearchRecursive(size_t nodeIndex, const BBox2D& query,
     return true;
 }
 
-bool RTree::pointSearchRecursive(size_t nodeIndex, const Vector2D &point,
+bool RTree2D::pointSearchRecursive(size_t nodeIndex, const Vector2D &point,
     const ShapeCallback &callback, const ShapeFilter &filter) const
 {
     const RTreeNode &node = _nodes[nodeIndex];
@@ -189,7 +189,7 @@ bool RTree::pointSearchRecursive(size_t nodeIndex, const Vector2D &point,
     return true;
 }
 
-ShapeID RTree::query_nearest(const Vector2D& queryPoint, const ShapeFilter& filter) const
+ShapeID RTree2D::query_nearest(const Vector2D& queryPoint, const ShapeFilter& filter) const
 {
     if (_rootIndex == InvalidNode)
         return ShapeID::invalid();
@@ -249,7 +249,7 @@ ShapeID RTree::query_nearest(const Vector2D& queryPoint, const ShapeFilter& filt
     return nearestShape;
 }
 
-void RTree::query_knn(const Vector2D& queryPoint, size_t k,
+void RTree2D::query_knn(const Vector2D& queryPoint, size_t k,
     const ShapeCallback& callback, const ShapeFilter& filter) const
 {
     if (!callback || k == 0 || _rootIndex == InvalidNode)
@@ -325,7 +325,7 @@ void RTree::query_knn(const Vector2D& queryPoint, size_t k,
     extractKNearestResults(k, bestKResultsQueue, callback);
 }
 
-void RTree::extractKNearestResults(size_t k,
+void RTree2D::extractKNearestResults(size_t k,
     RTreeDistanceQueue& bestKResultsQueue,
     const ShapeCallback& callback) const
 {
@@ -351,7 +351,7 @@ void RTree::extractKNearestResults(size_t k,
 // --- Queries for Point and Ray ---
 
 // Point query
-void RTree::query_point(const Vector2D& point, const ShapeCallback& callback,
+void RTree2D::query_point(const Vector2D& point, const ShapeCallback& callback,
     const ShapeFilter& filter) const
 {
     if (!callback || _rootIndex == InvalidNode || !_rootBounds.contains(point))
@@ -361,7 +361,7 @@ void RTree::query_point(const Vector2D& point, const ShapeCallback& callback,
 }
 
 // Ray query
-void RTree::query_ray(const Ray2D& ray, real_t t_min, real_t t_max, 
+void RTree2D::query_ray(const Ray2D& ray, real_t t_min, real_t t_max, 
     const RayHitCallback& callback, const ShapeFilter& filter) const
 {
     if (!callback || _rootIndex == InvalidNode)
@@ -415,7 +415,7 @@ void RTree::query_ray(const Ray2D& ray, real_t t_min, real_t t_max,
 
 // --- Misc ---
 
-RTreeFilter RTree::createFilter(const BBox2D& region, size_t maxDepth) const
+RTreeFilter RTree2D::createFilter(const BBox2D& region, size_t maxDepth) const
 {
     RTreeFilter filter;
     filter.region = region;
@@ -427,7 +427,7 @@ RTreeFilter RTree::createFilter(const BBox2D& region, size_t maxDepth) const
     return filter;
 }
 
-void RTree::collectFilterNodes(size_t nodeIndex,
+void RTree2D::collectFilterNodes(size_t nodeIndex,
     const BBox2D& region,
     size_t depth,
     size_t maxDepth,
