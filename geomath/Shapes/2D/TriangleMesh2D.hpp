@@ -10,6 +10,7 @@
 #include "BBox2D.hpp"
 #include "Interfaces/IFiniteShape2D.hpp"
 #include "Triangle2D.hpp"
+#include "Shapes/Common/TriangleIndices.hpp"
 
 namespace Arns
 {
@@ -17,24 +18,6 @@ namespace Arns
 namespace geomath
 {
 
-struct TriangleIndices
-{
-    TriangleIndices(int v0, int v1, int v2) : v0(v0), v1(v1), v2(v2) {}
-
-    int v0, v1, v2;
-
-    unsigned int operator[](size_t index) const
-    {
-        switch (index)
-        {
-        case 0: return v0;
-        case 1: return v1;
-        case 2: return v2;
-        default:
-            return 0; //Throw exception
-        }
-    }
-};
 
 // Todo: Should have the same structure as TriangleMesh3D
 
@@ -70,9 +53,7 @@ public:
         return true;
     }
 
-    void addTriangle(const Triangle2D& triangle);
-
-    void addTriangle(const Vector2D& a, const Vector2D& b, const Vector2D& c);
+    // --- Data Accessors & Mutators ---
 
     Triangle2D getTriangle(size_t index) const
     {
@@ -82,6 +63,27 @@ public:
         const TriangleIndices& triIndices = m_triangles[index];
         return Triangle2D(m_vertices[triIndices.v0], m_vertices[triIndices.v1], m_vertices[triIndices.v2]);
     }
+
+    // --- Geometric Properties ---
+
+    // area
+
+    // --- Transform / modification ---
+
+    // translate, scale, rotate, transform
+
+    // --- Spatial Queries ---
+
+    // --- Operators ---
+
+    TriangleIndices& operator[](size_t index)
+    {
+        return m_triangles[index];
+    }
+};
+
+class TriangleMeshBuilder2D 
+{
 };
 
 
