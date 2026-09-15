@@ -10,6 +10,7 @@
 #include "../ISpatialIndex2D.hpp"
 
 #include <cassert>
+#include <initializer_list>
 #include <queue>
 
 
@@ -20,12 +21,6 @@ namespace geomath
 {
 
 using RTreeNodeIndex = size_t;
-
-struct RTreeLeafEntry
-{
-    BBox2D bounds;
-    ShapeID shape;
-};
 
 struct RTreeChildEntry
 {
@@ -50,7 +45,7 @@ using RTreeDistanceQueue = std::priority_queue<
 struct RTreeNode
 {
     bool isLeaf = false;
-    std::vector<RTreeLeafEntry> leafEntries;
+    std::vector<SpatialEntry> leafEntries;
     std::vector<RTreeChildEntry> childEntries;
 };
 
@@ -70,10 +65,16 @@ public:
     }
 
     // Bulk-loading method
-    void build(const std::vector<std::pair<BBox2D, ShapeID>>& elementBoundsWithIndices);
+    void build(const std::span<SpatialEntry> elementBoundsWithIndices);
+
+    void build(std::initializer_list<SpatialEntry> elementBoundsWithIndices)
+    {
+        std::vector<SpatialEntry> entries(elementBoundsWithIndices);
+        build(std::span<SpatialEntry>(entries));
+    }
 
     // Dynamic insertion
-    void insert(ShapeID shapeIndex, const BBox2D& bounds) override {}
+    // void insert(ShapeID shapeIndex, const BBox2D& bounds) override {}
 
     // Reset method
     void clear()
@@ -134,7 +135,7 @@ private:
     }
 
     // Returns the index of subtree root
-    size_t buildRecursive(std::vector<RTreeLeafEntry>& currentElements, int axis);
+    size_t buildRecursive(std::span<SpatialEntry> currentElements, int axis);
 
     template <typename Entry>
     static BBox2D calculateMBR(const std::vector<Entry>& entries)

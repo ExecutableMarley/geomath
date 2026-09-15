@@ -15,20 +15,31 @@ namespace Arns
 namespace geomath
 {
 
+
+struct SpatialEntry
+{
+    BBox2D bounds;
+    ShapeID shape;
+};
+
 class ISpatialIndex2D
 {
 public:
 
     //--- [Building/Clearing] ---
 
-    virtual void build(const std::vector<std::pair<BBox2D, ShapeID>>& shapeBounds) = 0;
+    //virtual void build(const std::vector<SpatialEntry>& shapeBounds) = 0;
 
+    virtual void build(const std::span<SpatialEntry> entries) = 0;
+
+    /*
     virtual void insert(ShapeID shapeIndex, const BBox2D& bbox) = 0;
 
     void insert(ShapeID shapeIndex, const IFiniteShape2D& shape)
     {
         return insert(shapeIndex, shape.boundingBox());
     }
+    */
 
     virtual void clear() = 0;
 

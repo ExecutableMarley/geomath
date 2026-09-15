@@ -43,9 +43,9 @@ using RTreeRayQueue = std::priority_queue<
 
 }
 
-void RTree::build(const std::vector<std::pair<BBox2D, ShapeID>>& elementBoundsWithIndices)
+void RTree::build(const std::span<SpatialEntry> elementBoundsWithIndices)
 {
-    clear();
+    this->clear();
 
     //Consider reserving space in _nodes
     if (elementBoundsWithIndices.empty())
@@ -54,24 +54,19 @@ void RTree::build(const std::vector<std::pair<BBox2D, ShapeID>>& elementBoundsWi
         return;
     }
 
-    std::vector<RTreeLeafEntry> initialEntries;
-    initialEntries.reserve(elementBoundsWithIndices.size());
-    for (const auto& pair : elementBoundsWithIndices)
-    {
-        initialEntries.push_back({ pair.first, pair.second });
-    }
-
-    _rootIndex = buildRecursive(initialEntries, 0);
+    // mutable workspace
+    std::vector<SpatialEntry> buildWorkspace(elementBoundsWithIndices.begin(), elementBoundsWithIndices.end());
+    _rootIndex = buildRecursive(std::span<SpatialEntry>(buildWorkspace), 0);
     _rootBounds = calculateNodeMBR(_rootIndex);
 }
 
-size_t RTree::buildRecursive(std::vector<RTreeLeafEntry>& currentElements, int axis)
+size_t RTree::buildRecursive(const std::span<SpatialEntry> currentElements, int axis)
 {
     // Base Case
     if (currentElements.size() <= _maxEntries)
     {
         size_t newNodeIdx = createNode(true);
-        _nodes[newNodeIdx].leafEntries = currentElements;
+        _nodes[newNodeIdx].leafEntries.assign(currentElements.begin(), currentElements.end());
         return newNodeIdx;
     }
 
@@ -86,7 +81,7 @@ size_t RTree::buildRecursive(std::vector<RTreeLeafEntry>& currentElements, int a
     {
         // Sort by X-coordinate
         std::sort(currentElements.begin(), currentElements.end(),
-            [](const RTreeLeafEntry& a, const RTreeLeafEntry& b)
+            [](const SpatialEntry& a, const SpatialEntry& b)
             {
                 return a.bounds.m_min.x < b.bounds.m_min.x;
             });
@@ -95,7 +90,7 @@ size_t RTree::buildRecursive(std::vector<RTreeLeafEntry>& currentElements, int a
     {
         // Sort by Y-coordinate
         std::sort(currentElements.begin(), currentElements.end(),
-            [](const RTreeLeafEntry& a, const RTreeLeafEntry& b)
+            [](const SpatialEntry& a, const SpatialEntry& b)
             {
                 return a.bounds.m_min.y < b.bounds.m_min.y;
             });
@@ -110,10 +105,7 @@ size_t RTree::buildRecursive(std::vector<RTreeLeafEntry>& currentElements, int a
 
         if (sliceStart >= sliceEnd) continue; // Should not happen
 
-        //vector view instead maybe?
-        std::vector<RTreeLeafEntry> slice(currentElements.begin() + sliceStart,
-            currentElements.begin() + sliceEnd);
-
+        std::span<SpatialEntry> slice = currentElements.subspan(sliceStart, sliceEnd - sliceStart);
         size_t childNodeIndex = buildRecursive(slice, 1 - axis);
 
         _nodes[newNodeIdx].childEntries.push_back({ calculateNodeMBR(childNodeIndex), childNodeIndex });

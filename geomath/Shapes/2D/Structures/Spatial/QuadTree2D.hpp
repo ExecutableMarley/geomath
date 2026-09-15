@@ -16,12 +16,6 @@ using NodeIndex = uint32_t;
 
 static constexpr NodeIndex INVALID_NODE = std::numeric_limits<NodeIndex>::max();
 
-struct QuadTreeEntry
-{
-    ShapeID shape;
-    BBox2D bounds;
-};
-
 struct QuadTreeNode
 {
     BBox2D bounds;
@@ -33,7 +27,7 @@ struct QuadTreeNode
         INVALID_NODE
     };
 
-    std::vector<QuadTreeEntry> objects;
+    std::vector<SpatialEntry> objects;
 
     QuadTreeNode(BBox2D bounds) : bounds(bounds) {}
 
@@ -57,7 +51,7 @@ public:
         _nodes.emplace_back(QuadTreeNode(bounds));
     }
 
-    void insert(ShapeID shapeIndex, const BBox2D& bounds) override
+    void insert(ShapeID shapeIndex, const BBox2D& bounds)
     {
         if (!_rootBounds.contains(bounds) || _maxEntries == 0)
         {
@@ -79,15 +73,15 @@ public:
                 return insertRecursive(node.children[index], depth + 1, shapeIndex, bounds);
         }
 
-        _nodes[currentNode].objects.emplace_back(QuadTreeEntry{shapeIndex, bounds});
+        _nodes[currentNode].objects.emplace_back(SpatialEntry{bounds, shapeIndex});
 
         if (isLeaf && _nodes[currentNode].objects.size() > _maxEntries && depth < _maxDepth)
         {
             subdivide(currentNode);
-            std::vector<QuadTreeEntry> entries = std::move(_nodes[currentNode].objects);
+            std::vector<SpatialEntry> entries = std::move(_nodes[currentNode].objects);
             _nodes[currentNode].objects.clear();
 
-            for (const QuadTreeEntry& entry : entries)
+            for (const SpatialEntry& entry : entries)
             {
                 insertRecursive(currentNode, depth, entry.shape, entry.bounds);
             }
