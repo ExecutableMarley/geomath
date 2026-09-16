@@ -259,6 +259,14 @@ public:
     {
         return BBox2D(Vector2D::min(box1.m_min, box2.m_min), Vector2D::max(box1.m_max, box2.m_max));
     }
+
+    static BBox2D FromPointAndRadius(const Vector2D& center, real_t radius)
+    {
+        return BBox2D(
+            { center.x - radius, center.y - radius },
+            { center.x + radius, center.y + radius }
+        );
+    }
 };
 
 } // namespace geomath
