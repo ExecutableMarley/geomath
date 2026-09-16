@@ -104,9 +104,9 @@ TEST_CASE("delaunay triangulates a square")
 
     const TriangleMesh2D mesh = delaunay(points);
 
-    CHECK(mesh.m_vertices == points);
-    CHECK(mesh.m_triangles.size() == 2);
-    CHECK(mesh.validate());
+    CHECK(mesh.vertices() == points);
+    CHECK(mesh.triangles().size() == 2);
+    CHECK(mesh.isValid());
     CHECK(isDelaunay(mesh));
 }
 
@@ -116,9 +116,9 @@ TEST_CASE("delaunay returns no triangles for fewer than three points")
 
     const TriangleMesh2D mesh = delaunay(points);
 
-    CHECK(mesh.m_vertices == points);
-    CHECK(mesh.m_triangles.empty());
-    CHECK(mesh.validate());
+    CHECK(mesh.vertices() == points);
+    CHECK(mesh.triangles().empty());
+    CHECK(mesh.isValid());
 }
 
 TEST_CASE("delaunay handles high-density co-circular ring")
@@ -134,8 +134,8 @@ TEST_CASE("delaunay handles high-density co-circular ring")
     const TriangleMesh2D mesh = delaunay(points);
 
     // Any convex polygon with N vertices decomposes into exactly N - 2 triangles
-    CHECK(mesh.m_triangles.size() == static_cast<size_t>(N - 2));
-    CHECK(mesh.validate());
+    CHECK(mesh.triangles().size() == static_cast<size_t>(N - 2));
+    CHECK(mesh.isValid());
     CHECK(isDelaunay(mesh));
 }
 
@@ -154,8 +154,8 @@ TEST_CASE("delaunay processes structured grid")
 
     // A rectangular grid of WxH points produces exactly 2 * (W - 1) * (H - 1) triangles
     const size_t expectedTriangles = 2 * (W - 1) * (H - 1);
-    CHECK(mesh.m_triangles.size() == expectedTriangles);
-    CHECK(mesh.validate());
+    CHECK(mesh.triangles().size() == expectedTriangles);
+    CHECK(mesh.isValid());
     CHECK(isDelaunay(mesh));
 }
 
@@ -171,8 +171,8 @@ TEST_CASE("delaunay handles near-collinear points under perturbation")
 
     const TriangleMesh2D mesh = delaunay(points);
 
-    CHECK(!mesh.m_triangles.empty());
-    CHECK(mesh.validate());
+    CHECK(!mesh.triangles().empty());
+    CHECK(mesh.isValid());
     CHECK(isDelaunay(mesh));
 }
 
@@ -188,7 +188,7 @@ TEST_CASE("delaunay ignores or safely handles duplicate points")
 
     const TriangleMesh2D mesh = delaunay(points);
 
-    CHECK(mesh.validate());
+    CHECK(mesh.isValid());
     CHECK(isDelaunay(mesh));
 }
 
@@ -204,7 +204,7 @@ TEST_CASE("delaunay correctly flips edges for interior point")
 
     const TriangleMesh2D mesh = delaunay(points);
 
-    CHECK(mesh.m_triangles.size() == 4);
-    CHECK(mesh.validate());
+    CHECK(mesh.triangles().size() == 4);
+    CHECK(mesh.isValid());
     CHECK(isDelaunay(mesh));
 }

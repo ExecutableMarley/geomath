@@ -80,8 +80,8 @@ real_t circumradiusSquared(const Vector2D& a, const Vector2D& b, const Vector2D&
 
 bool isDelaunay(const TriangleMesh2D& mesh)
 {
-    const auto& verts = mesh.m_vertices;
-    const auto& tris = mesh.m_triangles;
+    const auto& verts = mesh.vertices();
+    const auto& tris = mesh.triangles();
 
     for (const auto& tri : tris)
     {
@@ -189,7 +189,9 @@ public:
 
     TriangleMesh2D getTriangleMesh(const std::span<const Vector2D> inputPoints)
     {
-        return TriangleMesh2D(inputPoints, getTriangleTriplets());
+        TriangleMeshData data(inputPoints, getTriangleTriplets());
+        data.validate();
+        return TriangleMesh2D(std::move(data));
     }
 
 private:
