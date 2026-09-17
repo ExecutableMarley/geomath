@@ -1,23 +1,21 @@
 #pragma once
 
+#include "CommonMath.hpp"
+#include "Geometry/Vector2D.hpp"
+#include "Algebra/Transform2D.hpp"
+#include "Shapes/Common/TriangleIndices.hpp"
+#include "Shapes/2D/BBox2D.hpp"
+#include "Shapes/2D/Interfaces/IFiniteShape2D.hpp"
+#include "Shapes/2D/Triangle2D.hpp"
+
 #include <math.h>
 #include <stdexcept>
 #include <vector>
 #include <span>
+#include <initializer_list>
 
-#include "CommonMath.hpp"
-#include "Geometry/Vector2D.hpp"
-#include "BBox2D.hpp"
-#include "Interfaces/IFiniteShape2D.hpp"
-#include "Triangle2D.hpp"
-#include "Shapes/Common/TriangleIndices.hpp"
-
-namespace Arns
+namespace Arns::geomath
 {
-
-namespace geomath
-{
-
 
 // Todo: Should have the same structure as TriangleMesh3D
 
@@ -25,6 +23,8 @@ struct TriangleMeshData
 {
     std::vector<Vector2D> m_vertices;
     std::vector<TriangleIndices> m_triangles;
+
+    TriangleMeshData() = default;
 
     TriangleMeshData(const std::span<const Vector2D>& vertices, const std::span<const TriangleIndices>& triangles) :
         m_vertices(vertices.begin(), vertices.end()), m_triangles(triangles.begin(), triangles.end()) {}
@@ -34,6 +34,14 @@ struct TriangleMeshData
         : m_vertices(vertices.begin(), vertices.end()),
           m_triangles(triangles)
     {}
+
+    TriangleMeshData(
+        std::initializer_list<Vector2D> vertices,
+        std::initializer_list<TriangleIndices> triangles)
+        : m_vertices(vertices),
+          m_triangles(triangles)
+    {
+    }
 
     bool isValid() const 
     {
@@ -94,11 +102,63 @@ struct TriangleMeshData
 class TriangleMesh2D
 {
 private:
-    TriangleMeshData m_data;
+    // Base Members
 
-    //BBox2D
-    //cached area
-    //Vector2D centroid
+    TriangleMeshData m_data;
+    Transform2D m_transform;
+
+    // Derived local data from Mesh
+
+    BBox2D m_localBounds;
+    real_t   m_area;
+    Vector2D m_centroid;
+    
+    // Cached world data
+
+    mutable BBox2D m_worldBounds;
+    mutable bool m_worldBoundsDirty = true;
+
+
+    void _invalidate()
+    {
+        m_worldBoundsDirty = true;
+    }
+
+    void _derivedData()
+    {
+        if (this->m_data.m_triangles.empty())
+        {
+            m_localBounds = BBox2D();
+            m_area = 0;
+            m_centroid = Vector2D();
+            return;
+        }
+
+        m_localBounds = m_data.m_vertices[m_data.m_triangles[0].v0];
+        real_t totalArea = real_t{0};
+        Vector2D weightedCentroid = Vector2D::zero();
+
+        for (const auto& t : m_data.m_triangles)
+        {
+            const Vector2D& v0 = m_data.m_vertices[t.v0];
+            const Vector2D& v1 = m_data.m_vertices[t.v1];
+            const Vector2D& v2 = m_data.m_vertices[t.v2];
+
+            m_localBounds.encapsulate(v0);
+            m_localBounds.encapsulate(v1);
+            m_localBounds.encapsulate(v2);
+
+            const real_t triangleArea = cross(v1 - v0, v2 - v0) * real_t{0.5};
+            const Vector2D triangleCentroid = (v0 + v1 + v2) / real_t{3};
+
+            weightedCentroid += triangleCentroid * triangleArea;
+            totalArea += triangleArea;
+        }
+
+        this->m_area = totalArea;
+        this->m_centroid = weightedCentroid / totalArea;
+    }
+
 public:
 
     // --- Constructors ---
@@ -106,15 +166,28 @@ public:
     TriangleMesh2D() = default;
 
     explicit TriangleMesh2D(TriangleMeshData data) 
-        : m_data(std::move(data)) {}
+        : m_data(std::move(data)) {
+            this->_derivedData();
+        }
 
     TriangleMesh2D(const std::span<const Vector2D>& vertices, const std::span<const TriangleIndices>& triangles) :
-        m_data(vertices, triangles) {}
+        m_data(vertices, triangles) {
+            this->_derivedData();
+        }
 
     TriangleMesh2D(
         std::span<const Vector2D> vertices,
         std::initializer_list<TriangleIndices> triangles) :
-            m_data(vertices, triangles) {}
+            m_data(vertices, triangles) {
+                this->_derivedData();
+            }
+
+    TriangleMesh2D(
+        std::initializer_list<Vector2D> vertices,
+        std::initializer_list<TriangleIndices> triangles) :
+            m_data(vertices, triangles) {
+                this->_derivedData();
+            }
 
     TriangleMeshData releaseData() &&
     {
@@ -137,13 +210,86 @@ public:
         return Triangle2D(m_data.m_vertices[triIndices.v0], m_data.m_vertices[triIndices.v1], m_data.m_vertices[triIndices.v2]);
     }
 
+    Triangle2D getTriangleWorld(size_t index) const
+    {
+        if (index >= m_data.m_triangles.size())
+            throw std::out_of_range("Triangle index out of range");
+
+        const TriangleIndices& t = m_data.m_triangles[index];
+        const Vector2D& a = m_transform.transformPoint(m_data.m_vertices[t.v0]);
+        const Vector2D& b = m_transform.transformPoint(m_data.m_vertices[t.v1]);
+        const Vector2D& c = m_transform.transformPoint(m_data.m_vertices[t.v2]);
+        return Triangle2D(a,b,c);
+    }
+
     // --- Geometric Properties ---
+
+    real_t localArea() const { return m_area; }
+    real_t worldArea() const { return m_area * m_transform.getScale() * m_transform.getScale(); }
+
+    Vector2D localCentroid() const { return m_centroid; }
+    Vector2D worldCentroid() const { return m_transform.transformPoint(m_centroid); }
+
+    BBox2D localBounds () const { return m_localBounds; }
+    BBox2D worldBounds () const
+    {
+        if (m_worldBoundsDirty)
+        {
+            m_worldBounds = BBox2D::fromPoints(
+                m_transform.transformPoint(m_localBounds.topLeft()),
+                m_transform.transformPoint(m_localBounds.topRight()),
+                m_transform.transformPoint(m_localBounds.bottomRight()),
+                m_transform.transformPoint(m_localBounds.bottomLeft()));
+
+            m_worldBoundsDirty = false;
+        }
+        return m_worldBounds;
+    }
 
     // area
 
     // --- Transform / modification ---
 
-    // translate, scale, rotate, transform
+    TriangleMesh2D& translate(const Vector2D& translation)
+    {
+        this->m_transform.translate(translation);
+        _invalidate();
+        return *this;
+    }
+
+    TriangleMesh2D& rotate(real_t rotate)
+    {
+        this->m_transform.rotate(rotate);
+        _invalidate();
+        return *this;
+    }
+
+    TriangleMesh2D& scale(real_t scale)
+    {
+        this->m_transform.scale(scale);
+        _invalidate();
+        return *this;
+    }
+
+    TriangleMesh2D& transform(Transform2D transform)
+    {
+        this->m_transform *= transform;
+        _invalidate();
+        return *this;
+    }
+
+    //bake
+    void bakeTransform()
+    {
+        for (auto& v : m_data.m_vertices)
+        {
+            v = m_transform.transformPoint(v);
+        }
+        m_transform.reset();
+        _derivedData();
+        _invalidate();
+    }
+
 
     // --- Spatial Queries ---
 
@@ -218,7 +364,4 @@ public:
 };
 
 
-
-} // namespace Math
-
-} // namespace Arns
+} // namespace Arns::geomath
