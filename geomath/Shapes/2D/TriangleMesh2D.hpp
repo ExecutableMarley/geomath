@@ -264,11 +264,18 @@ public:
         return *this;
     }
 
-    TriangleMesh2D& scale(real_t scale)
+    TriangleMesh2D& scale(real_t factor, const Vector2D& point)
     {
-        this->m_transform.scale(scale);
+        const Vector2D position = m_transform.getPosition();
+        m_transform.setScale(m_transform.getScale() * factor);
+        m_transform.setPosition(point + (position - point) * factor);
         _invalidate();
         return *this;
+    }
+
+    TriangleMesh2D& scale(real_t factor)
+    {
+        return scale(factor, this->worldCentroid());
     }
 
     TriangleMesh2D& transform(Transform2D transform)
