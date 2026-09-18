@@ -26,18 +26,14 @@ public:
 	explicit BVH2D(size_t maxLeafEntries = 4)
 		: _maxLeafEntries(std::max<size_t>(1, maxLeafEntries)) {}
 
+	using ISpatialIndex2D::build;
+
 	void build(const std::span<SpatialEntry> entries) override
 	{
 		clear();
 		_entries.assign(entries.begin(), entries.end());
 		if (!_entries.empty())
 			_rootIndex = buildNode(0, _entries.size());
-	}
-
-	void build(std::initializer_list<SpatialEntry> entries)
-	{
-		std::vector<SpatialEntry> entriesCopy(entries);
-		build(std::span<SpatialEntry>(entriesCopy));
 	}
 
 	void clear() override

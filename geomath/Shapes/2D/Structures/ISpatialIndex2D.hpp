@@ -1,13 +1,15 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-#include <functional>
-
 #include "../Interfaces/IFiniteShape2D.hpp"
 #include "../BBox2D.hpp"
 #include "../Ray2D.hpp"
 #include "ShapeStore2D.hpp"
+
+#include <initializer_list>
+#include <memory>
+#include <vector>
+#include <span>
+#include <functional>
 
 namespace Arns
 {
@@ -31,6 +33,12 @@ public:
     //virtual void build(const std::vector<SpatialEntry>& shapeBounds) = 0;
 
     virtual void build(const std::span<SpatialEntry> entries) = 0;
+
+    void build(std::initializer_list<SpatialEntry> entries)
+    {
+        std::vector<SpatialEntry> _entries(entries);
+        build(std::span<SpatialEntry>(_entries));
+    }
 
     /*
     virtual void insert(ShapeID shapeIndex, const BBox2D& bbox) = 0;

@@ -65,14 +65,10 @@ public:
         assert(_minEntries <= _maxEntries && _minEntries >= 1);
     }
 
+    using ISpatialIndex2D::build;
+
     // Bulk-loading method
     void build(const std::span<SpatialEntry> elementBoundsWithIndices);
-
-    void build(std::initializer_list<SpatialEntry> elementBoundsWithIndices)
-    {
-        std::vector<SpatialEntry> entries(elementBoundsWithIndices);
-        build(std::span<SpatialEntry>(entries));
-    }
 
     // Dynamic insertion
     // void insert(ShapeID shapeIndex, const BBox2D& bounds) override {}
