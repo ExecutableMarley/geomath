@@ -154,7 +154,7 @@ bool RTree2D::rangeSearchRecursive(size_t nodeIndex, const BBox2D& query,
         {
             if (entry.bounds.intersects(query))
             {
-                if (!rangeSearchRecursive(entry.child, query, callback, filter))
+                if (!rangeSearchRecursive(entry.idx, query, callback, filter))
                     return false;
             }
         }
@@ -182,7 +182,7 @@ bool RTree2D::pointSearchRecursive(size_t nodeIndex, const Vector2D &point,
     for (const auto &entry : node.childEntries)
     {
         if (entry.bounds.contains(point))
-            if (!pointSearchRecursive(entry.child, point, callback, filter))
+            if (!pointSearchRecursive(entry.idx, point, callback, filter))
                 return false;
     }
 
@@ -241,7 +241,7 @@ ShapeID RTree2D::query_nearest(const Vector2D& queryPoint, const ShapeFilter& fi
 
                 // Pruning check
                 if (childMinDistSq < nearestDistanceSq)
-                    nodesToVisitQueue.push({ childMinDistSq, entry.child });
+                    nodesToVisitQueue.push({ childMinDistSq, entry.idx });
             }
         }
     }
@@ -316,7 +316,7 @@ void RTree2D::query_knn(const Vector2D& queryPoint, size_t k,
                 {
                     continue;
                 }
-                nodesToVisitQueue.push({ childMinDistSq, entry.child });
+                nodesToVisitQueue.push({ childMinDistSq, entry.idx });
             }
         }
     }
@@ -408,7 +408,7 @@ void RTree2D::query_ray(const Ray2D& ray, real_t t_min, real_t t_max,
             real_t childEnter;
             real_t childExit;
             if (rayBoundsInterval(ray, entry.bounds, t_min, t_max, childEnter, childExit))
-                candidates.push({ childEnter, entry.child, ShapeID::invalid(), true, sequence++ });
+                candidates.push({ childEnter, entry.idx, ShapeID::invalid(), true, sequence++ });
         }
     }
 }
@@ -454,7 +454,7 @@ void RTree2D::collectFilterNodes(size_t nodeIndex,
     {
         if (entry.bounds.intersects(region))
         {
-            collectFilterNodes(entry.child, region, depth + 1, maxDepth, outNodes, outBounds);
+            collectFilterNodes(entry.idx, region, depth + 1, maxDepth, outNodes, outBounds);
         }
     }
 }

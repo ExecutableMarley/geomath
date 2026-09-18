@@ -10,7 +10,6 @@
 #include "../ISpatialIndex2D.hpp"
 
 #include <cassert>
-#include <initializer_list>
 #include <queue>
 
 
@@ -20,12 +19,14 @@ namespace Arns
 namespace geomath
 {
 
+// Todo: Bring this up to the quality of BVH2D
+
 using RTreeNodeIndex = size_t;
 
 struct RTreeChildEntry
 {
     BBox2D bounds;
-    RTreeNodeIndex child;
+    RTreeNodeIndex idx;
 };
 
 struct RTreeDistanceEntryCompare
@@ -87,7 +88,24 @@ public:
 
     size_t size() const
     {
-        return _nodes.size();
+        return size(_rootIndex);
+    }
+
+    size_t size(RTreeNodeIndex idx) const
+    {
+        if (_nodes[idx].isLeaf)
+        {
+            return _nodes[idx].leafEntries.size();
+        }
+        else
+        {
+            size_t subTreeSize = 0;
+            for (RTreeChildEntry childEntry : _nodes[idx].childEntries)
+            {
+                subTreeSize += size(childEntry.idx);
+            }
+            return subTreeSize;
+        }
     }
 
 
