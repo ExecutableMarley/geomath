@@ -5,12 +5,14 @@
 
 #pragma once
 
-#include <math.h>
-#include <algorithm>
-#include <vector>
-
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
+
+#include <math.h>
+#include <algorithm>
+#include <concepts>
+#include <type_traits>
+#include <vector>
 
 namespace Arns
 {
@@ -235,6 +237,19 @@ public:
 
     // --- Static factory Functions ---
 
+    static BBox2D fromTwoPoints(const Vector2D& a, const Vector2D& b)
+    {
+        return BBox2D(Vector2D::min(a, b), Vector2D::max(a, b));
+    }
+
+    template <typename... Points> requires (std::same_as<std::remove_cvref_t<Points>, Vector2D> && ...)
+    static BBox2D fromPoints(const Vector2D& first, const Points&... points)
+    {
+        BBox2D result(first);
+        (result.encapsulate(points), ...);
+        return result;
+    }
+
     template <typename Iter>
     static BBox2D fromRange(Iter begin, Iter end)
     {
@@ -250,10 +265,7 @@ public:
         return BBox2D(min, max);
     }
 
-    static BBox2D fromTwoPoints(const Vector2D& a, const Vector2D& b)
-    {
-        return BBox2D(Vector2D::min(a, b), Vector2D::max(a, b));
-    }
+    
 
     static BBox2D merge(const BBox2D &box1, const BBox2D &box2)
     {
