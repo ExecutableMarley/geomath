@@ -139,16 +139,17 @@ bool isPointInShape(const Vector2D& point, const IBaseShape2D& shape)
 
 bool isSegmentInsideShape(const Segment2D& segment, const IBaseShape2D& shape)
 {
-    if (isConvexPolygonal(shape.type()) || shape.type() == SHAPE2D_CIRCLE)
-        return shape.contains(segment.m_start) && shape.contains(segment.m_end);
-    else if (shape.type() == SHAPE2D_POLYGON)
-    {
-        if (shape.contains(segment.m_start) && shape.contains(segment.m_start))
-        {
-            return !intersect(segment, shape);
-        }
+    if (!shape.contains(segment.m_start) || !shape.contains(segment.m_end))
         return false;
+
+    if (shape.type() == SHAPE2D_POLYGON)
+    {
+        return !intersect(segment, shape);
     }
+
+    if (isConvexPolygonal(shape.type()) || shape.type() == SHAPE2D_CIRCLE)
+        return true;
+
     assert(false && "Unreachable code reached!");
     return false;
 }
@@ -249,6 +250,8 @@ bool isPolygonInsidePolygon(const std::span<const Vector2D> poly1, const std::sp
     return true;
 }
 
+bool isCircleInsidePolygon(const Circle2D& circle, const std::span<const Vector2D> poly);
+
 bool isCircleInsideConvexPolygon(const Circle2D& circle, const std::span<const Vector2D> convexPoly)
 {
     if (!isPointInsideConvexPolygon(circle.m_center, convexPoly))
@@ -256,25 +259,12 @@ bool isCircleInsideConvexPolygon(const Circle2D& circle, const std::span<const V
         return false;
     }
 
-    const size_t n = convexPoly.size();
-    for (size_t i = 0; i < n; ++i)
-    {
-        const Vector2D& v1 = convexPoly[i];
-        const Vector2D& v2 = convexPoly[(i + 1) % n];
-
-        real_t dist = distancePointToSegment(circle.m_center, v1, v2);
-        if (dist < circle.m_radius)
-        {
-            return false;
-        }
-    }
-    return true;
+    return isCircleInsidePolygon(circle, convexPoly);
 }
 
-//Same as isCircleInsideConvexPolygon. Should be merged to one function
 bool isCircleInsidePolygon(const Circle2D& circle, const std::span<const Vector2D> poly)
 {
-    if (!isPointInsideConvexPolygon(circle.m_center, poly))
+    if (!isPointInsidePolygon(circle.m_center, poly))
     {
         return false;
     }
@@ -348,7 +338,7 @@ bool isShapeInsideCircle(const IFiniteShape2D& shape, const Circle2D& circle)
     {
         return isPolygonInsideCircle(shape.polygonal()->vertices(), circle);
     }
-    else if (shape.type() == SHAPE2D_CONVEX_POLYGON)
+    else if (shape.type() == SHAPE2D_CIRCLE)
     {
         return isCircleInsideCircle(*shape.shape_cast<Circle2D>(), circle);
     }
