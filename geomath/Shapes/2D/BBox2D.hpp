@@ -235,6 +235,13 @@ public:
         return !(*this == other);
     }
 
+    // --- Stream Output ---
+
+    friend std::ostream& operator<<(std::ostream& stream, const BBox2D& bbox)
+    {
+        return stream << "BBox2D(m_min: " << bbox.m_min << ", m_max: " << bbox.m_max << ")";
+    }
+
     // --- Static factory Functions ---
 
     static BBox2D fromTwoPoints(const Vector2D& a, const Vector2D& b)
