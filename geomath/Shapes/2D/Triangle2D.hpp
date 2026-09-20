@@ -146,14 +146,7 @@ public:
 
     bool contains(const Vector2D &point) const override
     {
-        const real_t areaABC = area();
-        const auto& m_a = this->a();
-        const auto& m_b = this->b();
-        const auto& m_c = this->c();
-        const real_t areaPBC = real_t{0.5} * std::abs((m_b.x - point.x) * (m_c.y - point.y) - (m_c.x - point.x) * (m_b.y - point.y));
-        const real_t areaPCA = real_t{0.5} * std::abs((m_c.x - point.x) * (m_a.y - point.y) - (m_a.x - point.x) * (m_c.y - point.y));
-        const real_t areaPAB = real_t{0.5} * std::abs((m_a.x - point.x) * (m_b.y - point.y) - (m_b.x - point.x) * (m_a.y - point.y));
-        return approximatelyEqual(areaABC, areaPBC + areaPCA + areaPAB);
+        return isPointInsideTriangle(point, *this);
     }
 
     bool contains(const Segment2D& segment) const
@@ -163,7 +156,7 @@ public:
 
     bool contains(const Triangle2D &triangle) const
     {
-        return contains(triangle.a()) && contains(triangle.b()) && contains(triangle.c());
+        return isPolygonInsideConvexPolygon(triangle.vertices(), m_vertices);
     }
 
     bool contains(const IFiniteShape2D& shape) const

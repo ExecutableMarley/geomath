@@ -121,7 +121,7 @@ public:
 
     bool contains(const Vector2D &point) const override
     {
-        return (point - m_center).lengthSquared() <= m_radius * m_radius;
+        return isPointInsideCircle(point, *this);
     }
 
     bool contains(const Segment2D& segment) const
@@ -131,9 +131,7 @@ public:
 
     bool contains(const Circle2D &circle) const
     {
-        if (circle.m_radius > m_radius) return false;
-        real_t radiusDelta = m_radius - circle.m_radius;
-        return (m_center - circle.m_center).lengthSquared() <= (radiusDelta * radiusDelta);
+        return isCircleInsideCircle(circle, *this);
     }
 
     bool contains(const IFiniteShape2D& shape) const

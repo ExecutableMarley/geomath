@@ -160,21 +160,7 @@ public:
 
     bool contains(const Vector2D &point) const override
     {
-        const auto& m_a = this->a();
-        const auto& m_b = this->b();
-        const auto& m_c = this->c();
-        const auto& m_d = this->d();
-
-        const Vector2D ab = m_b - m_a;
-        const Vector2D ap = point - m_a;
-        const Vector2D bc = m_c - m_b;
-        const Vector2D bp = point - m_b;
-        const Vector2D cd = m_d - m_c;
-        const Vector2D cp = point - m_c;
-        const Vector2D da = m_a - m_d;
-        const Vector2D dp = point - m_d;
-
-        return ab.cross(ap) >= 0 && bc.cross(bp) >= 0 && cd.cross(cp) >= 0 && da.cross(dp) >= 0;
+        return isPointInsideRectangle(point, *this);
     }
 
     bool contains(const Segment2D& segment) const
@@ -184,7 +170,7 @@ public:
 
     bool contains(const Rectangle2D &rectangle) const
     {
-        return contains(rectangle.a()) && contains(rectangle.b()) && contains(rectangle.c()) && contains(rectangle.d());
+        return isPolygonInsideConvexPolygon(rectangle.vertices(), m_vertices);
     }
 
     bool contains(const IFiniteShape2D& shape) const

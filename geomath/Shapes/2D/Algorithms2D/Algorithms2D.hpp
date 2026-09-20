@@ -53,7 +53,23 @@ bool isSegmentOnSegment(const Segment2D& segment1, const Segment2D& segment2);
 
 // --- Point-in-Shape containment
 
-bool isPointInShape(const Segment2D& segment, const IBaseShape2D& shape);
+bool isPointInsideBBox(const Vector2D& point, const BBox2D& bbox);
+
+bool isPointInsideTriangle(const Vector2D& point, const Triangle2D& triangle);
+
+bool isPointInsideRectangle(const Vector2D& point, const Rectangle2D& rectangle);
+
+bool isPointInsideConvexPolygon(const Vector2D& point, const std::span<const Vector2D> vertices);
+
+bool isPointInsideConvexPolygon(const Vector2D& point, const ConvexPolygon2D& polygon);
+
+bool isPointInsidePolygon(const Vector2D& point, const std::span<const Vector2D> vertices);
+
+bool isPointInsidePolygon(const Vector2D& point, const Polygon2D& polygon);
+
+bool isPointInsideCircle(const Vector2D& point, const Circle2D& circle);
+
+bool isPointInShape(const Vector2D& point, const IBaseShape2D& shape);
 
 // --- Segment-in-Shape containment
 
@@ -68,6 +84,10 @@ bool isPolygonalInsideBBox(const IPolygonalShape2D& polygon, const BBox2D& bbox)
 bool isCircleInsideBBox(const Circle2D& circle, const BBox2D& bbox);
 
 //
+
+bool isPolygonInsideConvexPolygon(const std::span<const Vector2D> poly, const std::span<const Vector2D> convexPoly);
+
+bool isCircleInsideCircle(const Circle2D& circle1, const Circle2D& circle2);
 
 bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::span<const Vector2D> convexPoly);
 

@@ -221,20 +221,7 @@ public:
     /*This only works for "simple" (non self intersecting) polygons*/
     bool contains(const Vector2D &point) const override
     {
-        bool contains = false;
-        for (size_t i = 0, j = m_vertices.size() - 1; i < m_vertices.size(); j = i++)
-        {
-            if (isPointOnSegment(point, m_vertices[i], m_vertices[j]))
-                return true;
-
-            if (((m_vertices[i].y > point.y) != (m_vertices[j].y > point.y)) &&
-                (point.x < (m_vertices[j].x - m_vertices[i].x) * (point.y - m_vertices[i].y) / (m_vertices[j].y - m_vertices[i].y) + m_vertices[i].x))
-            {
-                contains = !contains;
-            }
-        }
-
-        return contains;
+        return isPointInsidePolygon(point, std::span<const Vector2D>(m_vertices));
     }
 
     bool strictlyContains(const Vector2D &point) const

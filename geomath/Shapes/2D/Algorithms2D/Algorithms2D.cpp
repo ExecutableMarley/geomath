@@ -63,12 +63,27 @@ bool isPointInsideBBox(const Vector2D& point, const BBox2D& bbox)
 
 bool isPointInsideTriangle(const Vector2D& point, const Triangle2D& triangle)
 {
-    return triangle.contains(point);
+    const real_t areaABC = triangle.area();
+    const auto& a = triangle.a();
+    const auto& b = triangle.b();
+    const auto& c = triangle.c();
+    const real_t areaPBC = real_t{0.5} * std::abs((b.x - point.x) * (c.y - point.y) - (c.x - point.x) * (b.y - point.y));
+    const real_t areaPCA = real_t{0.5} * std::abs((c.x - point.x) * (a.y - point.y) - (a.x - point.x) * (c.y - point.y));
+    const real_t areaPAB = real_t{0.5} * std::abs((a.x - point.x) * (b.y - point.y) - (b.x - point.x) * (a.y - point.y));
+    return approximatelyEqual(areaABC, areaPBC + areaPCA + areaPAB);
 }
 
 bool isPointInsideRectangle(const Vector2D& point, const Rectangle2D& rectangle)
 {
-    return rectangle.contains(point);
+    const auto& a = rectangle.a();
+    const auto& b = rectangle.b();
+    const auto& c = rectangle.c();
+    const auto& d = rectangle.d();
+
+    return (b - a).cross(point - a) >= 0 &&
+           (c - b).cross(point - b) >= 0 &&
+           (d - c).cross(point - c) >= 0 &&
+           (a - d).cross(point - d) >= 0;
 }
 
 //Todo: Consider the O(log n) method
@@ -122,12 +137,12 @@ bool isPointInsideConvexPolygon(const Vector2D& point, const ConvexPolygon2D& po
 
 bool isPointInsidePolygon(const Vector2D& point, const Polygon2D& polygon)
 {
-    return polygon.contains(point);
+    return isPointInsidePolygon(point, polygon.vertices());
 }
 
 bool isPointInsideCircle(const Vector2D& point, const Circle2D& circle)
 {
-    return circle.contains(point);
+    return (point - circle.m_center).lengthSquared() <= circle.m_radius * circle.m_radius;
 }
 
 bool isPointInShape(const Vector2D& point, const IBaseShape2D& shape)
@@ -329,7 +344,11 @@ bool isPolygonInsideCircle(const std::span<const Vector2D> poly, const Circle2D&
 
 bool isCircleInsideCircle(const Circle2D& circle1, const Circle2D& circle2)
 {
-    return circle1.contains(circle2);
+    if (circle1.m_radius > circle2.m_radius)
+        return false;
+
+    const real_t radiusDelta = circle2.m_radius - circle1.m_radius;
+    return (circle2.m_center - circle1.m_center).lengthSquared() <= radiusDelta * radiusDelta;
 }
 
 bool isShapeInsideCircle(const IFiniteShape2D& shape, const Circle2D& circle)
