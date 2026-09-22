@@ -1,7 +1,9 @@
 add_library(Geomath INTERFACE)
 
 target_sources(Geomath INTERFACE
-    Shapes/2D/Algorithms2D/Algorithms2D.cpp
+    Shapes/2D/Algorithms2D/Containment2D.cpp
+    Shapes/2D/Algorithms2D/Distance2D.cpp
+    Shapes/2D/Algorithms2D/Intersection2D.cpp
     Shapes/2D/Structures/Spatial/RTree.cpp
     Shapes/2D/Algorithms2D/Triangulation/Detail/DelaunayTriangulation.cpp
     Shapes/3D/Algorithms3D/Algorithms3D.cpp
