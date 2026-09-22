@@ -29,10 +29,11 @@
 */
 
 //2D
-#include "Shapes/2D/Algorithms2D/Algorithms2D.cpp"
-
-#include "Shapes/2D/Structures/Spatial/RTree.cpp"
+#include "Shapes/2D/Algorithms2D/Containment2D.cpp"
+#include "Shapes/2D/Algorithms2D/Distance2D.cpp"
+#include "Shapes/2D/Algorithms2D/Intersection2D.cpp"
 #include "Shapes/2D/Algorithms2D/Triangulation/Detail/DelaunayTriangulation.cpp"
+#include "Shapes/2D/Structures/Spatial/RTree.cpp"
 
 //3D
 #include "Shapes/3D/Algorithms3D/Algorithms3D.cpp"

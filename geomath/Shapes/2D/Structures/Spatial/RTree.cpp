@@ -369,7 +369,7 @@ void RTree2D::query_ray(const Ray2D& ray, real_t t_min, real_t t_max,
 
     real_t rootEnter;
     real_t rootExit;
-    if (!rayBoundsInterval(ray, _rootBounds, t_min, t_max, rootEnter, rootExit))
+    if (!detail::rayBoundsInterval(ray, _rootBounds, t_min, t_max, rootEnter, rootExit))
         return;
 
     RTreeRayQueue candidates;
@@ -407,7 +407,7 @@ void RTree2D::query_ray(const Ray2D& ray, real_t t_min, real_t t_max,
         {
             real_t childEnter;
             real_t childExit;
-            if (rayBoundsInterval(ray, entry.bounds, t_min, t_max, childEnter, childExit))
+            if (detail::rayBoundsInterval(ray, entry.bounds, t_min, t_max, childEnter, childExit))
                 candidates.push({ childEnter, entry.idx, ShapeID::invalid(), true, sequence++ });
         }
     }

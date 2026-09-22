@@ -287,7 +287,7 @@ bool isCircleInsidePolygon(const Circle2D& circle, const std::span<const Vector2
         const Vector2D& v1 = poly[i];
         const Vector2D& v2 = poly[(i + 1) % n];
 
-        real_t dist = distancePointToSegment(circle.m_center, v1, v2);
+        real_t dist = detail::distancePointToSegment(circle.m_center, v1, v2);
         if (dist < circle.m_radius)
         {
             return false;

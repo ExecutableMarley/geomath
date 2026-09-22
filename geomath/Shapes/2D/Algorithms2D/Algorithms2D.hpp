@@ -100,11 +100,16 @@ bool isShapeInsideShape(const IFiniteShape2D& shape1, const IFiniteShape2D& shap
 
 // Distance calculation algorithms
 
-real_t distancePointToSegment(const Vector2D& point, const Vector2D& segmentStart, const Vector2D& segmentEnd, Vector2D* closestPoint = nullptr);
+namespace detail
+{
 
-real_t distanceSegmentToSegment(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
+real_t distancePointToSegment(const Vector2D& point, const Vector2D& segmentStart, const Vector2D& segmentEnd, 
+    Vector2D* closestPoint = nullptr);
 
-//Todo: Distance to shapes
+real_t distanceSegmentToSegment(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2, 
+    Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
+
+}
 
 real_t distance(const Vector2D& point, const Segment2D& segment, Vector2D* closestPoint = nullptr);
 
@@ -140,11 +145,18 @@ real_t distance(const Circle2D& circle1, const Circle2D& circle2, Vector2D* clos
 
 //    --- Rays ---
 
-bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2D& p2, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
+namespace detail
+{
+
+bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2D& p2, 
+    real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
+
+bool rayBoundsInterval(const Ray2D& ray, const BBox2D& bbox, 
+    real_t t_min, real_t t_max, real_t& t_enter, real_t& t_exit);
+
+}
 
 bool intersect(const Ray2D& ray, const Segment2D& segment, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
-
-bool rayBoundsInterval(const Ray2D& ray, const BBox2D& bbox, real_t t_min, real_t t_max, real_t& t_enter, real_t& t_exit);
 
 bool intersect(const Ray2D& ray, const BBox2D& bbox, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
 

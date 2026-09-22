@@ -25,6 +25,10 @@ namespace Arns::geomath
 
 //    --- Rays ---
 
+
+namespace detail
+{
+
 // Internal Helper
 bool intersectParams(const Vector2D& p, const Vector2D& r, const Vector2D& q, const Vector2D& s, 
     real_t& t, real_t& u)
@@ -61,11 +65,6 @@ bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2
     return true;
 }
 
-bool intersect(const Ray2D& ray, const Segment2D& segment, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
-{
-    return intersectRayWithSegment(ray, segment.m_start, segment.m_end, t_min, t_max, hitInfo);
-}
-
 bool rayBoundsInterval(const Ray2D& ray, const BBox2D& bbox, real_t t_min, real_t t_max, real_t& t_enter, real_t& t_exit)
 {
     t_enter = t_min;
@@ -97,11 +96,92 @@ bool rayBoundsInterval(const Ray2D& ray, const BBox2D& bbox, real_t t_min, real_
     return true;
 }
 
+// --- Misc Helper ---
+
+inline void projectPointSetOntoAxis(std::span<const Vector2D> pts, const Vector2D& axis,
+                                    real_t& outMin, real_t& outMax)
+{
+    outMin = std::numeric_limits<real_t>::max();
+    outMax = std::numeric_limits<real_t>::lowest();
+
+    for (const auto& p : pts)
+    {
+        real_t v = p.dot(axis);
+        if (v < outMin) outMin = v;
+        if (v > outMax) outMax = v;
+    }
+}
+
+inline void projectBBoxOntoAxis(const BBox2D& bbox, const Vector2D& axis,
+                                real_t& outMin, real_t& outMax)
+{
+    Vector2D center  = (bbox.m_min + bbox.m_max) * 0.5f;
+    Vector2D extents = (bbox.m_max - bbox.m_min) * 0.5f;
+
+    // The "radius" of the box projection
+    real_t radius = std::abs(extents.x * axis.x) + std::abs(extents.y * axis.y);
+    real_t centerProj = center.dot(axis);
+
+    outMin = centerProj - radius;
+    outMax = centerProj + radius;
+    //return { centerProj - radius, centerProj + radius }
+}
+
+// Generic SAT-based intersection for a convex polygon with a BBox
+inline bool intersectBBoxWithConvexShape(const BBox2D& bbox, std::span<const Vector2D> verts)
+{
+    if (verts.size() < 3) return false; // degenerate
+
+    real_t vMinX = verts[0].x, vMaxX = verts[0].x;
+    real_t vMinY = verts[0].y, vMaxY = verts[0].y;
+
+    for (size_t i = 1; i < verts.size(); ++i)
+    {
+        if (verts[i].x < vMinX) vMinX = verts[i].x;
+        if (verts[i].x > vMaxX) vMaxX = verts[i].x;
+        if (verts[i].y < vMinY) vMinY = verts[i].y;
+        if (verts[i].y > vMaxY) vMaxY = verts[i].y;
+    }
+
+    if (vMaxX < bbox.m_min.x || vMinX > bbox.m_max.x) return false;
+    if (vMaxY < bbox.m_min.y || vMinY > bbox.m_max.y) return false;
+
+    real_t bmin, bmax, tmin, tmax;
+
+    for (size_t i = 0; i < verts.size(); ++i)
+    {
+        // Get the edge between current and next vertex (wrapping around)
+        const Vector2D& p1 = verts[i];
+        const Vector2D& p2 = verts[(i + 1) % verts.size()];
+        
+        Vector2D edge = p2 - p1;
+        Vector2D axis = edge.createPerpendicular();
+
+        // Skip degenerate edges (nearly identical vertices)
+        if (axis.isZero()) continue;
+
+        projectBBoxOntoAxis    (bbox , axis, bmin, bmax);
+        projectPointSetOntoAxis(verts, axis, tmin, tmax);
+
+        if (!intervalsOverlap(bmin, bmax, tmin, tmax))
+            return false;
+    }
+
+    return true; // No separating axis found
+}
+
+}
+
+bool intersect(const Ray2D& ray, const Segment2D& segment, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+{
+    return detail::intersectRayWithSegment(ray, segment.m_start, segment.m_end, t_min, t_max, hitInfo);
+}
+
 bool intersect(const Ray2D& ray, const BBox2D& bbox, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     real_t t_enter;
     real_t t_exit;
-    if (!rayBoundsInterval(ray, bbox, t_min, t_max, t_enter, t_exit))
+    if (!detail::rayBoundsInterval(ray, bbox, t_min, t_max, t_enter, t_exit))
         return false;
 
     if (hitInfo)
@@ -122,7 +202,7 @@ bool intersectRayWithPolygonOptimized(const Ray2D& ray, const IPolygonalShape2D&
         const Vector2D& p1 = polygon[i];
         const Vector2D& p2 = polygon[(i + 1) % polygon.vertexCount()];
 
-        if (intersectRayWithSegment(ray, p1, p2, t_min, t_max, NULL))
+        if (detail::intersectRayWithSegment(ray, p1, p2, t_min, t_max, NULL))
         {
             return true;
         }
@@ -143,7 +223,7 @@ bool intersect(const Ray2D& ray, const IPolygonalShape2D& polygon, real_t t_min,
         const Vector2D& p1 = polygon[i];
         const Vector2D& p2 = polygon[(i + 1) % polygon.vertexCount()];
 
-        if (intersectRayWithSegment(ray, p1, p2, t_min, t, hitInfo))
+        if (detail::intersectRayWithSegment(ray, p1, p2, t_min, t, hitInfo))
         {
             hit = true;
             t = hitInfo->t;
@@ -201,18 +281,18 @@ bool intersect(const Ray2D& ray, const IBaseShape2D& shape, real_t t_min, real_t
 
 bool intersectSegmentWithSegment(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo)
 {
-    return intersectRayWithSegment(Ray2D(p1, p2 - p1), q1, q2, 0.f, 1.f, hitInfo);
+    return detail::intersectRayWithSegment(Ray2D(p1, p2 - p1), q1, q2, 0.f, 1.f, hitInfo);
 }
 
 bool intersect(const Segment2D& segment1, const Segment2D& segment2, HitInfo2D* hitInfo)
 {
-    return intersectRayWithSegment(Ray2D(segment1.m_start, segment1.deltaVector()), segment2.m_start, segment2.m_end, 0.f, 1.f, hitInfo);
+    return detail::intersectRayWithSegment(Ray2D(segment1.m_start, segment1.deltaVector()), segment2.m_start, segment2.m_end, 0.f, 1.f, hitInfo);
 }
 
 bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo)
 {
     real_t t, u;
-    if (!intersectParams(p1, p2 - p1, q1, q2 - q1, t, u))
+    if (!detail::intersectParams(p1, p2 - p1, q1, q2 - q1, t, u))
         return false;
 
     if (!approximatelyGreater(t, real_t{0}) || !approximatelyLess(t, real_t{1}) ||
@@ -256,36 +336,6 @@ bool intersect(const Segment2D& segment, const IBaseShape2D& shape, HitInfo2D* h
     return intersect(Ray2D(segment.m_start, segment.direction()), shape, 0.0f, segment.length(), hitInfo);
 }
 
-// --- Misc Helper ---
-
-inline void projectPointSetOntoAxis(std::span<const Vector2D> pts, const Vector2D& axis,
-                                    real_t& outMin, real_t& outMax)
-{
-    outMin = std::numeric_limits<real_t>::max();
-    outMax = std::numeric_limits<real_t>::lowest();
-
-    for (const auto& p : pts)
-    {
-        real_t v = p.dot(axis);
-        if (v < outMin) outMin = v;
-        if (v > outMax) outMax = v;
-    }
-}
-
-inline void projectBBoxOntoAxis(const BBox2D& bbox, const Vector2D& axis,
-                                real_t& outMin, real_t& outMax)
-{
-    Vector2D center  = (bbox.m_min + bbox.m_max) * 0.5f;
-    Vector2D extents = (bbox.m_max - bbox.m_min) * 0.5f;
-
-    // The "radius" of the box projection
-    real_t radius = std::abs(extents.x * axis.x) + std::abs(extents.y * axis.y);
-    real_t centerProj = center.dot(axis);
-
-    outMin = centerProj - radius;
-    outMax = centerProj + radius;
-    //return { centerProj - radius, centerProj + radius }
-}
 
 // --- Bounding Box ---
 
@@ -306,55 +356,13 @@ bool intersect(const BBox2D& b1, const BBox2D& b2)
 #endif
 }
 
-// Generic SAT-based intersection for a convex polygon with a BBox
-inline bool intersectBBoxWithConvexShape(const BBox2D& bbox, std::span<const Vector2D> verts)
-{
-    if (verts.size() < 3) return false; // degenerate
-
-    real_t vMinX = verts[0].x, vMaxX = verts[0].x;
-    real_t vMinY = verts[0].y, vMaxY = verts[0].y;
-
-    for (size_t i = 1; i < verts.size(); ++i)
-    {
-        if (verts[i].x < vMinX) vMinX = verts[i].x;
-        if (verts[i].x > vMaxX) vMaxX = verts[i].x;
-        if (verts[i].y < vMinY) vMinY = verts[i].y;
-        if (verts[i].y > vMaxY) vMaxY = verts[i].y;
-    }
-
-    if (vMaxX < bbox.m_min.x || vMinX > bbox.m_max.x) return false;
-    if (vMaxY < bbox.m_min.y || vMinY > bbox.m_max.y) return false;
-
-    real_t bmin, bmax, tmin, tmax;
-
-    for (size_t i = 0; i < verts.size(); ++i)
-    {
-        // Get the edge between current and next vertex (wrapping around)
-        const Vector2D& p1 = verts[i];
-        const Vector2D& p2 = verts[(i + 1) % verts.size()];
-        
-        Vector2D edge = p2 - p1;
-        Vector2D axis = edge.createPerpendicular();
-
-        // Skip degenerate edges (nearly identical vertices)
-        if (axis.isZero()) continue;
-
-        projectBBoxOntoAxis    (bbox , axis, bmin, bmax);
-        projectPointSetOntoAxis(verts, axis, tmin, tmax);
-
-        if (!intervalsOverlap(bmin, bmax, tmin, tmax))
-            return false;
-    }
-
-    return true; // No separating axis found
-}
 
 bool intersect(const BBox2D& bbox, const IPolygonalShape2D& polygon)
 {
     if (isConvexPolygonal(polygon.type()))
     {
         const ConvexPolygon2D* convex = static_cast<const ConvexPolygon2D*>(&polygon);
-        return intersectBBoxWithConvexShape(bbox, polygon.vertices());
+        return detail::intersectBBoxWithConvexShape(bbox, polygon.vertices());
     }
     
     Vector2D box[4] =
@@ -428,8 +436,8 @@ bool intersectConvexPolygonWithConvexPolygon(const std::span<const Vector2D> v1,
         if (axis.isZero())
             continue;
 
-        projectPointSetOntoAxis(v1, axis, min1, max1);
-        projectPointSetOntoAxis(v2, axis, min2, max2);
+        detail::projectPointSetOntoAxis(v1, axis, min1, max1);
+        detail::projectPointSetOntoAxis(v2, axis, min2, max2);
 
         if (!intervalsOverlap(min1, max1, min2, max2))
             return false; // separating axis found
@@ -448,8 +456,8 @@ bool intersectConvexPolygonWithConvexPolygon(const std::span<const Vector2D> v1,
         if (axis.isZero())
             continue;
 
-        projectPointSetOntoAxis(v1, axis, min1, max1);
-        projectPointSetOntoAxis(v2, axis, min2, max2);
+        detail::projectPointSetOntoAxis(v1, axis, min1, max1);
+        detail::projectPointSetOntoAxis(v2, axis, min2, max2);
 
         if (!intervalsOverlap(min1, max1, min2, max2))
             return false;
@@ -512,7 +520,7 @@ bool intersectPolygonWithCircle(const std::span<const Vector2D> poly, const Circ
         const Vector2D& a = poly[i];
         const Vector2D& b = poly[(i + 1) % poly.size()];
 
-        if (distancePointToSegment(circle.m_center, a, b) <= r)
+        if (detail::distancePointToSegment(circle.m_center, a, b) <= r)
             return true;
     }
     return false;
@@ -543,7 +551,7 @@ bool intersect(const IPolygonalShape2D& polygon, const Circle2D& circle)
         const Vector2D& a = polygon[i];
         const Vector2D& b = polygon[(i + 1) % n];
 
-        if (distancePointToSegment(circle.m_center, a, b) <= r)
+        if (detail::distancePointToSegment(circle.m_center, a, b) <= r)
             return true;
     }
     return false;

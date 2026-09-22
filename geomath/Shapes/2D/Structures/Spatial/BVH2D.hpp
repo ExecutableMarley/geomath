@@ -181,7 +181,7 @@ private:
 
 	struct CandidateCompare
 	{
-		bool operator()(const Candidate& left, const Candidate& right) const
+		bool operator()(const Candidate& left, const Candidate& right) const noexcept
 		{
 			return left.priority > right.priority;
 		}
@@ -243,7 +243,7 @@ private:
 			return;
 		real_t enter;
 		real_t exit;
-		if (rayBoundsInterval(ray, _nodes[nodeIndex].bounds, t_min, t_max, enter, exit))
+		if (detail::rayBoundsInterval(ray, _nodes[nodeIndex].bounds, t_min, t_max, enter, exit))
 			queue.push({ enter, false, nodeIndex });
 	}
 
