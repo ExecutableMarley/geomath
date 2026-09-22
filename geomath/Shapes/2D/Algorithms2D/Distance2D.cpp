@@ -25,6 +25,23 @@ namespace Arns::geomath
 namespace detail
 {
 
+real_t distancePointToSegment(const Vector2D& point, const Vector2D& segmentStart, const Vector2D& segmentEnd, Vector2D* closestPoint)
+{
+    const Vector2D r = segmentEnd - segmentStart;
+    const Vector2D s = point - segmentStart;
+    const real_t rDotR = r.dot(r);
+    if (rDotR == 0.0f)
+    {
+        if (closestPoint) *closestPoint = segmentStart;
+        return (point - segmentStart).length();
+    }
+    real_t t = std::clamp(s.dot(r) / rDotR, real_t{0}, real_t{1});
+    const Vector2D projection = segmentStart + r * t;
+    if (closestPoint)
+        *closestPoint = projection;
+    return (point - projection).length();
+}
+
 real_t distanceSegmentToSegment(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2, 
     Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
@@ -33,14 +50,18 @@ real_t distanceSegmentToSegment(const Vector2D& s1, const Vector2D& s2, const Ve
     real_t lengthSquared1 = delta1.lengthSquared();
     real_t lengthSquared2 = delta2.lengthSquared();
 
-    if (lengthSquared1 == 0 || lengthSquared2 == 0)
+    if (lengthSquared1 == 0)
     {
         if (closestPoint1)
             *closestPoint1 = s1;
+        return distancePointToSegment(s1, k1, k2, closestPoint2);
+    }
+
+    if (lengthSquared2 == 0)
+    {
         if (closestPoint2)
             *closestPoint2 = k1;
-        //Todo: this is not correct if only one segment is degenerate
-        return (s1 - k1).length();
+        return distancePointToSegment(k1, s1, s2, closestPoint1);
     }
 
     const Vector2D startDelta = s1 - k1;
@@ -66,23 +87,6 @@ real_t distanceSegmentToSegment(const Vector2D& s1, const Vector2D& s2, const Ve
         *closestPoint2 = closestPointOnLine2;
     
     return (closestPointOnLine1 - closestPointOnLine2).length();
-}
-
-real_t distancePointToSegment(const Vector2D& point, const Vector2D& segmentStart, const Vector2D& segmentEnd, Vector2D* closestPoint)
-{
-    const Vector2D r = segmentEnd - segmentStart;
-    const Vector2D s = point - segmentStart;
-    const real_t rDotR = r.dot(r);
-    if (rDotR == 0.0f)
-    {
-        if (closestPoint) *closestPoint = segmentStart;
-        return (point - segmentStart).length();
-    }
-    real_t t = std::clamp(s.dot(r) / rDotR, real_t{0}, real_t{1});
-    const Vector2D projection = segmentStart + r * t;
-    if (closestPoint)
-        *closestPoint = projection;
-    return (point - projection).length();
 }
 
 real_t distancePointToPolygonEdges(const Vector2D& point, const std::span<const Vector2D> polygon, Vector2D* closestPoint)

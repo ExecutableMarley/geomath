@@ -82,6 +82,13 @@ TEST_CASE("distance segment-segment")
     Segment2D c(Vector2D(0.5, -1), Vector2D(0.5, 1));
     real_t d0 = distance(a, c, &c1, &c2);
         CHECK(doctest::Approx(d0) == real_t{0});
+
+    Segment2D point(Vector2D(0, 0), Vector2D(0, 0));
+    Segment2D other(Vector2D(-1, 1), Vector2D(1, 1));
+    real_t dDegenerate = distance(point, other, &c1, &c2);
+    CHECK(doctest::Approx(dDegenerate) == real_t{1});
+    CHECK(c1 == Vector2D(0, 0));
+    CHECK(c2 == Vector2D(0, 1));
 }
 
 TEST_CASE("distance segment-bbox")
