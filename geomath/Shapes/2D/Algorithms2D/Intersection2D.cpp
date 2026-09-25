@@ -530,7 +530,7 @@ bool intersectPolygonWithCircle(const std::span<const Vector2D> poly, const Circ
 
 bool intersect(const IPolygonalShape2D& polygon1, const IPolygonalShape2D& polygon2)
 {
-    if (isPolygonalShape(polygon1.type()) && isPolygonalShape(polygon2.type()))
+    if (isConvexPolygonal(polygon1.type()) && isConvexPolygonal(polygon2.type()))
         return intersectConvexPolygonWithConvexPolygon(polygon1.vertices(), polygon2.vertices());
 
     return intersectPolygonWithPolygon(polygon1.vertices(), polygon2.vertices());

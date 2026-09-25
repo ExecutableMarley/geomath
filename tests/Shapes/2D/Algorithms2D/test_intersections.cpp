@@ -288,6 +288,20 @@ TEST_CASE("IPolygonalShape2D intersection")
     CHECK(intersect(t1, t3) == false);
 }
 
+TEST_CASE("Concave polygon intersection respects its notch")
+{
+    Polygon2D uShape({
+        Vector2D(0, 0), Vector2D(4, 0), Vector2D(4, 4), Vector2D(3, 4),
+        Vector2D(3, 1), Vector2D(1, 1), Vector2D(1, 4), Vector2D(0, 4)
+    });
+    Polygon2D polygonInNotch({
+        Vector2D(real_t{1.5}, 2), Vector2D(real_t{2.5}, 2),
+        Vector2D(real_t{2.5}, 3), Vector2D(real_t{1.5}, 3)
+    });
+
+    CHECK(intersect(uShape, polygonInNotch) == false);
+}
+
 TEST_CASE("Degenerate triangle (collinear)")
 {
     Triangle2D t(Vector2D(0, 0), Vector2D(1, 1), Vector2D(2, 2)); // line
