@@ -58,12 +58,17 @@ public:
 
     real_t perimeter() const
     {
-        return 2.0f * (width() + height());
+        return 2 * (width() + height());
     }
 
     Vector2D centroid() const
     {
-        return (m_min + m_max) * 0.5f;
+        return (m_min + m_max) * real_t{0.5};
+    }
+
+    Vector2D halfExtents() const
+    {
+        return (m_max - m_min) * real_t{0.5};
     }
 
     Vector2D bottomLeft() const
