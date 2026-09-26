@@ -542,6 +542,31 @@ real_t distance(const Circle2D& circle1, const Circle2D& circle2, Vector2D* clos
     return dist - circle1.m_radius - circle2.m_radius;
 }
 
+real_t distance(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    const Circle2D* circle1 = shape_cast<Circle2D>(&shape1);
+    const Circle2D* circle2 = shape_cast<Circle2D>(&shape2);
+    const IPolygonalShape2D* polygon1 = shape1.polygonal();
+    const IPolygonalShape2D* polygon2 = shape2.polygonal();
+
+    if (circle1 && circle2)
+        return distance(*circle1, *circle2, closestPoint1, closestPoint2);
+
+    if (polygon1 && polygon2)
+        return distance(*polygon1, *polygon2, closestPoint1, closestPoint2);
+
+    if (polygon1 && circle2)
+        return distance(*polygon1, *circle2, closestPoint1, closestPoint2);
+
+    if (circle1 && polygon2)
+    {
+        return distance(*polygon2, *circle1, closestPoint2, closestPoint1);
+    }
+
+    //Todo: Consider behaviour
+    return std::numeric_limits<real_t>::max();
+}
+
 
     
 }
