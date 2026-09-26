@@ -186,6 +186,31 @@ inline bool approximatelyLess(long double a, long double b,
     return a < b;
 }
 
+template <typename T>
+inline T approximatelyGreaterEqual(T a, T b,
+                                    T absEpsilon = RealTraits<T>::absEpsilon,
+                                    T relEpsilon = RealTraits<T>::relEpsilon)
+{
+    return approximatelyGreater(a, b, absEpsilon, relEpsilon) || approximatelyEqual(a, b, absEpsilon, relEpsilon);
+}
+
+template <typename T>
+inline T approximatelyLessEqual(T a, T b,
+                                 T absEpsilon = RealTraits<T>::absEpsilon,
+                                 T relEpsilon = RealTraits<T>::relEpsilon)
+{
+    return approximatelyLess(a, b, absEpsilon, relEpsilon) || approximatelyEqual(a, b, absEpsilon, relEpsilon);
+}
+
+template <typename T>
+inline T approximatelyBetween(T value, T minVal, T maxVal,
+                                 T absEpsilon = RealTraits<T>::absEpsilon,
+                                 T relEpsilon = RealTraits<T>::relEpsilon)
+{
+    return approximatelyGreaterEqual(value, minVal, absEpsilon, relEpsilon) &&
+           approximatelyLessEqual(value, maxVal, absEpsilon, relEpsilon);
+}
+
 inline bool approximatelyZeroAbs(float value, float absEpsilon = RealTraits<float>::absEpsilon)
 {
     return fabs(value) < absEpsilon;
