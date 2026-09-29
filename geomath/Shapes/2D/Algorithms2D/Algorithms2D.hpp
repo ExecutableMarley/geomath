@@ -40,6 +40,14 @@ struct HitInfo2D
     //IShape2D* shape;
 };
 
+struct SweepResult
+{
+    bool hit = false;
+    real_t toi = 1.0;
+    Vector2D normal{};
+    Vector2D point{};
+};
+
 
 //
 
@@ -111,6 +119,8 @@ real_t distanceSegmentToSegment(const Vector2D& s1, const Vector2D& s2, const Ve
 
 }
 
+//GJK dist?
+
 real_t distance(const Vector2D& point, const Segment2D& segment, Vector2D* closestPoint = nullptr);
 
 real_t distance(const Vector2D& point, const BBox2D& bbox, Vector2D* closestPoint = nullptr);
@@ -140,6 +150,8 @@ real_t distance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, 
 real_t distance(const IPolygonalShape2D& poly1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
 
 real_t distance(const Circle2D& circle1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distance(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 
 // Intersection calculation algorithms
 
@@ -205,10 +217,34 @@ bool intersect(const Circle2D& circle1, const Circle2D& circle2);
 bool intersect(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2);
 
 //================================
-//
+// CCD (sweep)
 //================================
 
+/*
+SweepResult sweepConservativeAdvancement(
+    const BBox2D& a, Vector2D velocityA,
+    const BBox2D& b, Vector2D velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15,
+    real_t epsilon = real_t(1e-4));
 
+SweepResult sweepConservativeAdvancement(
+    const BBox2D& a, Vector2D velocityA,
+    const IFiniteShape2D& b, Vector2D velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15,
+    real_t epsilon = real_t(1e-4));
+
+SweepResult sweepConservativeAdvancement(
+    const IFiniteShape2D& a, Vector2D velocityA,
+    const BBox2D& b, Vector2D velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15,
+    real_t epsilon = real_t(1e-4));
+*/
+
+SweepResult sweepConservativeAdvancement(
+    const IFiniteShape2D& a, Vector2D velocityA,
+    const IFiniteShape2D& b, Vector2D velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15,
+    real_t epsilon = real_t(1e-4));
 
 
 } // namespace Math
