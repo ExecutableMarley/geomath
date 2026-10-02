@@ -568,49 +568,24 @@ bool intersect(const Circle2D& circle1, const Circle2D& circle2)
 
 bool intersect(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2)
 {
-    ShapeType2D type1 = shape1.type();
-    ShapeType2D type2 = shape2.type();
+    const Circle2D* circle1 = shape_cast<Circle2D>(&shape1);
+    const Circle2D* circle2 = shape_cast<Circle2D>(&shape2);
+    const IPolygonalShape2D* polygon1 = shape1.polygonal();
+    const IPolygonalShape2D* polygon2 = shape2.polygonal();
 
-    if (type1 > type2)
-        return intersect(shape2, shape1);
+    if (circle1 && circle2)
+        return intersect(*circle1, *circle2);
 
-    if (isConvexPolygonal(type1))
-    {
-        const IPolygonalShape2D* s1 = shape1.polygonal();
-        if (isConvexPolygonal(type2))
-        {
-            const IPolygonalShape2D* s2 = shape2.polygonal();
-            return intersectConvexPolygonWithConvexPolygon(s1->vertices(), s2->vertices());
-        }
-        if (type2 == ShapeType2D::SHAPE2D_CIRCLE)
-        {
-            const Circle2D* s2 = shape2.shape_cast<Circle2D>();
-            return intersectPolygonWithCircle(s1->vertices(), *s2);
-        }
-    }
-    if (isPolygonalShape(type1))
-    {
-        const IPolygonalShape2D* s1 = shape1.polygonal();
-        if (isPolygonalShape(type2))
-        {
-            const IPolygonalShape2D* s2 = shape2.polygonal();
-            return intersectPolygonWithPolygon(s1->vertices(), s2->vertices());
-        }
-        if (type2 == ShapeType2D::SHAPE2D_CIRCLE)
-        {
-            const Circle2D* s2 = shape2.shape_cast<Circle2D>();
-            return intersectPolygonWithCircle(shape1.polygonal()->vertices(), *shape2.shape_cast<Circle2D>());
-        }
-    }
-    else if (type1 == ShapeType2D::SHAPE2D_CIRCLE)
-    {
-        const Circle2D* s1 = shape1.shape_cast<Circle2D>();
-        if (type2 == ShapeType2D::SHAPE2D_CIRCLE)
-        {
-            const Circle2D* s2 = shape2.shape_cast<Circle2D>();
-            return intersect(*s1, *s2);
-        }
-    }
+    if (polygon1 && polygon2)
+        return intersect(*polygon1, *polygon2);
+
+    if (polygon1 && circle2)
+        return intersect(*polygon1, *circle2);
+
+    if (circle1 && polygon2)
+        return intersect(*polygon2, *circle1);
+
+    //Todo: Consider behaviour
     return false;
 }
     
