@@ -70,25 +70,51 @@ TEST_CASE("distance point-polygon and point-circle")
 
 TEST_CASE("distance segment-segment")
 {
-    Segment2D a(Vector2D(0, 0), Vector2D(1, 0));
-    Segment2D b(Vector2D(0, 1), Vector2D(1, 1));
     Vector2D c1, c2;
 
-    real_t d = distance(a, b, &c1, &c2);
-    CHECK(doctest::Approx(d) == real_t{1.0});
-    CHECK(c1 == Vector2D(0, 0));
-    CHECK(c2 == Vector2D(0, 1));
+    SUBCASE("parallel segments")
+    {
+        Segment2D a(Vector2D(0, 0), Vector2D(1, 0));
+        Segment2D b(Vector2D(0, 1), Vector2D(1, 1));
 
-    Segment2D c(Vector2D(0.5, -1), Vector2D(0.5, 1));
-    real_t d0 = distance(a, c, &c1, &c2);
-        CHECK(doctest::Approx(d0) == real_t{0});
+        real_t d = distance(a, b, &c1, &c2);
+        CHECK(doctest::Approx(d) == real_t{1.0});
+        CHECK(c1 == Vector2D(0, 0));
+        CHECK(c2 == Vector2D(0, 1));
+    }
 
-    Segment2D point(Vector2D(0, 0), Vector2D(0, 0));
-    Segment2D other(Vector2D(-1, 1), Vector2D(1, 1));
-    real_t dDegenerate = distance(point, other, &c1, &c2);
-    CHECK(doctest::Approx(dDegenerate) == real_t{1});
-    CHECK(c1 == Vector2D(0, 0));
-    CHECK(c2 == Vector2D(0, 1));
+    SUBCASE("intersecting segments")
+    {
+        Segment2D a(Vector2D(0, 0), Vector2D(1, 0));
+        Segment2D c(Vector2D(0.5, -1), Vector2D(0.5, 1));
+
+        real_t d0 = distance(a, c, &c1, &c2);
+        CHECK(doctest::Approx(d0) == real_t{0.0});
+    }
+
+    SUBCASE("degenerate point segment")
+    {
+        Segment2D point(Vector2D(0, 0), Vector2D(0, 0));
+        Segment2D other(Vector2D(-1, 1), Vector2D(1, 1));
+
+        real_t dDegenerate = distance(point, other, &c1, &c2);
+        CHECK(doctest::Approx(dDegenerate) == real_t{1.0});
+        CHECK(c1 == Vector2D(0, 0));
+        CHECK(c2 == Vector2D(0, 1));
+    }
+
+    SUBCASE("skewed line intersection outside segment bounds")
+    {
+        Segment2D a(Vector2D(0, 1), Vector2D(2, 3));
+        Segment2D b(Vector2D(0, 0), Vector2D(1, -1));
+
+        real_t d = distance(a, b, &c1, &c2);
+
+        // Expected closest point on A is (0, 1) and on B is (0, 0)
+        CHECK(c1 == Vector2D(0, 1));
+        CHECK(c2 == Vector2D(0, 0));
+        CHECK(doctest::Approx(d) == real_t{1.0});
+    }
 }
 
 TEST_CASE("distance segment-bbox")
@@ -114,7 +140,9 @@ TEST_CASE("distance segment-polygon and segment-circle")
     Vector2D c1, c2;
 
     real_t d = distance(seg, tri, &c1, &c2);
-    CHECK(doctest::Approx(d) == std::sqrt(real_t{10}));
+    CHECK(doctest::Approx(d) == std::sqrt(real_t{8}));
+    CHECK(c1 == Vector2D(3, 3));
+    CHECK(c2 == Vector2D(1, 1));
 
     Circle2D circle(Vector2D(0, 0), real_t{1});
     Segment2D seg2(Vector2D(2, 0), Vector2D(3, 0));
@@ -127,3 +155,28 @@ TEST_CASE("distance segment-polygon and segment-circle")
 // 
 // ============================================================================
 
+TEST_CASE("Polygon vs Polygon (Triangle vs Rectangle) - Corner to Edge Collision")
+{
+    // Right triangle pointing its tip toward the right
+    Triangle2D tri(
+        Vector2D(0, -1),
+        Vector2D(1, 0), // Tip at (1,0)
+        Vector2D(0, 1));
+
+    // Vertical wall rectangle at X = 3
+    Rectangle2D wall(
+        Vector2D(3, -2),
+        Vector2D(4, -2),
+        Vector2D(4, 2),
+        Vector2D(3, 2));
+
+    Vector2D velTri(2.0, 0.0);
+    Vector2D velWall(0.0, 0.0);
+
+    Vector2D bestA, bestB;
+    
+    real_t d = distance(tri, wall, &bestA, &bestB);
+    CHECK(d == doctest::Approx(2.0));
+    CHECK(bestA == Vector2D(1, 0));
+    CHECK(bestB == Vector2D(3, 0));
+}

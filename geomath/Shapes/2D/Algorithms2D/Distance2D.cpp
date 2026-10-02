@@ -42,51 +42,88 @@ real_t distancePointToSegment(const Vector2D& point, const Vector2D& segmentStar
     return (point - projection).length();
 }
 
+// Based on David Eberly's robust segment-segment distance algorithm.
+// References: 
+// - Geometric Tools (https://www.geometrictools.com)
+// - "3D Game Engine Design" by David Eberly
+
 real_t distanceSegmentToSegment(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2, 
     Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
-    const Vector2D delta1 = s2 - s1;
-    const Vector2D delta2 = k2 - k1;
-    real_t lengthSquared1 = delta1.lengthSquared();
-    real_t lengthSquared2 = delta2.lengthSquared();
+    // Delta Vectors
+    const Vector2D d1 = s2 - s1;
+    const Vector2D d2 = k2 - k1;
+    const Vector2D r  = s1 - k1;
 
-    if (lengthSquared1 == 0)
+    // Delta lengths
+    const real_t l1 = d1.lengthSquared();
+    const real_t l2 = d2.lengthSquared();
+    const real_t f = d2.dot(r);
+
+    const bool degen1 = approximatelyZero(l1);
+    const bool degen2 = approximatelyZero(l2);
+
+    real_t s = real_t{0};
+    real_t t = real_t{0};
+
+    if (degen1 && degen2)
     {
-        if (closestPoint1)
-            *closestPoint1 = s1;
-        return distancePointToSegment(s1, k1, k2, closestPoint2);
+        s = real_t{0};
+        t = real_t{0};
+    }
+    else if (degen1)
+    {
+        s = real_t{0};
+        t = clamp(f / l2, real_t{0}, real_t{1});
+    }
+    else
+    {
+        const real_t c = d1.dot(r);
+        if (degen2) 
+        {
+            t = real_t{0};
+            s = clamp(-c / l1, real_t{0}, real_t{1});
+        } 
+        else 
+        {
+            // General non-degenerate case
+            const real_t b = d1.dot(d2);
+            const real_t denom = l1 * l2 - b * b;
+
+            // Compute unconstrained s
+            if (!approximatelyZero(denom)) 
+            {
+                s = clamp((b * f - c * l2) / denom, real_t{0}, real_t{1});
+            } 
+            else
+            {
+                s = real_t{0}; // parallel
+            }
+
+            // Compute optimal t for the chosen s
+            t = (b * s + f) / l2;
+
+            // If t lies outside [0, 1], clamp t and recompute s on that boundary
+            if (approximatelyLess(t, real_t{0})) 
+            {
+                t = real_t{0};
+                s = clamp(-c / l1, real_t{0}, real_t{1});
+            } 
+            else if (approximatelyGreater(t, real_t{1})) 
+            {
+                t = real_t{1};
+                s = clamp((b - c) / l1, real_t{0}, real_t{1});
+            }
+        }
     }
 
-    if (lengthSquared2 == 0)
-    {
-        if (closestPoint2)
-            *closestPoint2 = k1;
-        return distancePointToSegment(k1, s1, s2, closestPoint1);
-    }
+    const Vector2D best1 = s1 + d1 * s;
+    const Vector2D best2 = k1 + d2 * t;
 
-    const Vector2D startDelta = s1 - k1;
-    
-    const real_t a = delta1.dot(startDelta);
-    const real_t b = delta2.dot(startDelta);
-    const real_t c = delta1.dot(delta2);
+    if (closestPoint1) *closestPoint1 = best1;
+    if (closestPoint2) *closestPoint2 = best2;
 
-    const real_t d = lengthSquared1 * lengthSquared2 - c * c;
-
-    real_t t = d != 0 ? (b * c - a * lengthSquared2) / d : real_t{0};
-    real_t u = d != 0 ? (lengthSquared1 * b - c * a) / d : real_t{0};
-
-    t = clamp(t, real_t{0}, real_t{1});
-    u = clamp(u, real_t{0}, real_t{1});
-
-    const Vector2D closestPointOnLine1 = s1 + delta1 * t;
-    const Vector2D closestPointOnLine2 = k1 + delta2 * u;
-
-    if (closestPoint1)
-        *closestPoint1 = closestPointOnLine1;
-    if (closestPoint2)
-        *closestPoint2 = closestPointOnLine2;
-    
-    return (closestPointOnLine1 - closestPointOnLine2).length();
+    return (best1 - best2).length();
 }
 
 real_t distancePointToPolygonEdges(const Vector2D& point, const std::span<const Vector2D> polygon, Vector2D* closestPoint)
@@ -432,7 +469,7 @@ real_t distance(const BBox2D& bbox, const Circle2D& circle, Vector2D* closestPoi
     return dist - r;
 }
 
-real_t distance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t boundaryDistance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     const auto v1 = poly1.vertices();
     const auto v2 = poly2.vertices();
@@ -477,6 +514,51 @@ real_t distance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, 
     if (closestPoint2) *closestPoint2 = bestP2;
 
     return minDist;
+}
+
+real_t distance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    real_t bDist = boundaryDistance(poly1, poly2, closestPoint1, closestPoint2);
+    
+    // Boundary Collision
+    if (bDist == real_t(0)) return real_t(0);
+
+    const auto v1 = poly1.vertices();
+    const auto v2 = poly2.vertices();
+
+    // Test for containment
+    if ((!v1.empty() && poly2.contains(v1[0])) || 
+        (!v2.empty() && poly1.contains(v2[0])))
+    {
+        // When contained, the closest witness points coincide inside the region
+        Vector2D overlapPt = !v1.empty() ? v1[0] : v2[0];
+        if (closestPoint1) *closestPoint1 = overlapPt;
+        if (closestPoint2) *closestPoint2 = overlapPt;
+        return real_t(0);
+    }
+
+    return bDist;
+}
+
+real_t signedDistance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, 
+    Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr)
+{
+    real_t bDist = boundaryDistance(poly1, poly2, closestPoint1, closestPoint2);
+    
+    // Boundary Collision
+    if (bDist == real_t(0)) return real_t(0);
+
+    const auto v1 = poly1.vertices();
+    const auto v2 = poly2.vertices();
+
+    // Test for containment
+    if ((!v1.empty() && poly2.contains(v1[0])) || 
+        (!v2.empty() && poly1.contains(v2[0])))
+    {
+        return -bDist; // Negate to signal penetration
+    }
+
+    return bDist;
 }
 
 real_t distance(const IPolygonalShape2D& poly1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2)
