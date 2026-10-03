@@ -261,13 +261,37 @@ real_t distance(const Vector2D& point, const Circle2D& circle, Vector2D* closest
     return std::abs(dist - circle.m_radius);
 }
 
-real_t distance(const Segment2D& segment, const BBox2D& bbox, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t boundaryDistance(const Segment2D& segment, const BBox2D& bbox, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     return detail::distanceSegmentToEdgeList(segment, bbox.corners(), true, closestPoint1, closestPoint2);
 }
 
+real_t distance(const Segment2D& segment, const BBox2D& bbox, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    if (isPointInsideBBox(segment.m_start, bbox))
+    {
+        if (closestPoint1) *closestPoint1 = segment.m_start;
+        if (closestPoint2) *closestPoint2 = segment.m_start;
+        return real_t{0};
+    }
+
+    return detail::distanceSegmentToEdgeList(segment, bbox.corners(), true, closestPoint1, closestPoint2);
+}
+
+real_t boundaryDistance(const Segment2D& segment, const IPolygonalShape2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    return detail::distanceSegmentToEdgeList(segment, polygon.vertices(), true, closestPoint1, closestPoint2);
+}
+
 real_t distance(const Segment2D& segment, const IPolygonalShape2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
+    if (isPointInsidePolygon(segment.m_start, polygon))
+    {
+        if (closestPoint1) *closestPoint1 = segment.m_start;
+        if (closestPoint2) *closestPoint2 = segment.m_start;
+        return real_t{0};
+    }
+
     return detail::distanceSegmentToEdgeList(segment, polygon.vertices(), true, closestPoint1, closestPoint2);
 }
 
@@ -356,7 +380,7 @@ real_t distance(const BBox2D& a, const BBox2D& b, Vector2D* closestPoint1, Vecto
 
 //real_t distanceCircleToCircle(const Circle2D& circle1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
 
-real_t distance(const BBox2D& bbox1, const IPolygonalShape2D& poly2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t boundaryDistance(const BBox2D& bbox1, const IPolygonalShape2D& poly2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     //Todo: This can (and should) be optimized
 
@@ -401,6 +425,36 @@ real_t distance(const BBox2D& bbox1, const IPolygonalShape2D& poly2, Vector2D* c
     if (closestPoint2) *closestPoint2 = bestP2;
 
     return minDist;
+}
+
+real_t distance(const BBox2D& bbox1, const IPolygonalShape2D& poly2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    const real_t bDist = boundaryDistance(bbox1, poly2, closestPoint1, closestPoint2);
+    if (bDist == real_t{0})
+        return real_t{0};
+
+    const auto vertices = poly2.vertices();
+    for (const Vector2D& vertex : vertices)
+    {
+        if (isPointInsideBBox(vertex, bbox1))
+        {
+            if (closestPoint1) *closestPoint1 = vertex;
+            if (closestPoint2) *closestPoint2 = vertex;
+            return real_t{0};
+        }
+    }
+
+    for (const Vector2D& corner : bbox1.corners())
+    {
+        if (poly2.contains(corner))
+        {
+            if (closestPoint1) *closestPoint1 = corner;
+            if (closestPoint2) *closestPoint2 = corner;
+            return real_t{0};
+        }
+    }
+
+    return bDist;
 }
 
 real_t distance(const BBox2D& bbox, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2)
@@ -469,7 +523,8 @@ real_t distance(const BBox2D& bbox, const Circle2D& circle, Vector2D* closestPoi
     return dist - r;
 }
 
-real_t boundaryDistance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t boundaryDistance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, 
+    Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     const auto v1 = poly1.vertices();
     const auto v2 = poly2.vertices();
@@ -516,7 +571,8 @@ real_t boundaryDistance(const IPolygonalShape2D& poly1, const IPolygonalShape2D&
     return minDist;
 }
 
-real_t distance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t distance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, 
+    Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     real_t bDist = boundaryDistance(poly1, poly2, closestPoint1, closestPoint2);
     
@@ -561,7 +617,7 @@ real_t signedDistance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& p
     return bDist;
 }
 
-real_t distance(const IPolygonalShape2D& poly1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t boundaryDistance(const IPolygonalShape2D& poly1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     const auto v = poly1.vertices();
     const int n = (int)v.size();
@@ -600,6 +656,18 @@ real_t distance(const IPolygonalShape2D& poly1, const Circle2D& circle2, Vector2
     if (closestPoint1) *closestPoint1 = bestP1;
     if (closestPoint2) *closestPoint2 = bestP2;
     return minDist;
+}
+
+real_t distance(const IPolygonalShape2D& poly1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    if (poly1.contains(circle2.m_center))
+    {
+        if (closestPoint1) *closestPoint1 = circle2.m_center;
+        if (closestPoint2) *closestPoint2 = circle2.m_center;
+        return real_t{0};
+    }
+
+    return boundaryDistance(poly1, circle2, closestPoint1, closestPoint2);
 }
 
 real_t distance(const Circle2D& circle1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2)
