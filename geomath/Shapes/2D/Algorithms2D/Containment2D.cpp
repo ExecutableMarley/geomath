@@ -137,6 +137,11 @@ bool isPointInsidePolygon(const Vector2D& point, const Polygon2D& polygon)
     return isPointInsidePolygon(point, polygon.vertices());
 }
 
+bool isPointInsidePolygon(const Vector2D& point, const IPolygonalShape2D& polygon)
+{
+    return isPointInsidePolygon(point, polygon.vertices());
+}
+
 bool isPointInsideCircle(const Vector2D& point, const Circle2D& circle)
 {
     return (point - circle.m_center).lengthSquared() <= circle.m_radius * circle.m_radius;

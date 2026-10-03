@@ -75,6 +75,8 @@ bool isPointInsidePolygon(const Vector2D& point, const std::span<const Vector2D>
 
 bool isPointInsidePolygon(const Vector2D& point, const Polygon2D& polygon);
 
+bool isPointInsidePolygon(const Vector2D& point, const IPolygonalShape2D& polygon);
+
 bool isPointInsideCircle(const Vector2D& point, const Circle2D& circle);
 
 bool isPointInShape(const Vector2D& point, const IBaseShape2D& shape);
