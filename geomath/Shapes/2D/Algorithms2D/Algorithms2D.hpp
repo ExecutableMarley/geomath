@@ -40,7 +40,7 @@ struct HitInfo2D
     //IShape2D* shape;
 };
 
-struct SweepResult
+struct SweepResult2D
 {
     bool hit = false;
     real_t toi = 1.0;
@@ -242,7 +242,7 @@ SweepResult sweepConservativeAdvancement(
     real_t epsilon = real_t(1e-4));
 */
 
-SweepResult sweepConservativeAdvancement(
+SweepResult2D sweepConservativeAdvancement(
     const IFiniteShape2D& a, Vector2D velocityA,
     const IFiniteShape2D& b, Vector2D velocityB,
     real_t maxTime = real_t(1), int maxIterations = 15,

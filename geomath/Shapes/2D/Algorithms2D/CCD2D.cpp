@@ -25,18 +25,11 @@ namespace Arns::geomath
 
 //Todo: Refactor the specialized versions at some point to fit them in
 
-/*
-struct CCDResult 
-{
-    bool hit{false};
-    real_t toi{0.0}; // Time of Impact in range [0, 1]
-    Vector2D normal{0.0, 0.0}; // Contact normal pointing from B to A
-};
 
-CCDResult SolveCircleToCircleCCD(const Circle2D& a, const Vector2D& velA,
+SweepResult2D SolveCircleToCircleCCD(const Circle2D& a, const Vector2D& velA,
     const Circle2D& b, const Vector2D& velB, real_t maxTime) 
 {
-    CCDResult result;
+    SweepResult2D result;
 
     Vector2D p0 = a.m_center - b.m_center;
     Vector2D v = velA - velB;
@@ -50,7 +43,8 @@ CCDResult SolveCircleToCircleCCD(const Circle2D& a, const Vector2D& velA,
         result.hit = true;
         result.toi = 0;
         real_t dist = p0.length();
-        result.normal = approximatelyZero(dist) ? Vector2D{1, 0} : p0 / dist;
+        result.normal = approximatelyZero(dist) ? Vector2D{1, 0} : -p0 / dist;
+        result.point = b.m_center - result.normal * b.m_radius;
         return result;
     }
 
@@ -83,16 +77,17 @@ CCDResult SolveCircleToCircleCCD(const Circle2D& a, const Vector2D& velA,
         result.hit = true;
         result.toi = t;
         Vector2D hitPos = p0 + v * t;
-        result.normal = hitPos.normalize(); // Points away from center B
+        result.normal = -hitPos.normalize();
+        result.point = b.m_center + velB * t - result.normal * b.m_radius;
     }
 
     return result;
 }
 
-CCDResult SolveBBoxToBBoxCCD(const BBox2D& a, const Vector2D& velA,
+SweepResult2D SolveBBoxToBBoxCCD(const BBox2D& a, const Vector2D& velA,
     const BBox2D& b, const Vector2D& velB, real_t maxTime) 
 {
-    CCDResult result;
+    SweepResult2D result;
 
     Vector2D p0 = a.centroid() - b.centroid();
     Vector2D E = a.halfExtents() + b.halfExtents();
@@ -148,100 +143,41 @@ CCDResult SolveBBoxToBBoxCCD(const BBox2D& a, const Vector2D& velA,
     }
 
     // Check if shapes were already overlapping at t = 0
-    //if (p0.x >= -E.x && p0.x <= E.x && p0.y >= -E.y && p0.y <= E.y) 
     if (approximatelyBetween(p0.x, -E.x, E.x) && approximatelyBetween(p0.y, -E.y, E.y))
     {
         result.hit = true;
         result.toi = 0;
         result.normal = hitNormal; 
+        result.point = b.closestPoint(a.centroid());
         return result;
     }
 
-    //if (tMin >= 0 && tMin <= 1)
-    if (approximatelyBetween(tMin, real_t{0}, real_t{1}))
+    if (approximatelyBetween(tMin, real_t{0}, maxTime))
     {
         result.hit = true;
         result.toi = tMin;
         result.normal = hitNormal;
-    }
-
-    return result;
-}
-
-CCDResult SolveBBoxToCircleCCD(
-    const BBox2D& box, const Vector2D& velBox,
-    const Circle2D& circle, const Vector2D& velCircle,
-    real_t maxTime, int maxIterations, real_t epsilon) 
-{
-    CCDResult result;
-
-    // Compute relative velocity (Circle moving relative to a stationary AABB)
-    Vector2D relVel = velCircle - velBox;
-    real_t speed = relVel.length();
-
-    // Static case: circle is stationary relative to the box
-    if (speed < real_t{1e-8}) {
-        real_t dist = box.minDistance(circle.m_center) - circle.m_radius;
-        if (dist <= real_t{0}) {
-            result.hit = true;
-            result.toi = real_t{0};
-            Vector2D cp = box.closestPoint(circle.m_center);
-            Vector2D normalDir = box.centroid() - circle.m_center; // fallback vector
-            Vector2D diff = cp - circle.m_center;
-            result.normal = (diff.lengthSquared() > real_t{1e-8}) ? diff.normalize() : normalDir.normalize();
-        }
-        return result;
-    }
-
-    real_t t = real_t{0};
-
-    // Conservative Advancement Iterative Loop
-    for (int i = 0; i < maxIterations; ++i) {
-        Vector2D currentCircleCenter = circle.m_center + relVel * t;
-
-        // Separation distance between circle and AABB
-        real_t boxDist = box.minDistance(currentCircleCenter);
-        real_t separationDist = boxDist - circle.m_radius;
-
-        // Collision threshold reached
-        if (separationDist <= epsilon) {
-            result.hit = true;
-            result.toi = t;
-
-            // Calculate contact normal at TOI
-            Vector2D cp = box.closestPoint(currentCircleCenter);
-            Vector2D diff = cp - currentCircleCenter;
-
-            // Normal points from Circle to Box
-            if (diff.lengthSquared() > real_t{1e-8})
-            {
-                result.normal = diff.normalize();
-            }
-            else
-            {
-                // Center is inside the box at contact (fallback normal opposite to velocity)
-                result.normal = (relVel * real_t{-1}).normalize();
-            }
-            return result;
-        }
-
-        // Advance time conservatively along relative velocity vector
-        real_t dt = separationDist / speed;
-        t += dt;
-
-        // Exceeded max time
-        if (t > maxTime)
+        const Vector2D centerA = a.centroid() + velA * tMin;
+        const BBox2D boxBAtImpact = b.copy().translate(velB * tMin);
+        if (!approximatelyZero(hitNormal.x))
         {
-            return result;
+            result.point = {
+                hitNormal.x > real_t{0} ? boxBAtImpact.m_max.x : boxBAtImpact.m_min.x,
+                std::clamp(centerA.y, boxBAtImpact.m_min.y, boxBAtImpact.m_max.y)};
+        }
+        else
+        {
+            result.point = {
+                std::clamp(centerA.x, boxBAtImpact.m_min.x, boxBAtImpact.m_max.x),
+                hitNormal.y > real_t{0} ? boxBAtImpact.m_max.y : boxBAtImpact.m_min.y};
         }
     }
 
     return result;
 }
-*/
 
 template <typename A, typename B>
-SweepResult sweepConservativeAdvancementGeneric(
+SweepResult2D sweepConservativeAdvancementGeneric(
     const A& a, Vector2D velocityA,
     const B& b, Vector2D velocityB,
     real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4))
@@ -259,6 +195,9 @@ SweepResult sweepConservativeAdvancementGeneric(
         Vector2D cloA, cloB;
         real_t d;
 
+        // Todo: Ugly heap allocation
+        // Best way to get rid of it would be distance functions that support optional transforms
+        // That is a task for future me though
         if constexpr (std::is_base_of_v<IFiniteShape2D, A> &&
                       std::is_base_of_v<IFiniteShape2D, B>)
         {
@@ -301,17 +240,69 @@ SweepResult sweepConservativeAdvancementGeneric(
     return {};
 }
 
-SweepResult sweepConservativeAdvancement(
+template <typename A, typename B, typename Enable = void>
+struct SweepTraits {
+    static SweepResult2D sweep(
+        const A& a, Vector2D va,
+        const B& b, Vector2D vb,
+        real_t maxTime, int maxIterations, real_t epsilon) 
+    {
+        return sweepConservativeAdvancementGeneric(a, va, b, vb, maxTime, maxIterations, epsilon);
+    }
+};
+
+template <>
+struct SweepTraits<Circle2D, Circle2D> {
+    static SweepResult2D sweep(
+        const Circle2D& a, Vector2D va,
+        const Circle2D& b, Vector2D vb,
+        real_t maxTime, int, real_t)
+    {
+        return SolveCircleToCircleCCD(a, va, b, vb, maxTime);
+    }
+};
+
+template <typename A, typename B>
+SweepResult2D sweep(
+    const A& a, Vector2D va,
+    const B& b, Vector2D vb,
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4))
+{
+    return SweepTraits<A, B>::sweep(a, va, b, vb, maxTime, maxIterations, epsilon);
+}
+
+SweepResult2D sweep(
+    const IFiniteShape2D& shapeA, Vector2D va,
+    const IFiniteShape2D& shapeB, Vector2D vb,
+    real_t maxTime, int maxIterations, real_t epsilon)
+{
+    const Circle2D* circle1 = shape_cast<Circle2D>(&shapeA);
+    const Circle2D* circle2 = shape_cast<Circle2D>(&shapeB);
+    const IPolygonalShape2D* polygon1 = shapeA.polygonal();
+    const IPolygonalShape2D* polygon2 = shapeB.polygonal();
+
+    if (circle1 && circle2)
+        return SweepTraits<Circle2D, Circle2D>::sweep(*circle1, va, *circle2, vb, maxTime, maxIterations, epsilon);
+
+    if (polygon1 && polygon2)
+        return SweepTraits<IPolygonalShape2D, IPolygonalShape2D>::sweep(*polygon1, va, *polygon2, vb, maxTime, maxIterations, epsilon);
+
+    if (polygon1 && circle2)
+        return SweepTraits<IPolygonalShape2D, Circle2D>::sweep(*polygon1, va, *circle2, vb, maxTime, maxIterations, epsilon);
+
+    if (circle1 && polygon2)
+        return SweepTraits<Circle2D, IPolygonalShape2D>::sweep(*circle1, va, *polygon2, vb, maxTime, maxIterations, epsilon);
+
+    return {};
+}
+
+SweepResult2D sweepConservativeAdvancement(
     const IFiniteShape2D& a, Vector2D velocityA,
     const IFiniteShape2D& b, Vector2D velocityB,
     real_t maxTime, int maxIterations, real_t epsilon)
 {
-    //const Circle2D* circleA = shape_cast<Circle2D>(&a);
-    //const Circle2D* circleB = shape_cast<Circle2D>(&b);
-
-    return sweepConservativeAdvancementGeneric(a, velocityA, b, velocityB, maxTime, maxIterations, epsilon);
+    return sweep(a, velocityA, b, velocityB, maxTime, maxIterations, epsilon);
 }
-
 
 // Todo: Consider the correct place for this
 
