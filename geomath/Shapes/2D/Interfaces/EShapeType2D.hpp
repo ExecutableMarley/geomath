@@ -19,7 +19,8 @@ enum ShapeType2D
     SHAPE2D_RECTANGLE,
     SHAPE2D_CONVEX_POLYGON,
     SHAPE2D_POLYGON,
-    SHAPE2D_CIRCLE
+    SHAPE2D_CIRCLE,
+    Count
 };
 
 constexpr std::string_view to_string(ShapeType2D type)
