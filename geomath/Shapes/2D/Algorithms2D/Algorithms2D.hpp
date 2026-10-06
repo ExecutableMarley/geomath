@@ -123,36 +123,36 @@ real_t distanceSegmentToSegment(const Vector2D& s1, const Vector2D& s2, const Ve
 
 //GJK dist?
 
+// ========================================================================
+// 1. Point vs Shape Queries (1 Output Point)
+// ========================================================================
+
 real_t distance(const Vector2D& point, const Segment2D& segment, Vector2D* closestPoint = nullptr);
-
 real_t distance(const Vector2D& point, const BBox2D& bbox, Vector2D* closestPoint = nullptr);
-
 real_t distance(const Vector2D& point, const IPolygonalShape2D& polygon, Vector2D* closestPoint = nullptr);
-
 real_t distance(const Vector2D& point, const Circle2D& circle, Vector2D* closestPoint = nullptr);
 
+// ========================================================================
+// 2. Line Segment vs Shape Queries (2 Output Points)
+// ========================================================================
+
 real_t distance(const Segment2D& segment1, const Segment2D& segment2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
-
 real_t distance(const Segment2D& segment, const BBox2D& bbox, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
-
 real_t distance(const Segment2D& segment, const IPolygonalShape2D& polygon, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
-
 real_t distance(const Segment2D& segment, const Circle2D& circle, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 
-//
+// ========================================================================
+// 3. Shape vs Shape Queries (2 Output Points)
+// ========================================================================
 
-real_t distance(const BBox2D& a, const BBox2D& b, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
-real_t distance(const BBox2D& bbox1, const IPolygonalShape2D& poly2, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
+real_t distance(const BBox2D& bbox1, const BBox2D& bbox2, Vector2D* closestPoint1, Vector2D* closestPoint2);
+real_t distance(const BBox2D& bbox, const IPolygonalShape2D& poly, Vector2D* closestPoint1, Vector2D* closestPoint2);
 real_t distance(const BBox2D& bbox, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
 
 real_t distance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
 real_t distance(const IPolygonalShape2D& poly1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
 
 real_t distance(const Circle2D& circle1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
-
 real_t distance(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 
 // Intersection calculation algorithms
@@ -242,11 +242,59 @@ SweepResult sweepConservativeAdvancement(
     real_t epsilon = real_t(1e-4));
 */
 
-SweepResult2D sweepConservativeAdvancement(
-    const IFiniteShape2D& a, Vector2D velocityA,
-    const IFiniteShape2D& b, Vector2D velocityB,
-    real_t maxTime = real_t(1), int maxIterations = 15,
-    real_t epsilon = real_t(1e-4));
+
+// ========================================================================
+// 1. Point vs Shape Queries
+// ========================================================================
+
+/*
+SweepResult2D sweep(const Vector2D& point, const Vector2D& velocityA, const Segment2D& segment, const Vector2D& velocityB, 
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
+SweepResult2D sweep(const Vector2D& point, const Vector2D& velocityA, const BBox2D& bbox,       const Vector2D& velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
+SweepResult2D sweep(const Vector2D& point, const Vector2D& velocityA, const IPolygonalShape2D& polygon, const Vector2D& velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
+SweepResult2D sweep(const Vector2D& point, const Vector2D& velocityA, const Circle2D& circle, const Vector2D& velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
+*/
+
+// ========================================================================
+// 2. Line Segment vs Shape Queries
+// ========================================================================
+
+/*
+SweepResult2D sweep(const Segment2D& segment1, const Vector2D& velocityA, const Segment2D& segment2,        const Vector2D& velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
+SweepResult2D sweep(const Segment2D& segment,  const Vector2D& velocityA, const BBox2D& bbox,               const Vector2D& velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
+SweepResult2D sweep(const Segment2D& segment,  const Vector2D& velocityA, const IPolygonalShape2D& polygon, const Vector2D& velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
+SweepResult2D sweep(const Segment2D& segment,  const Vector2D& velocityA, const Circle2D& circle,           const Vector2D& velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
+*/
+
+// ========================================================================
+// 3. Shape vs Shape Queries
+// ========================================================================
+
+/*
+SweepResult2D sweep(const BBox2D& bbox1, const Vector2D& velocityA, const BBox2D& bbox2,           const Vector2D& velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
+SweepResult2D sweep(const BBox2D& bbox,  const Vector2D& velocityA, const IPolygonalShape2D& poly, const Vector2D& velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
+SweepResult2D sweep(const BBox2D& bbox,  const Vector2D& velocityA, const Circle2D& circle,        const Vector2D& velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
+
+SweepResult2D sweep(const IPolygonalShape2D& poly1, const Vector2D& velocityA, const IPolygonalShape2D& poly2, const Vector2D& velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
+SweepResult2D sweep(const IPolygonalShape2D& poly1, const Vector2D& velocityA, const Circle2D& circle2, const Vector2D& velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
+
+SweepResult2D sweep(const Circle2D& circle1, const Vector2D& velocityA, const Circle2D& circle2,      const Vector2D& velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
+*/
+SweepResult2D sweep(const IFiniteShape2D& a, Vector2D velocityA, const IFiniteShape2D& b, Vector2D velocityB,
+    real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
 
 
 } // namespace Math
