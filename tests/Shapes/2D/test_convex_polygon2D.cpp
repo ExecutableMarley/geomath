@@ -3,7 +3,7 @@
 
 TEST_CASE("ConvexPolygon2D polygonal interface")
 {
-    ConvexPolygon2D poly({
+    ConvexPolygon2D poly = ConvexPolygon2D::fromHull({
         Vector2D{0, 0},
         Vector2D{2, 0},
         Vector2D{3, 1},

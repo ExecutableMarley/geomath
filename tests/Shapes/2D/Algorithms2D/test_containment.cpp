@@ -468,7 +468,7 @@ TEST_CASE("ConvexPolygon2D point containment")
         Vector2D{4, 4},
         Vector2D{0, 4}
     };
-    ConvexPolygon2D convex(vertices);
+    ConvexPolygon2D convex = ConvexPolygon2D::tryCreate(vertices).value();
 
     SUBCASE("Point at centroid should be contained")
     {
@@ -511,7 +511,7 @@ TEST_CASE("ConvexPolygon2D segment containment")
         Vector2D{5, 5},
         Vector2D{0, 5}
     };
-    ConvexPolygon2D convex(vertices);
+    ConvexPolygon2D convex = ConvexPolygon2D::tryCreate(vertices).value();
 
     SUBCASE("Segment inside convex polygon should be contained")
     {
@@ -540,7 +540,7 @@ TEST_CASE("ConvexPolygon2D shape containment")
         Vector2D{8, 6},
         Vector2D{0, 6}
     };
-    ConvexPolygon2D convex(vertices);
+    ConvexPolygon2D convex = ConvexPolygon2D::tryCreate(vertices).value();
 
     SUBCASE("Smaller convex polygon inside should be contained")
     {
@@ -550,7 +550,7 @@ TEST_CASE("ConvexPolygon2D shape containment")
             Vector2D{6, 5},
             Vector2D{2, 5}
         };
-        ConvexPolygon2D smaller(smallerVerts);
+        ConvexPolygon2D smaller = ConvexPolygon2D::tryCreate(smallerVerts).value();
         CHECK(convex.contains(smaller));
     }
 
