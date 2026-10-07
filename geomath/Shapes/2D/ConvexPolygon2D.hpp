@@ -157,7 +157,7 @@ public:
 
     bool contains(const Vector2D &point) const override
     {
-        return isPointInsidePolygon(point, std::span<const Vector2D>(m_vertices));
+        return detail::isPointInsidePolygon(point, std::span<const Vector2D>(m_vertices));
     }
 
     bool contains(const Segment2D& segment) const
@@ -165,9 +165,10 @@ public:
         return isSegmentInsideShape(segment, *this);
     }
 
-    bool contains(const IFiniteShape2D& shape) const
+    template <typename T> requires FiniteShape2D<T>
+    bool contains(const T& innerShape) const
     {
-        return isShapeInsidePolygon(shape, m_vertices);
+        return isShapeInsideShape(innerShape, *this);
     }
 
     BBox2D boundingBox() const override

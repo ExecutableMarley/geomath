@@ -13,6 +13,8 @@
 #include "../Rectangle2D.hpp"
 #include "../Polygon2D.hpp"
 #include "../ConvexPolygon2D.hpp"
+#include "../Variants/ShapeConcepts.hpp"
+#include "../Variants/ShapeVariants.hpp"
 
 #include <cassert>
 #include <span>
@@ -221,7 +223,7 @@ real_t distance(const Vector2D& point, const IPolygonalShape2D& polygon, Vector2
     //Todo: refactor this
     if (isConvexPolygonal(polygon.type()))
     {
-        if (isPointInsideConvexPolygon(point, polygon.vertices()))
+        if (detail::isPointInsideConvexPolygon(point, polygon.vertices()))
         {
             if (closestPoint)
                 *closestPoint = point;
@@ -231,7 +233,7 @@ real_t distance(const Vector2D& point, const IPolygonalShape2D& polygon, Vector2
     }
     else
     {
-        if (isPointInsidePolygon(point, polygon.vertices()))
+        if (detail::isPointInsidePolygon(point, polygon.vertices()))
         {
             if (closestPoint)
                 *closestPoint = point;
@@ -523,7 +525,8 @@ real_t distance(const BBox2D& bbox, const Circle2D& circle, Vector2D* closestPoi
     return dist - r;
 }
 
-real_t boundaryDistance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, 
+template <PolygonalShape Polygon>
+real_t boundaryDistance(const Polygon& poly1, const Polygon& poly2, 
     Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     const auto v1 = poly1.vertices();
@@ -596,7 +599,8 @@ real_t distance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2,
     return bDist;
 }
 
-real_t signedDistance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, 
+template <PolygonalShape Polygon>
+real_t signedDistance(const Polygon& poly1, const Polygon& poly2, 
     Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr)
 {
     real_t bDist = boundaryDistance(poly1, poly2, closestPoint1, closestPoint2);
@@ -717,6 +721,13 @@ real_t distance(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2, Vect
     return std::numeric_limits<real_t>::max();
 }
 
+real_t distance(const FiniteShapeVariant2D& shape1, const FiniteShapeVariant2D& shape2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    return std::visit([&](const auto& shape1, const auto& shape2)
+    {
+        return distance(shape1, shape2, closestPoint1, closestPoint2);
+    }, shape1, shape2);
+}
 
     
 }

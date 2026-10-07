@@ -135,9 +135,10 @@ public:
         return isCircleInsideCircle(circle, *this);
     }
 
-    bool contains(const IFiniteShape2D& shape) const
+    template <typename T> requires FiniteShape2D<T>
+    bool contains(const T& innerShape) const
     {
-        return isShapeInsideCircle(shape, *this);
+        return isShapeInsideShape(innerShape, *this);
     }
 
     bool intersects(const Circle2D &circle) const

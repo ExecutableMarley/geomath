@@ -13,6 +13,9 @@
 #include "../Rectangle2D.hpp"
 #include "../Polygon2D.hpp"
 #include "../ConvexPolygon2D.hpp"
+#include "Shapes/2D/Variants/ShapeConcepts.hpp"
+#include "Shapes/2D/Variants/ShapeVariants.hpp"
+#include "ShapeVariantAlgorithms.hpp"
 
 #include <cassert>
 #include <span>
@@ -198,6 +201,7 @@ SweepResult2D sweepConservativeAdvancementGeneric(
         // Todo: Ugly heap allocation
         // Best way to get rid of it would be distance functions that support optional transforms
         // That is a task for future me though
+        /*
         if constexpr (std::is_base_of_v<IFiniteShape2D, A> &&
                       std::is_base_of_v<IFiniteShape2D, B>)
         {
@@ -207,10 +211,11 @@ SweepResult2D sweepConservativeAdvancementGeneric(
         }
         else
         {
+        */
             B currentB = b;
             currentB.translate(relativeVelocity * t);
             d = distance(a, currentB, &cloA, &cloB);
-        }
+        //}
 
         if (d <= epsilon)
         {
@@ -262,6 +267,7 @@ struct SweepTraits<Circle2D, Circle2D> {
     }
 };
 
+// Helper function
 template <typename A, typename B>
 SweepResult2D sweep(
     const A& a, Vector2D va,
@@ -271,6 +277,7 @@ SweepResult2D sweep(
     return SweepTraits<A, B>::sweep(a, va, b, vb, maxTime, maxIterations, epsilon);
 }
 
+/*
 SweepResult2D sweep(
     const IFiniteShape2D& shapeA, Vector2D va,
     const IFiniteShape2D& shapeB, Vector2D vb,
@@ -295,13 +302,16 @@ SweepResult2D sweep(
 
     return {};
 }
+*/
 
-SweepResult2D sweepConservativeAdvancement(
-    const IFiniteShape2D& a, Vector2D velocityA,
-    const IFiniteShape2D& b, Vector2D velocityB,
+SweepResult2D sweep(
+    const FiniteShapeVariant2D& shapeA, Vector2D va, 
+    const FiniteShapeVariant2D& shapeB, Vector2D vb,
     real_t maxTime, int maxIterations, real_t epsilon)
 {
-    return sweep(a, velocityA, b, velocityB, maxTime, maxIterations, epsilon);
+    return std::visit([&](const auto& a, const auto& b) {
+        return sweep(a, va, b, vb, maxTime, maxIterations, epsilon);
+    }, shapeA, shapeB);
 }
 
 // Todo: Consider the correct place for this

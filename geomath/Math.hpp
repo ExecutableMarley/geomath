@@ -56,6 +56,7 @@
 #include "Shapes/2D/ConvexPolygon2D.hpp"
 #include "Shapes/2D/TriangleMesh2D.hpp"
 
+#include "Shapes/2D/Algorithms2D/ShapeVariantAlgorithms.hpp"
 #include "Shapes/2D/Algorithms2D/Triangulation/Triangulation.hpp"
 #include "Shapes/2D/Structures/ShapeStore2D.hpp"
 #include "Shapes/2D/Structures/ISpatialIndex2D.hpp"

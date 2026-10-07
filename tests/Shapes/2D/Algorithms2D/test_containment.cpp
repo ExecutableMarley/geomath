@@ -10,7 +10,7 @@
 #include "Shapes/2D/Polygon2D.hpp"
 #include "Shapes/2D/ConvexPolygon2D.hpp"
 #include "Shapes/2D/Circle2D.hpp"
-
+#include "Shapes/2D/Algorithms2D/ShapeVariantAlgorithms.hpp"
 
 using namespace Arns::geomath;
 

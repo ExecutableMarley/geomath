@@ -10,7 +10,8 @@
 #include "Shapes/2D/Polygon2D.hpp"
 #include "Shapes/2D/ConvexPolygon2D.hpp"
 #include "Shapes/2D/Circle2D.hpp"
-
+#include "Shapes/2D/Variants/ShapeVariants.hpp"
+#include "Shapes/2D/Algorithms2D/ShapeVariantAlgorithms.hpp"
 
 using namespace Arns::geomath;
 
@@ -330,6 +331,7 @@ TEST_CASE("Circle2D intersection")
     CHECK(intersect(c1, c3) == false);
 }
 
+/*
 TEST_CASE("IFiniteShape2D intersection")
 {
     Triangle2D t(Vector2D(0, 0), Vector2D(2, 0), Vector2D(1, 2));
@@ -338,4 +340,45 @@ TEST_CASE("IFiniteShape2D intersection")
 
     Circle2D c2(Vector2D(5, 5), 1);
     CHECK(intersect(static_cast<const IFiniteShape2D&>(t), static_cast<const IFiniteShape2D&>(c2)) == false);
+}
+*/
+
+//Todo: Testing alternative dispatching designs
+TEST_CASE("FiniteShapeVariant2D intersection")
+{
+    Triangle2D triangle(Vector2D(0, 0), Vector2D(2, 0), Vector2D(1, 2));
+    Rectangle2D rectangle({1, 1}, {1, -1}, {3, -1}, {3, 1});
+    Circle2D intersectingCircle(Vector2D(1, 1), real_t{0.5});
+    Circle2D overlappingCircle(Vector2D(1.5, 1), real_t{0.5});
+    Circle2D separateCircle(Vector2D(5, 5), 1);
+
+    const FiniteShapeVariant2D triangleShape{triangle};
+    const FiniteShapeVariant2D rectangleShape{rectangle};
+    const FiniteShapeVariant2D intersectingCircleShape{intersectingCircle};
+    const FiniteShapeVariant2D overlappingCircleShape{overlappingCircle};
+    const FiniteShapeVariant2D separateCircleShape{separateCircle};
+
+    CHECK(intersect(triangleShape, rectangleShape));
+    CHECK(intersect(triangleShape, intersectingCircleShape));
+    CHECK(intersect(intersectingCircleShape, triangleShape));
+    CHECK(intersect(intersectingCircleShape, overlappingCircleShape));
+    CHECK_FALSE(intersect(triangleShape, separateCircleShape));
+    CHECK_FALSE(intersect(intersectingCircleShape, separateCircleShape));
+}
+
+TEST_CASE("Ray2D and Segment2D intersection with FiniteShapeVariant2D")
+{
+    Triangle2D triangle(Vector2D(0, 0), Vector2D(2, 0), Vector2D(1, 2));
+    const FiniteShapeVariant2D triangleShape{triangle};
+    const FiniteShapeVariant2D circleShape{Circle2D(Vector2D(1, 1), real_t{0.5})};
+    const FiniteShapeVariant2D distantCircleShape{Circle2D(Vector2D(5, 5), 1)};
+    const Ray2D ray(Vector2D(-1, 1), Vector2D(1, 0));
+    const Segment2D segment(Vector2D(-1, 1), Vector2D(3, 1));
+
+    CHECK(intersect(ray, triangleShape));
+    CHECK(intersect(ray, circleShape));
+    CHECK_FALSE(intersect(ray, distantCircleShape));
+    CHECK(intersect(segment, triangleShape));
+    CHECK(intersect(segment, circleShape));
+    CHECK_FALSE(intersect(segment, distantCircleShape));
 }

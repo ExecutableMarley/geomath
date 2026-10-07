@@ -18,6 +18,8 @@ class IPolygonalShape2D : public IFiniteShape2D
 public:
     virtual ~IPolygonalShape2D() = default;
 
+    virtual bool isConvex() const = 0;
+
     /// Number of vertices
     virtual size_t vertexCount() const = 0;
 

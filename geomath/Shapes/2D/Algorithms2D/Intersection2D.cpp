@@ -13,9 +13,12 @@
 #include "../Rectangle2D.hpp"
 #include "../Polygon2D.hpp"
 #include "../ConvexPolygon2D.hpp"
+#include "../Variants/ShapeVariants.hpp"
+#include "ShapeVariantAlgorithms.hpp"
 
 #include <cassert>
 #include <span>
+#include <type_traits>
 
 namespace Arns::geomath
 {
@@ -336,6 +339,22 @@ bool intersect(const Segment2D& segment, const IBaseShape2D& shape, HitInfo2D* h
     return intersect(Ray2D(segment.m_start, segment.direction()), shape, 0.0f, segment.length(), hitInfo);
 }
 
+bool intersect(const Ray2D& ray, const FiniteShapeVariant2D& shape, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+{
+    return std::visit([&](const auto& concreteShape)
+    {
+        return intersect(ray, concreteShape, t_min, t_max, hitInfo);
+    }, shape);
+}
+
+bool intersect(const Segment2D& segment, const FiniteShapeVariant2D& shape, HitInfo2D* hitInfo)
+{
+    return std::visit([&](const auto& concreteShape)
+    {
+        return intersect(segment, concreteShape, hitInfo);
+    }, shape);
+}
+
 
 // --- Bounding Box ---
 
@@ -477,13 +496,13 @@ bool intersectPolygonWithPolygon(const std::span<const Vector2D> v1, const std::
 
     for (const auto& v : v1)
     {
-        if (isPointInsidePolygon(v, v2))
+        if (detail::isPointInsidePolygon(v, v2))
             return true;
     }
 
     for (const auto& v : v2)
     {
-        if (isPointInsidePolygon(v, v1))
+        if (detail::isPointInsidePolygon(v, v1))
             return true;
     }
 
@@ -508,7 +527,7 @@ bool intersectPolygonWithPolygon(const std::span<const Vector2D> v1, const std::
 
 bool intersectPolygonWithCircle(const std::span<const Vector2D> poly, const Circle2D& circle)
 {
-    if (isPointInsidePolygon(circle.m_center, poly))
+    if (detail::isPointInsidePolygon(circle.m_center, poly))
         return true;
 
     //Todo: Optimize with r^2
@@ -534,6 +553,19 @@ bool intersect(const IPolygonalShape2D& polygon1, const IPolygonalShape2D& polyg
         return intersectConvexPolygonWithConvexPolygon(polygon1.vertices(), polygon2.vertices());
 
     return intersectPolygonWithPolygon(polygon1.vertices(), polygon2.vertices());
+}
+
+bool intersect(const PolygonalShapeVariant2D& polygon1, const PolygonalShapeVariant2D& polygon2)
+{
+    return std::visit([&](const auto& p1, const auto& p2) {
+        std::span<const Vector2D> verts1 = p1.vertices();
+        std::span<const Vector2D> verts2 = p2.vertices();
+        
+        if (p1.isConvex() && p2.isConvex())
+            return intersectConvexPolygonWithConvexPolygon(verts1, verts2);
+        
+        return intersectPolygonWithPolygon(verts1, verts2);
+    }, polygon1, polygon2 );
 }
 
 bool intersect(const IPolygonalShape2D& polygon, const Circle2D& circle)
@@ -587,6 +619,39 @@ bool intersect(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2)
 
     //Todo: Consider behaviour
     return false;
+}
+
+bool intersect(const FiniteShapeVariant2D& shape1, const FiniteShapeVariant2D& shape2)
+{
+    return std::visit([](const auto& shape1, const auto& shape2)
+    {
+        using Shape1 = std::decay_t<decltype(shape1)>;
+        using Shape2 = std::decay_t<decltype(shape2)>;
+        constexpr bool shape1IsCircle = std::is_same_v<Shape1, Circle2D>;
+        constexpr bool shape2IsCircle = std::is_same_v<Shape2, Circle2D>;
+
+        if constexpr (shape1IsCircle && shape2IsCircle)
+        {
+            return intersect(shape1, shape2);
+        }
+        else if constexpr (shape1IsCircle)
+        {
+            return intersectPolygonWithCircle(shape2.vertices(), shape1);
+        }
+        else if constexpr (shape2IsCircle)
+        {
+            return intersectPolygonWithCircle(shape1.vertices(), shape2);
+        }
+        else
+        {
+            const auto vertices1 = shape1.vertices();
+            const auto vertices2 = shape2.vertices();
+            if (shape1.isConvex() && shape2.isConvex())
+                return intersectConvexPolygonWithConvexPolygon(vertices1, vertices2);
+
+            return intersectPolygonWithPolygon(vertices1, vertices2);
+        }
+    }, shape1, shape2);
 }
     
 }

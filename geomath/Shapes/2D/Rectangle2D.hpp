@@ -176,12 +176,13 @@ public:
 
     bool contains(const Rectangle2D &rectangle) const
     {
-        return isPolygonInsideConvexPolygon(rectangle.vertices(), m_vertices);
+        return detail::isPolygonInsideConvexPolygon(rectangle.vertices(), m_vertices);
     }
 
-    bool contains(const IFiniteShape2D& shape) const
+    template <typename T> requires FiniteShape2D<T>
+    bool contains(const T& innerShape) const
     {
-        return isShapeInsideConvexPolygon(shape, m_vertices);
+        return isShapeInsideShape(innerShape, *this);
     }
 
     BBox2D boundingBox() const override

@@ -51,6 +51,17 @@ struct SweepResult2D
 
 //
 
+namespace detail
+{
+
+bool isPointInsideConvexPolygon(const Vector2D& point, const std::span<const Vector2D> vertices);
+
+bool isPointInsidePolygon(const Vector2D& point, const std::span<const Vector2D> vertices);
+
+bool isPolygonInsideConvexPolygon(const std::span<const Vector2D> poly, const std::span<const Vector2D> convexPoly);
+
+}
+
 bool isPointOnSegment(const Vector2D& point, const Vector2D& segmentStart, const Vector2D& segmentEnd);
 
 bool isPointOnSegment(const Vector2D& point, const Segment2D& segment);
@@ -67,11 +78,7 @@ bool isPointInsideTriangle(const Vector2D& point, const Triangle2D& triangle);
 
 bool isPointInsideRectangle(const Vector2D& point, const Rectangle2D& rectangle);
 
-bool isPointInsideConvexPolygon(const Vector2D& point, const std::span<const Vector2D> vertices);
-
 bool isPointInsideConvexPolygon(const Vector2D& point, const ConvexPolygon2D& polygon);
-
-bool isPointInsidePolygon(const Vector2D& point, const std::span<const Vector2D> vertices);
 
 bool isPointInsidePolygon(const Vector2D& point, const Polygon2D& polygon);
 
@@ -95,17 +102,17 @@ bool isCircleInsideBBox(const Circle2D& circle, const BBox2D& bbox);
 
 //
 
-bool isPolygonInsideConvexPolygon(const std::span<const Vector2D> poly, const std::span<const Vector2D> convexPoly);
+
 
 bool isCircleInsideCircle(const Circle2D& circle1, const Circle2D& circle2);
 
-bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::span<const Vector2D> convexPoly);
+//bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::span<const Vector2D> convexPoly);
 
-bool isShapeInsidePolygon(const IFiniteShape2D& shape, const std::span<const Vector2D> poly);
+//bool isShapeInsidePolygon(const IFiniteShape2D& shape, const std::span<const Vector2D> poly);
 
-bool isShapeInsideCircle(const IFiniteShape2D& shape, const Circle2D& circle);
+//bool isShapeInsideCircle(const IFiniteShape2D& shape, const Circle2D& circle);
 
-bool isShapeInsideShape(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2);
+//bool isShapeInsideShape(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2);
 
 
 // Distance calculation algorithms
@@ -149,11 +156,16 @@ real_t distance(const BBox2D& bbox1, const BBox2D& bbox2, Vector2D* closestPoint
 real_t distance(const BBox2D& bbox, const IPolygonalShape2D& poly, Vector2D* closestPoint1, Vector2D* closestPoint2);
 real_t distance(const BBox2D& bbox, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
 
-real_t distance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, Vector2D* closestPoint1, Vector2D* closestPoint2);
-real_t distance(const IPolygonalShape2D& poly1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
+//real_t distance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, Vector2D* closestPoint1, Vector2D* closestPoint2);
+//real_t distance(const IPolygonalShape2D& poly1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
 
 real_t distance(const Circle2D& circle1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
-real_t distance(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
+//real_t distance(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
+
+
+// --- Symmetric Forwarding Helper ---
+
+
 
 // Intersection calculation algorithms
 
@@ -208,15 +220,15 @@ bool intersect(const BBox2D& bbox, const Circle2D& circle);
 
 // --- Polygonal and Circle shapes ---
 
-bool intersect(const IPolygonalShape2D& polygon1, const IPolygonalShape2D& polygon2);
+//bool intersect(const IPolygonalShape2D& polygon1, const IPolygonalShape2D& polygon2);
 
-bool intersect(const IPolygonalShape2D& polygon, const Circle2D& circle);
+//bool intersect(const IPolygonalShape2D& polygon, const Circle2D& circle);
 
 bool intersect(const Circle2D& circle1, const Circle2D& circle2);
 
 // --- Generic ---
 
-bool intersect(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2);
+//bool intersect(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2);
 
 //================================
 // CCD (sweep)
@@ -293,9 +305,10 @@ SweepResult2D sweep(const IPolygonalShape2D& poly1, const Vector2D& velocityA, c
 SweepResult2D sweep(const Circle2D& circle1, const Vector2D& velocityA, const Circle2D& circle2,      const Vector2D& velocityB,
     real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
 */
+/*
 SweepResult2D sweep(const IFiniteShape2D& a, Vector2D velocityA, const IFiniteShape2D& b, Vector2D velocityB,
     real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
-
+*/
 
 } // namespace Math
 

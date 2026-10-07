@@ -13,12 +13,122 @@
 #include "../Rectangle2D.hpp"
 #include "../Polygon2D.hpp"
 #include "../ConvexPolygon2D.hpp"
+#include "ShapeVariantAlgorithms.hpp"
 
 #include <cassert>
 #include <span>
 
 namespace Arns::geomath
 {
+
+namespace detail
+{
+
+//Todo: Consider the O(log n) method
+bool isPointInsideConvexPolygon(const Vector2D& point, const std::span<const Vector2D> vertices)
+{
+    const size_t n = vertices.size();
+    if (n < 3) return false;
+
+    bool hasPositive = false;
+    bool hasNegative = false;
+
+    for (size_t i = 0; i < n; ++i)
+    {
+        const auto& A = vertices[i];
+        const auto& B = vertices[(i + 1) % n];
+
+        real_t val = orient2D(A, B, point);
+
+        if (approximatelyGreaterAbs(val, real_t{0}))   hasPositive = true;
+        else if (approximatelyLessAbs(val, real_t{0})) hasNegative = true;
+
+        if (hasPositive && hasNegative) return false;
+    }
+
+    return true; 
+}
+
+//Non self intersecting polygons
+bool isPointInsidePolygon(const Vector2D& point, const std::span<const Vector2D> vertices)
+{
+    bool contains = false;
+    for (size_t i = 0, j = vertices.size() - 1; i < vertices.size(); j = i++)
+    {
+        if (isPointOnSegment(point, vertices[i], vertices[j]))
+            return true;
+
+        if (((vertices[i].y > point.y) != (vertices[j].y > point.y)) &&
+            (point.x < (vertices[j].x - vertices[i].x) * (point.y - vertices[i].y) / (vertices[j].y - vertices[i].y) + vertices[i].x))
+        {
+            contains = !contains;
+        }
+    }
+
+    return contains;
+}
+
+bool isPolygonalInsideBBox(const IPolygonalShape2D& polygon, const BBox2D& bbox)
+{
+    for (const auto& v : polygon.vertices())
+        if (!bbox.contains(v))
+            return false;
+    return true;
+}
+
+//Helper function
+bool edgeIntersectionPolygonWithPolygon(const std::span<const Vector2D> vertices1, const std::span<const Vector2D> vertices2, HitInfo2D* hitInfo = nullptr)
+{
+    const size_t countA = vertices1.size();
+    const size_t countB = vertices2.size();
+
+    if (countA < 3 || countB < 3)
+        return false;
+
+    for (size_t i = 0; i < countA; ++i)
+    {
+        const Vector2D& a1 = vertices1[i];
+        const Vector2D& a2 = vertices1[(i + 1) % countA];
+
+        for (size_t j = 0; j < countB; ++j)
+        {
+            const Vector2D& b1 = vertices2[j];
+            const Vector2D& b2 = vertices2[(j + 1) % countB];
+
+            if (intersectSegmentWithSegment(a1, a2, b1, b2, hitInfo))
+                return true;
+        }
+    }
+    return false;
+}
+
+bool isPolygonInsideConvexPolygon(const std::span<const Vector2D> poly, const std::span<const Vector2D> convexPoly)
+{
+    for (const auto& point : poly)
+    {
+        if (!detail::isPointInsideConvexPolygon(point, convexPoly))
+            return false;
+    }
+    return true;
+}
+
+bool isPolygonInsidePolygon(const std::span<const Vector2D> poly1, const std::span<const Vector2D> poly2)
+{
+    for (const auto& point : poly1)
+    {
+        if (!detail::isPointInsidePolygon(point, poly2))
+        {
+            return false;
+        }
+    }
+
+    if (detail::edgeIntersectionPolygonWithPolygon(poly1, poly2))
+        return false;
+
+    return true;
+}
+
+}
 
 
 bool isPointOnSegment(const Vector2D& point, const Vector2D& segmentStart, const Vector2D& segmentEnd)
@@ -83,63 +193,19 @@ bool isPointInsideRectangle(const Vector2D& point, const Rectangle2D& rectangle)
            (a - d).cross(point - d) >= 0;
 }
 
-//Todo: Consider the O(log n) method
-bool isPointInsideConvexPolygon(const Vector2D& point, const std::span<const Vector2D> vertices)
-{
-    const size_t n = vertices.size();
-    if (n < 3) return false;
-
-    bool hasPositive = false;
-    bool hasNegative = false;
-
-    for (size_t i = 0; i < n; ++i)
-    {
-        const auto& A = vertices[i];
-        const auto& B = vertices[(i + 1) % n];
-
-        real_t val = orient2D(A, B, point);
-
-        if (approximatelyGreaterAbs(val, real_t{0}))   hasPositive = true;
-        else if (approximatelyLessAbs(val, real_t{0})) hasNegative = true;
-
-        if (hasPositive && hasNegative) return false;
-    }
-
-    return true; 
-}
-
-//Non self intersecting polygons
-bool isPointInsidePolygon(const Vector2D& point, const std::span<const Vector2D> vertices)
-{
-    bool contains = false;
-    for (size_t i = 0, j = vertices.size() - 1; i < vertices.size(); j = i++)
-    {
-        if (isPointOnSegment(point, vertices[i], vertices[j]))
-            return true;
-
-        if (((vertices[i].y > point.y) != (vertices[j].y > point.y)) &&
-            (point.x < (vertices[j].x - vertices[i].x) * (point.y - vertices[i].y) / (vertices[j].y - vertices[i].y) + vertices[i].x))
-        {
-            contains = !contains;
-        }
-    }
-
-    return contains;
-}
-
 bool isPointInsideConvexPolygon(const Vector2D& point, const ConvexPolygon2D& polygon)
 {
-    return isPointInsideConvexPolygon(point, polygon.vertices());
+    return detail::isPointInsideConvexPolygon(point, polygon.vertices());
 }
 
 bool isPointInsidePolygon(const Vector2D& point, const Polygon2D& polygon)
 {
-    return isPointInsidePolygon(point, polygon.vertices());
+    return detail::isPointInsidePolygon(point, polygon.vertices());
 }
 
 bool isPointInsidePolygon(const Vector2D& point, const IPolygonalShape2D& polygon)
 {
-    return isPointInsidePolygon(point, polygon.vertices());
+    return detail::isPointInsidePolygon(point, polygon.vertices());
 }
 
 bool isPointInsideCircle(const Vector2D& point, const Circle2D& circle)
@@ -178,14 +244,6 @@ bool isBBoxInsideBBox(const BBox2D& bbox1, const BBox2D& bbox2)
     return bbox2.contains(bbox1);
 }
 
-bool isPolygonalInsideBBox(const IPolygonalShape2D& polygon, const BBox2D& bbox)
-{
-    for (const auto& v : polygon.vertices())
-        if (!bbox.contains(v))
-            return false;
-    return true;
-}
-
 bool isCircleInsideBBox(const Circle2D& circle, const BBox2D& bbox)
 {
     return bbox.contains(circle.m_center) && bbox.minDistanceSquared(circle.m_center) < circle.m_radius * circle.m_radius;
@@ -193,85 +251,35 @@ bool isCircleInsideBBox(const Circle2D& circle, const BBox2D& bbox)
 
 //
 
-//Helper function
-bool edgeIntersectionPolygonWithPolygon(const std::span<const Vector2D> vertices1, const std::span<const Vector2D> vertices2, HitInfo2D* hitInfo = nullptr)
-{
-    const size_t countA = vertices1.size();
-    const size_t countB = vertices2.size();
-
-    if (countA < 3 || countB < 3)
-        return false;
-
-    for (size_t i = 0; i < countA; ++i)
-    {
-        const Vector2D& a1 = vertices1[i];
-        const Vector2D& a2 = vertices1[(i + 1) % countA];
-
-        for (size_t j = 0; j < countB; ++j)
-        {
-            const Vector2D& b1 = vertices2[j];
-            const Vector2D& b2 = vertices2[(j + 1) % countB];
-
-            if (intersectSegmentWithSegment(a1, a2, b1, b2, hitInfo))
-                return true;
-        }
-    }
-    return false;
-}
-
 //
 
 bool isBBoxInsideConvexPolygon(const BBox2D& bbox, const std::span<const Vector2D> convexPoly)
 {
-    return isPointInsideConvexPolygon(bbox.bottomLeft(), convexPoly) && isPointInsideConvexPolygon(bbox.topLeft(), convexPoly) && 
-        isPointInsideConvexPolygon(bbox.topRight(), convexPoly) && isPointInsideConvexPolygon(bbox.bottomRight(), convexPoly);
+    return detail::isPointInsideConvexPolygon(bbox.bottomLeft(), convexPoly) && detail::isPointInsideConvexPolygon(bbox.topLeft(), convexPoly) && 
+        detail::isPointInsideConvexPolygon(bbox.topRight(), convexPoly) && detail::isPointInsideConvexPolygon(bbox.bottomRight(), convexPoly);
 }
 
 bool isBBoxInsidePolygon(const BBox2D& bbox, const std::span<const Vector2D> poly)
 {
     std::vector<Vector2D> bboxPoly = {bbox.bottomLeft(), bbox.bottomRight(), bbox.topRight(), bbox.topLeft()};
 
-    if (!isPointInsidePolygon(bbox.bottomLeft(), poly) || !isPointInsidePolygon(bbox.bottomRight(), poly) ||
-        !isPointInsidePolygon(bbox.topRight(), poly)   || !isPointInsidePolygon(bbox.topLeft(), poly))
+    if (!detail::isPointInsidePolygon(bbox.bottomLeft(), poly) || !detail::isPointInsidePolygon(bbox.bottomRight(), poly) ||
+        !detail::isPointInsidePolygon(bbox.topRight(), poly)   || !detail::isPointInsidePolygon(bbox.topLeft(), poly))
             return false;
 
-    if (edgeIntersectionPolygonWithPolygon(bboxPoly, poly))
+    if (detail::edgeIntersectionPolygonWithPolygon(bboxPoly, poly))
         return false;
 
     return true;
 }
 
-bool isPolygonInsideConvexPolygon(const std::span<const Vector2D> poly, const std::span<const Vector2D> convexPoly)
-{
-    for (const auto& point : poly)
-    {
-        if (!isPointInsideConvexPolygon(point, convexPoly))
-            return false;
-    }
-    return true;
-}
 
-bool isPolygonInsidePolygon(const std::span<const Vector2D> poly1, const std::span<const Vector2D> poly2)
-{
-    for (const auto& point : poly1)
-    {
-        if (!isPointInsidePolygon(point, poly2))
-        {
-            return false;
-        }
-    }
-
-    if (edgeIntersectionPolygonWithPolygon(poly1, poly2))
-        return false;
-
-    return true;
-}
 
 bool isCircleInsidePolygon(const Circle2D& circle, const std::span<const Vector2D> poly);
 
 bool isCircleInsideConvexPolygon(const Circle2D& circle, const std::span<const Vector2D> convexPoly)
 {
-    if (!isPointInsideConvexPolygon(circle.m_center, convexPoly))
+    if (!detail::isPointInsideConvexPolygon(circle.m_center, convexPoly))
     {
         return false;
     }
@@ -281,7 +289,7 @@ bool isCircleInsideConvexPolygon(const Circle2D& circle, const std::span<const V
 
 bool isCircleInsidePolygon(const Circle2D& circle, const std::span<const Vector2D> poly)
 {
-    if (!isPointInsidePolygon(circle.m_center, poly))
+    if (!detail::isPointInsidePolygon(circle.m_center, poly))
     {
         return false;
     }
@@ -305,7 +313,7 @@ bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::span<con
 {
     if (isPolygonalShape(shape.type()))
     {
-        return isPolygonInsideConvexPolygon(shape.polygonal()->vertices(), convexPoly);
+        return detail::isPolygonInsideConvexPolygon(shape.polygonal()->vertices(), convexPoly);
     }
     else if (shape.type() == SHAPE2D_CIRCLE)
     {
@@ -319,7 +327,7 @@ bool isShapeInsidePolygon(const IFiniteShape2D& shape, const std::span<const Vec
 {
     if (isPolygonalShape(shape.type()))
     {
-        return isPolygonInsidePolygon(shape.polygonal()->vertices(), poly);
+        return detail::isPolygonInsidePolygon(shape.polygonal()->vertices(), poly);
     }
     else if (shape.type() == SHAPE2D_CIRCLE)
     {
@@ -384,6 +392,17 @@ bool isShapeInsideShape(const IFiniteShape2D& shape1, const IFiniteShape2D& shap
     }
     assert(false && "Unreachable code reached!");
     return false;
+}
+
+bool isShapeInsideShape(const FiniteShapeVariant2D& inner, const FiniteShapeVariant2D& shell)
+{
+    // Todo: Don't rely on the function we want to remove in the future
+    return std::visit([](const auto& innerShape, const auto& shellShape)
+    {
+        return isShapeInsideShape(
+            static_cast<const IFiniteShape2D&>(innerShape),
+            static_cast<const IFiniteShape2D&>(shellShape));
+    }, inner, shell);
 }
 
 //Consider throwing an exception after unreachable code asserts

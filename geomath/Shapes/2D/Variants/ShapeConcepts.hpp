@@ -29,7 +29,7 @@ class ConvexPolygon2D;
 template <typename T>
 concept Shape2D = requires(T& t, const T& ct, const Vector2D& p) {
     { ct.contains(p) } -> std::same_as<bool>;
-    { t.translate(p) } -> std::same_as<T&>;
+    //{ t.translate(p) } -> std::same_as<T&>;
 };
 
 template <typename T>
