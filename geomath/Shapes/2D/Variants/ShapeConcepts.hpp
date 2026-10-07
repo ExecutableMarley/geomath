@@ -48,6 +48,7 @@ concept PolygonalShape =
     requires(const T& t) {
     { t.vertices() } -> std::same_as<const std::span<const Vector2D>>;
     { t.vertexCount() } -> std::same_as<std::size_t>;
+    { t.isConvex() } -> std::same_as<bool>;
 };
 
 template <typename T>

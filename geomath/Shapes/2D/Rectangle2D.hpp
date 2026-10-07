@@ -77,6 +77,11 @@ public:
 
     // --- Geometric Properties ---
 
+    bool isConvex() const noexcept
+    {
+        return true;
+    }
+
     real_t width() const
     {
         return (b() - a()).length();

@@ -73,6 +73,11 @@ public:
 
     // --- Geometric Properties ---
 
+    bool isConvex() const noexcept
+    {
+        return true;
+    }
+
     real_t area() const override
     {
         return 0.5f * fabs((a().x - c().x) * (b().y - c().y) - (b().x - c().x) * (a().y - c().y));

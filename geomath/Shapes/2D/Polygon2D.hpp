@@ -80,6 +80,8 @@ public:
     const_iterator begin() const { return m_vertices.begin(); }
     const_iterator end() const { return m_vertices.end(); }
 
+    // --- Geometric Properties ---
+
     bool isConvex() const
     {
         const size_t n = m_vertices.size();
@@ -121,8 +123,6 @@ public:
         }
         return true;
     }
-
-    // --- Geometric Properties ---
 
     real_t area() const override
     {
