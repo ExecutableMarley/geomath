@@ -13,6 +13,7 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
+#include "Variants/ShapeConcepts.hpp"
 #include "Algebra/Matrices/Matrix3x3.hpp"
 #include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
 #include "BBox2D.hpp"
@@ -218,6 +219,8 @@ public:
             max, {min.x, max.y});
     }
 };
+
+static_assert(PolygonalShape<Rectangle2D>);
 
 } // namespace geomath
 

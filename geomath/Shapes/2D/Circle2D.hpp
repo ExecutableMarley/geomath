@@ -12,6 +12,7 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
+#include "Variants/ShapeConcepts.hpp"
 #include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
 #include "BBox2D.hpp"
 #include "Interfaces/IFiniteShape2D.hpp"
@@ -168,6 +169,8 @@ public:
         return stream << "Circle2D(center: [" << circle.m_center.x << ", " << circle.m_center.y << "], radius: " << circle.m_radius << ")";
     }
 };
+
+static_assert(FiniteShape2D<Circle2D>);
 
 } // namespace Math
 
