@@ -26,7 +26,7 @@ struct TriangleMeshData
 
     TriangleMeshData() = default;
 
-    TriangleMeshData(const std::span<const Vector2D>& vertices, const std::span<const TriangleIndices>& triangles) :
+    TriangleMeshData(std::span<const Vector2D> vertices, std::span<const TriangleIndices> triangles) :
         m_vertices(vertices.begin(), vertices.end()), m_triangles(triangles.begin(), triangles.end()) {}
 
     TriangleMeshData(std::span<const Vector2D> vertices,
@@ -41,6 +41,12 @@ struct TriangleMeshData
         : m_vertices(vertices),
           m_triangles(triangles)
     {
+    }
+
+    void reserve(size_t numVertices, size_t numTriangles) 
+    {
+        m_vertices.reserve(numVertices);
+        m_triangles.reserve(numTriangles);
     }
 
     bool isValid() const 
@@ -342,8 +348,7 @@ public:
     }
 
     TriangleMeshBuilder2D& reserve(size_t numVertices, size_t numTriangles) {
-        m_data.m_vertices.reserve(numVertices);
-        m_data.m_triangles.reserve(numTriangles);
+        m_data.reserve(numVertices, numTriangles);
         return *this;
     }
 
@@ -352,12 +357,6 @@ public:
     {
         return std::move(m_data);
     }
-
-    // ivalue reference
-    /*TriangleMeshData build() const & 
-    {
-        return m_data;
-    }*/
 
     // ivalue reference
     TriangleMeshData copyData() const &
