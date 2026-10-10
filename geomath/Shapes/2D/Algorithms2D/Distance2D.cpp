@@ -190,7 +190,24 @@ real_t distanceSegmentToEdgeList(const Segment2D& seg, std::span<const Vector2D>
     return minDist;
 }
 
+real_t distanceSegmentToPolygon(const Segment2D& segment, std::span<const Vector2D> vertices,
+    bool convex, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    const bool startInside = convex
+        ? detail::isPointInsideConvexPolygon(segment.m_start, vertices)
+        : detail::isPointInsidePolygon(segment.m_start, vertices);
+
+    if (startInside)
+    {
+        if (closestPoint1) *closestPoint1 = segment.m_start;
+        if (closestPoint2) *closestPoint2 = segment.m_start;
+        return real_t{0};
+    }
+
+    return detail::distanceSegmentToEdgeList(segment, vertices, true, closestPoint1, closestPoint2);
 }
+
+} // namespace detail
 
 
 // Distance calculation algorithms
@@ -205,42 +222,11 @@ real_t distance(const Segment2D& segment1, const Segment2D& segment2, Vector2D* 
     return detail::distanceSegmentToSegment(segment1.m_start, segment1.m_end, segment2.m_start, segment2.m_end, closestPoint1, closestPoint2);
 }
 
-//Todo: Distance to shapes
-
 real_t distance(const Vector2D& point, const BBox2D& bbox, Vector2D* closestPoint)
 {
     Vector2D c = bbox.closestPoint(point);
     if (closestPoint) *closestPoint = c;
     return point.distance(c);
-}
-
-//Todo: Consider renaming slightly
-
-
-
-real_t distance(const Vector2D& point, const IPolygonalShape2D& polygon, Vector2D* closestPoint)
-{
-    //Todo: refactor this
-    if (isConvexPolygonal(polygon.type()))
-    {
-        if (detail::isPointInsideConvexPolygon(point, polygon.vertices()))
-        {
-            if (closestPoint)
-                *closestPoint = point;
-            return real_t{0};
-        }
-        return detail::distancePointToPolygonEdges(point, polygon.vertices(), closestPoint);
-    }
-    else
-    {
-        if (detail::isPointInsidePolygon(point, polygon.vertices()))
-        {
-            if (closestPoint)
-                *closestPoint = point;
-            return real_t{0};
-        }
-        return detail::distancePointToPolygonEdges(point, polygon.vertices(), closestPoint);
-    }
 }
 
 real_t distance(const Vector2D& point, const Circle2D& circle, Vector2D* closestPoint)
@@ -280,23 +266,6 @@ real_t distance(const Segment2D& segment, const BBox2D& bbox, Vector2D* closestP
     return detail::distanceSegmentToEdgeList(segment, bbox.corners(), true, closestPoint1, closestPoint2);
 }
 
-real_t boundaryDistance(const Segment2D& segment, const IPolygonalShape2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2)
-{
-    return detail::distanceSegmentToEdgeList(segment, polygon.vertices(), true, closestPoint1, closestPoint2);
-}
-
-real_t distance(const Segment2D& segment, const IPolygonalShape2D& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2)
-{
-    if (isPointInsidePolygon(segment.m_start, polygon))
-    {
-        if (closestPoint1) *closestPoint1 = segment.m_start;
-        if (closestPoint2) *closestPoint2 = segment.m_start;
-        return real_t{0};
-    }
-
-    return detail::distanceSegmentToEdgeList(segment, polygon.vertices(), true, closestPoint1, closestPoint2);
-}
-
 real_t distance(const Segment2D& segment, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     Vector2D p;
@@ -326,7 +295,7 @@ real_t distance(const Segment2D& segment, const Circle2D& circle, Vector2D* clos
 }
 
 
-real_t distance(const BBox2D& a, const BBox2D& b, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t detail::distanceImpl(const BBox2D& a, const BBox2D& b, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     real_t dx = 0;
     real_t dy = 0;
@@ -382,12 +351,12 @@ real_t distance(const BBox2D& a, const BBox2D& b, Vector2D* closestPoint1, Vecto
 
 //real_t distanceCircleToCircle(const Circle2D& circle1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
 
-real_t boundaryDistance(const BBox2D& bbox1, const IPolygonalShape2D& poly2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t detail::distanceBBoxToPolygon(const BBox2D& bbox1, std::span<const Vector2D> vertices, bool convex,
+    Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     //Todo: This can (and should) be optimized
 
-    const auto v = poly2.vertices();
-    const size_t n = v.size();
+    const size_t n = vertices.size();
 
     real_t minDist = std::numeric_limits<real_t>::max();
     Vector2D bestP1, bestP2;
@@ -401,8 +370,8 @@ real_t boundaryDistance(const BBox2D& bbox1, const IPolygonalShape2D& poly2, Vec
 
         for (int j = 0; j < n; ++j)
         {
-            Vector2D a2 = v[j];
-            Vector2D b2 = v[(j + 1) % n];
+            Vector2D a2 = vertices[j];
+            Vector2D b2 = vertices[(j + 1) % n];
 
             Vector2D p1, p2;
             real_t d = detail::distanceSegmentToSegment(a1, b1, a2, b2, &p1, &p2);
@@ -423,19 +392,13 @@ real_t boundaryDistance(const BBox2D& bbox1, const IPolygonalShape2D& poly2, Vec
         }
     }
 
-    if (closestPoint1) *closestPoint1 = bestP1;
-    if (closestPoint2) *closestPoint2 = bestP2;
+    if (minDist == real_t{0})
+        return real_t{0};
 
-    return minDist;
-}
-
-real_t distance(const BBox2D& bbox1, const IPolygonalShape2D& poly2, Vector2D* closestPoint1, Vector2D* closestPoint2)
-{
-    const real_t bDist = boundaryDistance(bbox1, poly2, closestPoint1, closestPoint2);
+    const real_t bDist = minDist;
     if (bDist == real_t{0})
         return real_t{0};
 
-    const auto vertices = poly2.vertices();
     for (const Vector2D& vertex : vertices)
     {
         if (isPointInsideBBox(vertex, bbox1))
@@ -448,7 +411,10 @@ real_t distance(const BBox2D& bbox1, const IPolygonalShape2D& poly2, Vector2D* c
 
     for (const Vector2D& corner : bbox1.corners())
     {
-        if (poly2.contains(corner))
+        const bool inside = convex
+            ? detail::isPointInsideConvexPolygon(corner, vertices)
+            : detail::isPointInsidePolygon(corner, vertices);
+        if (inside)
         {
             if (closestPoint1) *closestPoint1 = corner;
             if (closestPoint2) *closestPoint2 = corner;
@@ -456,10 +422,12 @@ real_t distance(const BBox2D& bbox1, const IPolygonalShape2D& poly2, Vector2D* c
         }
     }
 
+    if (closestPoint1) *closestPoint1 = bestP1;
+    if (closestPoint2) *closestPoint2 = bestP2;
     return bDist;
 }
 
-real_t distance(const BBox2D& bbox, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t detail::distanceImpl(const BBox2D& bbox, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     const Vector2D& c = circle.m_center;
     const real_t r = circle.m_radius;
@@ -574,23 +542,48 @@ real_t boundaryDistance(const Polygon& poly1, const Polygon& poly2,
     return minDist;
 }
 
-real_t distance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, 
-    Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t detail::distancePolygonToPolygon(std::span<const Vector2D> v1, bool convex1,
+    std::span<const Vector2D> v2, bool convex2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
-    real_t bDist = boundaryDistance(poly1, poly2, closestPoint1, closestPoint2);
-    
-    // Boundary Collision
-    if (bDist == real_t(0)) return real_t(0);
+    real_t bDist = std::numeric_limits<real_t>::max();
+    Vector2D bestP1, bestP2;
 
-    const auto v1 = poly1.vertices();
-    const auto v2 = poly2.vertices();
+    for (size_t i = 0; i < v1.size(); ++i)
+    {
+        for (size_t j = 0; j < v2.size(); ++j)
+        {
+            Vector2D p1, p2;
+            const real_t d = detail::distanceSegmentToSegment(v1[i], v1[(i + 1) % v1.size()],
+                v2[j], v2[(j + 1) % v2.size()], &p1, &p2);
+            if (d < bDist)
+            {
+                bDist = d;
+                bestP1 = p1;
+                bestP2 = p2;
+                if (d == real_t{0})
+                {
+                    if (closestPoint1) *closestPoint1 = p1;
+                    if (closestPoint2) *closestPoint2 = p2;
+                    return real_t{0};
+                }
+            }
+        }
+    }
+
+    if (closestPoint1) *closestPoint1 = bestP1;
+    if (closestPoint2) *closestPoint2 = bestP2;
 
     // Test for containment
-    if ((!v1.empty() && poly2.contains(v1[0])) || 
-        (!v2.empty() && poly1.contains(v2[0])))
+    const bool firstInsideSecond = !v1.empty() && (convex2
+        ? detail::isPointInsideConvexPolygon(v1[0], v2)
+        : detail::isPointInsidePolygon(v1[0], v2));
+    const bool secondInsideFirst = !v2.empty() && (convex1
+        ? detail::isPointInsideConvexPolygon(v2[0], v1)
+        : detail::isPointInsidePolygon(v2[0], v1));
+    if (firstInsideSecond || secondInsideFirst)
     {
         // When contained, the closest witness points coincide inside the region
-        Vector2D overlapPt = !v1.empty() ? v1[0] : v2[0];
+        Vector2D overlapPt = firstInsideSecond ? v1[0] : v2[0];
         if (closestPoint1) *closestPoint1 = overlapPt;
         if (closestPoint2) *closestPoint2 = overlapPt;
         return real_t(0);
@@ -621,7 +614,8 @@ real_t signedDistance(const Polygon& poly1, const Polygon& poly2,
     return bDist;
 }
 
-real_t boundaryDistance(const IPolygonalShape2D& poly1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+template <PolygonalShape Polygon>
+real_t boundaryDistance(const Polygon& poly1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     const auto v = poly1.vertices();
     const int n = (int)v.size();
@@ -662,19 +656,41 @@ real_t boundaryDistance(const IPolygonalShape2D& poly1, const Circle2D& circle2,
     return minDist;
 }
 
-real_t distance(const IPolygonalShape2D& poly1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t detail::distancePolygonToCircle(std::span<const Vector2D> vertices, bool convex,
+    const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
-    if (poly1.contains(circle2.m_center))
+    const bool centerInside = convex
+        ? detail::isPointInsideConvexPolygon(circle2.m_center, vertices)
+        : detail::isPointInsidePolygon(circle2.m_center, vertices);
+    if (centerInside)
     {
         if (closestPoint1) *closestPoint1 = circle2.m_center;
         if (closestPoint2) *closestPoint2 = circle2.m_center;
         return real_t{0};
     }
 
-    return boundaryDistance(poly1, circle2, closestPoint1, closestPoint2);
+    real_t minDist = std::numeric_limits<real_t>::max();
+    Vector2D bestP1, bestP2;
+    for (size_t i = 0; i < vertices.size(); ++i)
+    {
+        Vector2D p1, p2;
+        const Segment2D edge(vertices[i], vertices[(i + 1) % vertices.size()]);
+        const real_t d = distance(edge, circle2, &p1, &p2);
+        if (d < minDist)
+        {
+            minDist = d;
+            bestP1 = p1;
+            bestP2 = p2;
+            if (d == real_t{0})
+                break;
+        }
+    }
+    if (closestPoint1) *closestPoint1 = bestP1;
+    if (closestPoint2) *closestPoint2 = bestP2;
+    return minDist;
 }
 
-real_t distance(const Circle2D& circle1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t detail::distanceImpl(const Circle2D& circle1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     Vector2D delta = circle2.m_center - circle1.m_center;
     real_t dist = delta.length();
@@ -696,6 +712,7 @@ real_t distance(const Circle2D& circle1, const Circle2D& circle2, Vector2D* clos
     return dist - circle1.m_radius - circle2.m_radius;
 }
 
+/*
 real_t distance(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     const Circle2D* circle1 = shape_cast<Circle2D>(&shape1);
@@ -720,6 +737,21 @@ real_t distance(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2, Vect
     //Todo: Consider behaviour
     return std::numeric_limits<real_t>::max();
 }
+*/
+
+
+/*
+template <typename A, typename B>
+    requires (!std::same_as<A, B>) 
+          //&& (!requires(const A& a, const B& b, Vector2D* p1, Vector2D* p2) { distance(a, b, p1, p2); }) // Doesn't already exist
+          && requires(const B& b, const A& a, Vector2D* p1, Vector2D* p2) { distance(b, a, p1, p2); }     // Reverse DOES exist
+real_t distance(const A& a, const B& b, Vector2D* p1, Vector2D* p2) {
+    real_t res = distance(b, a, p2, p1);
+    //std::swap(*p1, *p2); // Swap outputs so closestA corresponds to 'a'
+    return res;
+}
+*/
+
 
 real_t distance(const FiniteShapeVariant2D& shape1, const FiniteShapeVariant2D& shape2, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {

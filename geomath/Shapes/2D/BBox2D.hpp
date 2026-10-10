@@ -195,10 +195,10 @@ public:
 
         if (delta.isZero()) // Point is inside the box
         {
-            real_t leftDist = std::abs(point.x - m_min.x);
-            real_t rightDist = std::abs(point.x - m_max.x);
+            real_t leftDist   = std::abs(point.x - m_min.x);
+            real_t rightDist  = std::abs(point.x - m_max.x);
             real_t bottomDist = std::abs(point.y - m_min.y);
-            real_t topDist = std::abs(point.y - m_max.y);
+            real_t topDist    = std::abs(point.y - m_max.y);
 
             real_t minDist = std::min({ leftDist, rightDist, bottomDist, topDist });
 

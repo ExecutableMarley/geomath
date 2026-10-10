@@ -7,6 +7,7 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
+#include "../Variants/ShapeConcepts.hpp"
 
 #include <math.h>
 #include <vector>
@@ -82,21 +83,46 @@ bool isPointInsideConvexPolygon(const Vector2D& point, const ConvexPolygon2D& po
 
 bool isPointInsidePolygon(const Vector2D& point, const Polygon2D& polygon);
 
-bool isPointInsidePolygon(const Vector2D& point, const IPolygonalShape2D& polygon);
+//bool isPointInsidePolygon(const Vector2D& point, const IPolygonalShape2D& polygon);
 
 bool isPointInsideCircle(const Vector2D& point, const Circle2D& circle);
 
-bool isPointInShape(const Vector2D& point, const IBaseShape2D& shape);
+//bool isPointInShape(const Vector2D& point, const IBaseShape2D& shape);
 
 // --- Segment-in-Shape containment
 
-bool isSegmentInsideShape(const Segment2D& segment, const IBaseShape2D& shape);
+bool isSegmentInsideBBox(const Segment2D &segment, const BBox2D& bbox);
+
+bool isSegmentInsideTriangle(const Segment2D &segment, const Triangle2D& triangle);
+
+bool isSegmentInsideRectangle(const Segment2D &segment, const Rectangle2D& rectangle);
+
+bool isSegmentInsideConvexPolygon(const Segment2D &segment, const ConvexPolygon2D& polygon);
+
+bool isSegmentInsidePolygon(const Segment2D &segment, const Polygon2D& polygon);
+
+bool isSegmentInsideCircle(const Segment2D &segment, const Circle2D& circle);
+
+/*
+template <PolygonalShape Shape>
+bool isSegmentInsideShape(const Segment2D &segment, const Shape &shape)
+{
+    if (shape.isConvex())
+        return isPointInsideConvexPolygon(segment.m_start, shape.vertices()) &&
+            return isPointInsideConvexPolygon(segment.m_end, shape.vertices());
+    else
+        return isPointInsidePolygon(segment.m_start, shape.vertices()) &&
+            return isPointInsidePolygon(segment.m_end, shape.vertices());
+}
+*/
+
+//bool isSegmentInsideShape(const Segment2D& segment, const IBaseShape2D& shape);
 
 //
 
 bool isBBoxInsideBBox(const BBox2D& bbox1, const BBox2D& bbox2);
 
-bool isPolygonalInsideBBox(const IPolygonalShape2D& polygon, const BBox2D& bbox);
+//bool isPolygonalInsideBBox(const IPolygonalShape2D& polygon, const BBox2D& bbox);
 
 bool isCircleInsideBBox(const Circle2D& circle, const BBox2D& bbox);
 
@@ -126,6 +152,15 @@ real_t distancePointToSegment(const Vector2D& point, const Vector2D& segmentStar
 real_t distanceSegmentToSegment(const Vector2D& s1, const Vector2D& s2, const Vector2D& k1, const Vector2D& k2, 
     Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 
+real_t distancePointToPolygonEdges(const Vector2D& point, std::span<const Vector2D> vertices,
+    Vector2D* closestPoint = nullptr);
+
+real_t distanceSegmentToEdgeList(const Segment2D& segment, std::span<const Vector2D> vertices,
+    bool closed, Vector2D* closestSegmentPoint = nullptr, Vector2D* closestEdgePoint = nullptr);
+
+real_t distanceSegmentToPolygon(const Segment2D& segment, std::span<const Vector2D> vertices,
+    bool convex, Vector2D* closestSegmentPoint = nullptr, Vector2D* closestPolygonPoint = nullptr);
+
 }
 
 //GJK dist?
@@ -136,7 +171,25 @@ real_t distanceSegmentToSegment(const Vector2D& s1, const Vector2D& s2, const Ve
 
 real_t distance(const Vector2D& point, const Segment2D& segment, Vector2D* closestPoint = nullptr);
 real_t distance(const Vector2D& point, const BBox2D& bbox, Vector2D* closestPoint = nullptr);
-real_t distance(const Vector2D& point, const IPolygonalShape2D& polygon, Vector2D* closestPoint = nullptr);
+
+template <PolygonalShape Polygon>
+real_t distance(const Vector2D& point, const Polygon& polygon, Vector2D* closestPoint = nullptr)
+{
+    const auto vertices = polygon.vertices();
+    const bool inside = polygon.isConvex()
+        ? detail::isPointInsideConvexPolygon(point, vertices)
+        : detail::isPointInsidePolygon(point, vertices);
+
+    if (inside)
+    {
+        if (closestPoint)
+            *closestPoint = point;
+        return real_t{0};
+    }
+
+    return detail::distancePointToPolygonEdges(point, vertices, closestPoint);
+}
+
 real_t distance(const Vector2D& point, const Circle2D& circle, Vector2D* closestPoint = nullptr);
 
 // ========================================================================
@@ -145,25 +198,76 @@ real_t distance(const Vector2D& point, const Circle2D& circle, Vector2D* closest
 
 real_t distance(const Segment2D& segment1, const Segment2D& segment2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 real_t distance(const Segment2D& segment, const BBox2D& bbox, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
-real_t distance(const Segment2D& segment, const IPolygonalShape2D& polygon, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
+
+template <PolygonalShape Polygon>
+real_t distance(const Segment2D& segment, const Polygon& polygon,
+    Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr)
+{
+    return detail::distanceSegmentToPolygon(
+        segment, polygon.vertices(), polygon.isConvex(), closestPoint1, closestPoint2);
+}
+
 real_t distance(const Segment2D& segment, const Circle2D& circle, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
 
 // ========================================================================
 // 3. Shape vs Shape Queries (2 Output Points)
 // ========================================================================
 
-real_t distance(const BBox2D& bbox1, const BBox2D& bbox2, Vector2D* closestPoint1, Vector2D* closestPoint2);
-real_t distance(const BBox2D& bbox, const IPolygonalShape2D& poly, Vector2D* closestPoint1, Vector2D* closestPoint2);
-real_t distance(const BBox2D& bbox, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
+namespace detail
+{
 
-//real_t distance(const IPolygonalShape2D& poly1, const IPolygonalShape2D& poly2, Vector2D* closestPoint1, Vector2D* closestPoint2);
-//real_t distance(const IPolygonalShape2D& poly1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
+real_t distanceImpl(const BBox2D& bbox1, const BBox2D& bbox2, Vector2D* closestPoint1, Vector2D* closestPoint2);
+real_t distanceImpl(const BBox2D& bbox, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
+real_t distanceImpl(const Circle2D& circle1, const Circle2D& circle2,
+    Vector2D* closestPoint1, Vector2D* closestPoint2);
 
-real_t distance(const Circle2D& circle1, const Circle2D& circle2, Vector2D* closestPoint1, Vector2D* closestPoint2);
-//real_t distance(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2, Vector2D* closestPoint1 = nullptr, Vector2D* closestPoint2 = nullptr);
+real_t distanceBBoxToPolygon(const BBox2D& bbox, std::span<const Vector2D> vertices, bool convex,
+    Vector2D* closestPoint1, Vector2D* closestPoint2);
+real_t distancePolygonToPolygon(std::span<const Vector2D> vertices1, bool convex1,
+    std::span<const Vector2D> vertices2, bool convex2, Vector2D* closestPoint1, Vector2D* closestPoint2);
+real_t distancePolygonToCircle(std::span<const Vector2D> vertices, bool convex,
+    const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
 
+template <PolygonalShape Polygon>
+real_t distanceImpl(const BBox2D& bbox, const Polygon& polygon, Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    return distanceBBoxToPolygon(bbox, polygon.vertices(), polygon.isConvex(), closestPoint1, closestPoint2);
+}
 
-// --- Symmetric Forwarding Helper ---
+template <PolygonalShape Polygon1, PolygonalShape Polygon2>
+real_t distanceImpl(const Polygon1& polygon1, const Polygon2& polygon2,
+    Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    return distancePolygonToPolygon(polygon1.vertices(), polygon1.isConvex(),
+        polygon2.vertices(), polygon2.isConvex(), closestPoint1, closestPoint2);
+}
+
+template <PolygonalShape Polygon>
+real_t distanceImpl(const Polygon& polygon, const Circle2D& circle,
+    Vector2D* closestPoint1, Vector2D* closestPoint2)
+{
+    return distancePolygonToCircle(polygon.vertices(), polygon.isConvex(), circle, closestPoint1, closestPoint2);
+}
+
+}
+
+template <typename A, typename B>
+    requires (requires(const A& a, const B& b, Vector2D* p1, Vector2D* p2) {
+                  detail::distanceImpl(a, b, p1, p2);
+              } || requires(const A& a, const B& b, Vector2D* p1, Vector2D* p2) {
+                  detail::distanceImpl(b, a, p2, p1);
+              })
+real_t distance(const A& a, const B& b, Vector2D* p1 = nullptr, Vector2D* p2 = nullptr)
+{
+    if constexpr (requires { detail::distanceImpl(a, b, p1, p2); })
+    {
+        return detail::distanceImpl(a, b, p1, p2);
+    }
+    else
+    {
+        return detail::distanceImpl(b, a, p2, p1);
+    }
+}
 
 
 

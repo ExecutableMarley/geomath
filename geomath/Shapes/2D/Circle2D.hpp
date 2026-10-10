@@ -127,7 +127,7 @@ public:
 
     bool contains(const Segment2D& segment) const
     {
-        return isSegmentInsideShape(segment, *this);
+        return isSegmentInsideCircle(segment, *this);
     }
 
     bool contains(const Circle2D &circle) const

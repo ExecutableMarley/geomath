@@ -383,3 +383,22 @@ TEST_CASE("distance polygon-polygon containment and boundary intersection")
         CHECK(distance(first, second, &c1, &c2) == doctest::Approx(0));
     }
 }
+
+TEST_CASE("distance variant dispatch handles reversed shape order")
+{
+    const Triangle2D triangle(Vector2D(0, 0), Vector2D(4, 0), Vector2D(0, 4));
+    const Circle2D circle(Vector2D(5, 1), real_t{0.5});
+    const FiniteShapeVariant2D triangleVariant{triangle};
+    const FiniteShapeVariant2D circleVariant{circle};
+    const real_t expectedDistance = std::sqrt(real_t{2}) - real_t{0.5};
+
+    Vector2D circlePoint;
+    Vector2D trianglePoint;
+    const real_t d = distance(circleVariant, triangleVariant, &circlePoint, &trianglePoint);
+
+    CHECK(d == doctest::Approx(expectedDistance));
+    CHECK(circlePoint == Vector2D(real_t{5} - real_t{0.5} / std::sqrt(real_t{2}),
+                                  real_t{1} - real_t{0.5} / std::sqrt(real_t{2})));
+    CHECK(trianglePoint == Vector2D(4, 0));
+    CHECK(distance(circleVariant, triangleVariant, nullptr, nullptr) == doctest::Approx(expectedDistance));
+}

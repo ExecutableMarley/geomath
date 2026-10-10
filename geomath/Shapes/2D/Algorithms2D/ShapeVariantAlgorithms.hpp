@@ -11,9 +11,13 @@
 namespace Arns::geomath
 {
 
-// We can't currently put variant dispatch functions inside Algorithms
+// We can't currently put variant dispatch functions inside Algorithms.hpp
 
 //
+
+//bool isPointInsideShape(const Vector2D& point, const FiniteShapeVariant2D& shell);
+
+//bool isSegmentInsideShape(const Segment2D& segment, const FiniteShapeVariant2D& shell);
 
 bool isShapeInsideShape(const FiniteShapeVariant2D& inner, const FiniteShapeVariant2D& shell);
 
@@ -30,6 +34,10 @@ bool intersect(const Segment2D& segment, const FiniteShapeVariant2D& shape, HitI
 bool intersect(const FiniteShapeVariant2D& shape1, const FiniteShapeVariant2D& shape2);
 
 //
+
+real_t distance(const Vector2D& point, const FiniteShapeVariant2D& shape2, Vector2D* closestPoint1, Vector2D* closestPoint2);
+
+real_t distance(const Segment2D& segment, const FiniteShapeVariant2D& shape2, Vector2D* closestPoint1, Vector2D* closestPoint2);
 
 real_t distance(const FiniteShapeVariant2D& shape1, const FiniteShapeVariant2D& shape2, Vector2D* closestPoint1, Vector2D* closestPoint2);
 

@@ -13,10 +13,13 @@
 #include "../Rectangle2D.hpp"
 #include "../Polygon2D.hpp"
 #include "../ConvexPolygon2D.hpp"
+#include "../Variants/ShapeConcepts.hpp"
 #include "ShapeVariantAlgorithms.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <span>
+#include <vector>
 
 namespace Arns::geomath
 {
@@ -68,6 +71,7 @@ bool isPointInsidePolygon(const Vector2D& point, const std::span<const Vector2D>
     return contains;
 }
 
+/*
 bool isPolygonalInsideBBox(const IPolygonalShape2D& polygon, const BBox2D& bbox)
 {
     for (const auto& v : polygon.vertices())
@@ -75,6 +79,7 @@ bool isPolygonalInsideBBox(const IPolygonalShape2D& polygon, const BBox2D& bbox)
             return false;
     return true;
 }
+*/
 
 //Helper function
 bool edgeIntersectionPolygonWithPolygon(const std::span<const Vector2D> vertices1, const std::span<const Vector2D> vertices2, HitInfo2D* hitInfo = nullptr)
@@ -203,38 +208,71 @@ bool isPointInsidePolygon(const Vector2D& point, const Polygon2D& polygon)
     return detail::isPointInsidePolygon(point, polygon.vertices());
 }
 
+/*
 bool isPointInsidePolygon(const Vector2D& point, const IPolygonalShape2D& polygon)
 {
     return detail::isPointInsidePolygon(point, polygon.vertices());
 }
+*/
 
 bool isPointInsideCircle(const Vector2D& point, const Circle2D& circle)
 {
     return (point - circle.m_center).lengthSquared() <= circle.m_radius * circle.m_radius;
 }
 
+/*
 bool isPointInShape(const Vector2D& point, const IBaseShape2D& shape)
 {
     return shape.contains(point);
 }
+*/
 
 // Segment inside shape
 
-bool isSegmentInsideShape(const Segment2D& segment, const IBaseShape2D& shape)
+bool isSegmentInsideBBox(const Segment2D &segment, const BBox2D& bbox)
 {
-    if (!shape.contains(segment.m_start) || !shape.contains(segment.m_end))
-        return false;
+    return isPointInsideBBox(segment.m_start, bbox) &&
+           isPointInsideBBox(segment.m_end, bbox);
+}
 
-    if (shape.type() == SHAPE2D_POLYGON)
+bool isSegmentInsideTriangle(const Segment2D &segment, const Triangle2D& triangle)
+{
+    return isPointInsideTriangle(segment.m_start, triangle) &&
+           isPointInsideTriangle(segment.m_end, triangle);
+}
+
+bool isSegmentInsideRectangle(const Segment2D &segment, const Rectangle2D& rectangle)
+{
+    return isPointInsideRectangle(segment.m_start, rectangle) &&
+           isPointInsideRectangle(segment.m_end, rectangle);
+}
+
+bool isSegmentInsideConvexPolygon(const Segment2D &segment, const ConvexPolygon2D& polygon)
+{
+    return isPointInsideConvexPolygon(segment.m_start, polygon) &&
+           isPointInsideConvexPolygon(segment.m_end, polygon);
+}
+
+bool isSegmentInsidePolygon(const Segment2D &segment, const Polygon2D& polygon)
+{
+    if (!isPointInsidePolygon(segment.m_start, polygon) ||
+        !isPointInsidePolygon(segment.m_end, polygon))
     {
-        return !intersect(segment, shape);
+        return false;
     }
 
-    if (isConvexPolygonal(shape.type()) || shape.type() == SHAPE2D_CIRCLE)
-        return true;
+    if (!polygon.isConvex())
+    {
+        return !intersect(segment, polygon);
+    }
+    
+    return true;
+}
 
-    assert(false && "Unreachable code reached!");
-    return false;
+bool isSegmentInsideCircle(const Segment2D &segment, const Circle2D& circle)
+{
+    return isPointInsideCircle(segment.m_start, circle) &&
+           isPointInsideCircle(segment.m_end, circle);
 }
 
 //Shape inside BBox
@@ -309,6 +347,7 @@ bool isCircleInsidePolygon(const Circle2D& circle, const std::span<const Vector2
     return true;
 }
 
+/*
 bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::span<const Vector2D> convexPoly)
 {
     if (isPolygonalShape(shape.type()))
@@ -322,7 +361,9 @@ bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::span<con
     assert(false && "Unreachable code reached!");
     return false;
 }
+*/
 
+/*
 bool isShapeInsidePolygon(const IFiniteShape2D& shape, const std::span<const Vector2D> poly)
 {
     if (isPolygonalShape(shape.type()))
@@ -336,6 +377,7 @@ bool isShapeInsidePolygon(const IFiniteShape2D& shape, const std::span<const Vec
     assert(false && "Unreachable code reached!");
     return false;
 }
+    */
 
 bool isBBoxInsideCircle(const BBox2D& bbox, const Circle2D& circle)
 {
@@ -361,6 +403,7 @@ bool isCircleInsideCircle(const Circle2D& circle1, const Circle2D& circle2)
     return (circle2.m_center - circle1.m_center).lengthSquared() <= radiusDelta * radiusDelta;
 }
 
+/*
 bool isShapeInsideCircle(const IFiniteShape2D& shape, const Circle2D& circle)
 {
     if (isPolygonalShape(shape.type()))
@@ -374,8 +417,9 @@ bool isShapeInsideCircle(const IFiniteShape2D& shape, const Circle2D& circle)
     assert(false && "Unreachable code reached!");
     return false;
 }
+*/
 
-
+/*
 bool isShapeInsideShape(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2)
 {
     if (isConvexPolygonal(shape2.type()))
@@ -393,9 +437,112 @@ bool isShapeInsideShape(const IFiniteShape2D& shape1, const IFiniteShape2D& shap
     assert(false && "Unreachable code reached!");
     return false;
 }
+*/
+
+namespace detail
+{
+
+    template <PolygonalShape Shape>
+    bool isShapeInsideCircle(const Shape& shape, const Circle2D& outerCircle)
+    {
+        return isPolygonInsideCircle(shape.vertices(), outerCircle);
+    }
+
+    bool isShapeInsideCircle(const Circle2D& inner, const Circle2D& outerCircle)
+    {
+        return isCircleInsideCircle(inner, outerCircle);
+    }
+
+
+    // -------------------------------------------------------------------------
+    // Shape -> convex polygon
+    // -------------------------------------------------------------------------
+
+    template <PolygonalShape Shape>
+    bool isShapeInsideConvexPolygon(
+        const Shape& shape,
+        std::span<const Vector2D> convexPolygon)
+    {
+        if (shape.isConvex())
+        {
+            return isPolygonInsideConvexPolygon(
+                shape.vertices(),
+                convexPolygon);
+        }
+
+        return isPolygonInsideConvexPolygon(
+            shape.vertices(),
+            convexPolygon);
+    }
+
+    inline bool isShapeInsideConvexPolygon(
+        const Circle2D& circle,
+        std::span<const Vector2D> convexPolygon)
+    {
+        return isCircleInsideConvexPolygon(
+            circle,
+            convexPolygon);
+    }
+
+
+    // -------------------------------------------------------------------------
+    // Shape -> arbitrary polygon
+    // -------------------------------------------------------------------------
+
+    template <PolygonalShape Shape>
+    bool isShapeInsidePolygon(
+        const Shape& shape,
+        std::span<const Vector2D> polygon)
+    {
+        return isPolygonInsidePolygon(
+            shape.vertices(),
+            polygon);
+    }
+
+    inline bool isShapeInsidePolygon(
+        const Circle2D& circle,
+        std::span<const Vector2D> polygon)
+    {
+        return isCircleInsidePolygon(
+            circle,
+            polygon);
+    }
+
+
+    // -------------------------------------------------------------------------
+    // Shape -> Shape
+    // -------------------------------------------------------------------------
+
+    template <FiniteShape2D Shape>
+    bool isShapeInsideShape(
+        const Shape& shape,
+        const PolygonalShape auto& shell)
+    {
+        if (shell.isConvex())
+        {
+            return isShapeInsideConvexPolygon(
+                shape,
+                shell.vertices());
+        }
+
+        return isShapeInsidePolygon(
+            shape,
+            shell.vertices());
+    }
+
+    template <FiniteShape2D Shape>
+    bool isShapeInsideShape(
+        const Shape& shape,
+        const Circle2D& circle)
+    {
+        return isShapeInsideCircle(shape, circle);
+    }
+
+}
 
 bool isShapeInsideShape(const FiniteShapeVariant2D& inner, const FiniteShapeVariant2D& shell)
 {
+#if 0
     // Todo: Don't rely on the function we want to remove in the future
     return std::visit([](const auto& innerShape, const auto& shellShape)
     {
@@ -403,7 +550,28 @@ bool isShapeInsideShape(const FiniteShapeVariant2D& inner, const FiniteShapeVari
             static_cast<const IFiniteShape2D&>(innerShape),
             static_cast<const IFiniteShape2D&>(shellShape));
     }, inner, shell);
+#else
+    return std::visit(
+        []<FiniteShape2D Inner, FiniteShape2D Shell>(
+            const Inner& inner,
+            const Shell& shell)
+        {
+            return detail::isShapeInsideShape(inner, shell);
+        }, inner, shell);
+#endif
 }
+
+/*
+bool isPointInsideShape(const Vector2D& point, const FiniteShapeVariant2D& shell)
+{
+    
+}
+
+bool isSegmentInsideShape(const Segment2D& segment, const FiniteShapeVariant2D& shell)
+{
+    
+}
+*/
 
 //Consider throwing an exception after unreachable code asserts
 

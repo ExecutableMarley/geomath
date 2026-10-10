@@ -34,4 +34,14 @@ using FiniteShapeVariant2D = std::variant<
 
 using ShapeVariant2D = FiniteShapeVariant2D;//Todo: Move this
 
+using GeometryVariant2D = std::variant<
+    //Vector2D,
+    Segment2D,
+    Circle2D,
+    Triangle2D,
+    Rectangle2D,
+    Polygon2D,
+    ConvexPolygon2D
+>;
+
 }

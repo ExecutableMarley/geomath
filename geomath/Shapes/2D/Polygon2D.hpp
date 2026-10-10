@@ -242,7 +242,7 @@ public:
 
     bool contains(const Segment2D& segment) const
     {
-        return isSegmentInsideShape(segment, *this);
+        return isSegmentInsidePolygon(segment, *this);
     }
 
     template <typename T> requires FiniteShape2D<T>

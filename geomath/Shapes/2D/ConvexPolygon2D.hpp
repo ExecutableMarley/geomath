@@ -157,12 +157,12 @@ public:
 
     bool contains(const Vector2D &point) const override
     {
-        return detail::isPointInsidePolygon(point, std::span<const Vector2D>(m_vertices));
+        return detail::isPointInsideConvexPolygon(point, std::span<const Vector2D>(m_vertices));
     }
 
     bool contains(const Segment2D& segment) const
     {
-        return isSegmentInsideShape(segment, *this);
+        return isSegmentInsideConvexPolygon(segment, *this);
     }
 
     template <typename T> requires FiniteShape2D<T>
