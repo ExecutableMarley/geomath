@@ -250,30 +250,6 @@ bool detail::intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2
     return true;
 }
 
-/*
-bool intersect(const Ray2D& ray, const IPolygonalShape2D& polygon, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
-{
-    if (hitInfo == nullptr)
-        return intersectRayWithPolygonOptimized(ray, polygon, t_min, t_max);
-
-    bool hit = false;
-    real_t t = t_max;
-
-    for (int i = 0; i < polygon.vertexCount(); i++)
-    {
-        const Vector2D& p1 = polygon[i];
-        const Vector2D& p2 = polygon[(i + 1) % polygon.vertexCount()];
-
-        if (detail::intersectRayWithSegment(ray, p1, p2, t_min, t, hitInfo))
-        {
-            hit = true;
-            t = hitInfo->t;
-        }
-    }
-    return hit;
-}
-*/
-
 bool detail::intersectRayImpl(const Ray2D& ray, const Segment2D& segment, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     return detail::intersectRayWithSegment(ray, segment.m_start, segment.m_end, t_min, t_max, hitInfo);
@@ -326,26 +302,6 @@ bool detail::intersectRayImpl(const Ray2D& ray, const Circle2D& circle, real_t t
 
     return true;
 }
-
-/*
-bool intersect(const Ray2D& ray, const IBaseShape2D& shape, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
-{
-    switch(shape.type())
-    {
-        case ShapeType2D::SHAPE2D_TRIANGLE:
-        case ShapeType2D::SHAPE2D_RECTANGLE:
-        case ShapeType2D::SHAPE2D_POLYGON:
-            return intersect(ray, dynamic_cast<const IPolygonalShape2D&>(shape), t_min, t_max, hitInfo);
-         case ShapeType2D::SHAPE2D_CIRCLE:
-            return intersect(ray, dynamic_cast<const Circle2D&>(shape), t_min, t_max, hitInfo);
-        default:
-            //Todo: we might just want to throw and error here
-            assert("Unreachable Code reached!");
-            return false;
-    }
-}
-*/
-
 
 bool intersect(const Ray2D& ray, const FiniteShapeVariant2D& shape, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
@@ -562,13 +518,6 @@ bool intersectPolygonWithCircle(std::span<const Vector2D> vertices, bool convex,
 
 }
 
-bool intersect(const PolygonalShapeVariant2D& polygon1, const PolygonalShapeVariant2D& polygon2)
-{
-    return std::visit([](const auto& p1, const auto& p2) {
-        return intersect(p1, p2);
-    }, polygon1, polygon2);
-}
-
 // --- Circles ---
 
 bool detail::intersectImpl(const Circle2D& circle1, const Circle2D& circle2)
@@ -609,5 +558,5 @@ bool intersect(const FiniteShapeVariant2D& shape1, const FiniteShapeVariant2D& s
         return intersect(shape1, shape2);
     }, shape1, shape2);
 }
-    
+ 
 }

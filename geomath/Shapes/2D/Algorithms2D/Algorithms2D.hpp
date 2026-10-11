@@ -150,13 +150,6 @@ real_t distancePolygonToPolygon(std::span<const Vector2D> vertices1, bool convex
 real_t distancePolygonToCircle(std::span<const Vector2D> vertices, bool convex,
     const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2);
 
-}
-
-//GJK dist?
-
-namespace detail
-{
-
 // ========================================================================
 // 1. Point vs Shape Queries (1 Output Point)
 // ========================================================================
@@ -235,6 +228,8 @@ real_t distanceImpl(const Polygon& polygon, const Circle2D& circle,
 
 } // namespace detail
 
+//  --- Generic Distance function ---
+
 template <typename A, typename B>
     requires (requires(const A& a, const B& b, Vector2D* p1, Vector2D* p2) {
                   detail::distanceImpl(a, b, p1, p2);
@@ -257,28 +252,26 @@ real_t distance(const A& a, const B& b, Vector2D* p1 = nullptr, Vector2D* p2 = n
 
 // Intersection calculation algorithms
 
-//    --- Rays ---
+
 
 namespace detail
 {
 
-bool intersectRayWithSegment(const Ray2D& ray, const Vector2D& p1, const Vector2D& p2, 
-    real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
+    bool intersectRayWithSegment(const Ray2D &ray, const Vector2D &p1, const Vector2D &p2,
+                                 real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D *hitInfo = nullptr);
 
-bool rayBoundsInterval(const Ray2D& ray, const BBox2D& bbox, 
-    real_t t_min, real_t t_max, real_t& t_enter, real_t& t_exit);
+    bool rayBoundsInterval(const Ray2D &ray, const BBox2D &bbox,
+                           real_t t_min, real_t t_max, real_t &t_enter, real_t &t_exit);
 
-bool intersectRayWithPolygon(const Ray2D& ray, std::span<const Vector2D> vertices, 
-    real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
+    bool intersectRayWithPolygon(const Ray2D &ray, std::span<const Vector2D> vertices,
+                                 real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D *hitInfo = nullptr);
 
-bool intersectSegmentWithSegment(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo = nullptr);
+    bool intersectSegmentWithSegment(const Vector2D &p1, const Vector2D &p2, const Vector2D &q1, const Vector2D &q2, HitInfo2D *hitInfo = nullptr);
 
-bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo = nullptr);
+    bool intersectSegmentWithSegmentStrict(const Vector2D &p1, const Vector2D &p2, const Vector2D &q1, const Vector2D &q2, HitInfo2D *hitInfo = nullptr);
 
-}
+    //    --- Rays ---
 
-namespace detail
-{
     bool intersectRayImpl(const Ray2D &ray, const Segment2D &segment, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D *hitInfo = nullptr);
 
     bool intersectRayImpl(const Ray2D &ray, const BBox2D &bbox, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D *hitInfo = nullptr);
@@ -305,7 +298,37 @@ namespace detail
                     ray, object, tMin, tMax, hitInfo)
             } -> std::convertible_to<bool>;
         };
+
+    bool intersectImpl(const BBox2D &bbox1, const BBox2D &bbox2);
+    bool intersectImpl(const BBox2D &bbox, const Circle2D &circle);
+    bool intersectImpl(const Circle2D &circle1, const Circle2D &circle2);
+
+    bool intersectBBoxWithPolygon(const BBox2D &bbox, std::span<const Vector2D> vertices, bool convex);
+    bool intersectPolygonWithPolygon(std::span<const Vector2D> vertices1, bool convex1,
+                                     std::span<const Vector2D> vertices2, bool convex2);
+    bool intersectPolygonWithCircle(std::span<const Vector2D> vertices, bool convex, const Circle2D &circle);
+
+    template <PolygonalShape Polygon>
+    bool intersectImpl(const BBox2D &bbox, const Polygon &polygon)
+    {
+        return intersectBBoxWithPolygon(bbox, polygon.vertices(), polygon.isConvex());
+    }
+
+    template <PolygonalShape Polygon1, PolygonalShape Polygon2>
+    bool intersectImpl(const Polygon1 &polygon1, const Polygon2 &polygon2)
+    {
+        return intersectPolygonWithPolygon(polygon1.vertices(), polygon1.isConvex(),
+                                           polygon2.vertices(), polygon2.isConvex());
+    }
+
+    template <PolygonalShape Polygon>
+    bool intersectImpl(const Polygon &polygon, const Circle2D &circle)
+    {
+        return intersectPolygonWithCircle(polygon.vertices(), polygon.isConvex(), circle);
+    }
 }
+
+//    --- Ray intersection function ---
 
 template <typename B> requires (detail::HasRayIntersectionImpl<B>)
 bool intersect(
@@ -316,7 +339,7 @@ bool intersect(
         return detail::intersectRayImpl(first, second, tMin, tMax, hitInfo);
     }
 
-//    --- Segments ---
+//    --- Segment intersection function ---
 
 template <typename Object> requires detail::HasRayIntersectionImpl<Object>
 bool intersect(const Segment2D& segment, const Object& object, HitInfo2D* hitInfo = nullptr)
@@ -325,42 +348,7 @@ bool intersect(const Segment2D& segment, const Object& object, HitInfo2D* hitInf
     return intersect(ray, object, real_t{0}, real_t{1}, hitInfo);
 }
 
-//bool intersect(const Segment2D& segment, const IBaseShape2D& shape, HitInfo2D* hitInfo = nullptr);
-
-// --- Bounding Box ---
-
-namespace detail
-{
-
-bool intersectImpl(const BBox2D& bbox1, const BBox2D& bbox2);
-bool intersectImpl(const BBox2D& bbox, const Circle2D& circle);
-bool intersectImpl(const Circle2D& circle1, const Circle2D& circle2);
-
-bool intersectBBoxWithPolygon(const BBox2D& bbox, std::span<const Vector2D> vertices, bool convex);
-bool intersectPolygonWithPolygon(std::span<const Vector2D> vertices1, bool convex1,
-    std::span<const Vector2D> vertices2, bool convex2);
-bool intersectPolygonWithCircle(std::span<const Vector2D> vertices, bool convex, const Circle2D& circle);
-
-template <PolygonalShape Polygon>
-bool intersectImpl(const BBox2D& bbox, const Polygon& polygon)
-{
-    return intersectBBoxWithPolygon(bbox, polygon.vertices(), polygon.isConvex());
-}
-
-template <PolygonalShape Polygon1, PolygonalShape Polygon2>
-bool intersectImpl(const Polygon1& polygon1, const Polygon2& polygon2)
-{
-    return intersectPolygonWithPolygon(polygon1.vertices(), polygon1.isConvex(),
-        polygon2.vertices(), polygon2.isConvex());
-}
-
-template <PolygonalShape Polygon>
-bool intersectImpl(const Polygon& polygon, const Circle2D& circle)
-{
-    return intersectPolygonWithCircle(polygon.vertices(), polygon.isConvex(), circle);
-}
-
-}
+//    --- Shape-Shape intersection function ---
 
 template <typename A, typename B>
     requires (requires(const A& a, const B& b) { detail::intersectImpl(a, b); } ||

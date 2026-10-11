@@ -71,16 +71,6 @@ bool isPointInsidePolygon(const Vector2D& point, const std::span<const Vector2D>
     return contains;
 }
 
-/*
-bool isPolygonalInsideBBox(const IPolygonalShape2D& polygon, const BBox2D& bbox)
-{
-    for (const auto& v : polygon.vertices())
-        if (!bbox.contains(v))
-            return false;
-    return true;
-}
-*/
-
 //Helper function
 bool edgeIntersectionPolygonWithPolygon(const std::span<const Vector2D> vertices1, const std::span<const Vector2D> vertices2, HitInfo2D* hitInfo = nullptr)
 {
@@ -356,42 +346,6 @@ bool isCircleInsideCircle(const Circle2D& circle1, const Circle2D& circle2)
     const real_t radiusDelta = circle2.m_radius - circle1.m_radius;
     return (circle2.m_center - circle1.m_center).lengthSquared() <= radiusDelta * radiusDelta;
 }
-
-/*
-bool isShapeInsideCircle(const IFiniteShape2D& shape, const Circle2D& circle)
-{
-    if (isPolygonalShape(shape.type()))
-    {
-        return isPolygonInsideCircle(shape.polygonal()->vertices(), circle);
-    }
-    else if (shape.type() == SHAPE2D_CIRCLE)
-    {
-        return isCircleInsideCircle(*shape.shape_cast<Circle2D>(), circle);
-    }
-    assert(false && "Unreachable code reached!");
-    return false;
-}
-*/
-
-/*
-bool isShapeInsideShape(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2)
-{
-    if (isConvexPolygonal(shape2.type()))
-    {
-        return isShapeInsideConvexPolygon(shape1, shape2.polygonal()->vertices());
-    }
-    else if (isPolygonalShape(shape2.type()))
-    {
-        return isShapeInsidePolygon(shape1, shape2.polygonal()->vertices());
-    }
-    else if (shape2.type() == SHAPE2D_CIRCLE)
-    {
-        return isShapeInsideCircle(shape1, *shape2.shape_cast<Circle2D>());
-    }
-    assert(false && "Unreachable code reached!");
-    return false;
-}
-*/
 
 namespace detail
 {
