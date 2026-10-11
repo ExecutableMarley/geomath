@@ -77,22 +77,22 @@ TEST_CASE("ray hits primitive")
     }
 }
 
-/*
 TEST_CASE("ray misses all primitives") 
 {
-    std::vector<std::unique_ptr<IBaseShape2D>> primitives;
+    //std::vector<std::unique_ptr<IBaseShape2D>> primitives;
+    std::vector<FiniteShapeVariant2D> primitives;
     //primitives.push_back(std::make_unique<BBox2D>(BBox2D({1, -1}, {3, 1})));
-    primitives.push_back(std::make_unique<Triangle2D>(Triangle2D({1, 1}, {1,-1}, {3, 1})));
-    primitives.push_back(std::make_unique<Rectangle2D>(Rectangle2D({1, 1}, {1,-1}, {3, -1}, {3, 1})));
-    primitives.push_back(std::make_unique<Circle2D>(Circle2D({1,0}, 2)));
+    primitives.push_back(Triangle2D({1, 1}, {1,-1}, {3, 1}));
+    primitives.push_back(Rectangle2D({1, 1}, {1,-1}, {3, -1}, {3, 1}));
+    primitives.push_back(Circle2D({1,0}, 2));
 
     SUBCASE("Ray passes beside")
     {
         Ray2D ray({0,5}, {1,0});
         for(const auto& p : primitives)
         {
-            CAPTURE(p->type());
-            CHECK_FALSE(intersect(ray, *p));
+            CAPTURE(std::visit([](const auto& shape) { return shape.type(); }, p));
+            CHECK_FALSE(intersect(ray, p));
         }
     }
 
@@ -101,12 +101,11 @@ TEST_CASE("ray misses all primitives")
         Ray2D ray({5,0}, {1,0});
         for(const auto& p : primitives)
         {
-            CAPTURE(p->type());
-            CHECK_FALSE(intersect(ray, *p));
+            CAPTURE(std::visit([](const auto& shape) { return shape.type(); }, p));
+            CHECK_FALSE(intersect(ray, p));
         }
     }
 }
-*/
 
 TEST_CASE("ray starts inside primitive")
 {
