@@ -19,23 +19,23 @@ namespace Arns::geomath
 
 // Todo: Should have the same structure as TriangleMesh3D
 
-struct TriangleMeshData
+struct TriangleMeshData2D
 {
     std::vector<Vector2D> m_vertices;
     std::vector<TriangleIndices> m_triangles;
 
-    TriangleMeshData() = default;
+    TriangleMeshData2D() = default;
 
-    TriangleMeshData(std::span<const Vector2D> vertices, std::span<const TriangleIndices> triangles) :
+    TriangleMeshData2D(std::span<const Vector2D> vertices, std::span<const TriangleIndices> triangles) :
         m_vertices(vertices.begin(), vertices.end()), m_triangles(triangles.begin(), triangles.end()) {}
 
-    TriangleMeshData(std::span<const Vector2D> vertices,
+    TriangleMeshData2D(std::span<const Vector2D> vertices,
         std::initializer_list<TriangleIndices> triangles)
         : m_vertices(vertices.begin(), vertices.end()),
           m_triangles(triangles)
     {}
 
-    TriangleMeshData(
+    TriangleMeshData2D(
         std::initializer_list<Vector2D> vertices,
         std::initializer_list<TriangleIndices> triangles)
         : m_vertices(vertices),
@@ -110,7 +110,7 @@ class TriangleMesh2D
 private:
     // Base Members
 
-    TriangleMeshData m_data;
+    TriangleMeshData2D m_data;
     Transform2D m_transform;
 
     // Derived local data from Mesh
@@ -171,7 +171,7 @@ public:
 
     TriangleMesh2D() = default;
 
-    explicit TriangleMesh2D(TriangleMeshData data) 
+    explicit TriangleMesh2D(TriangleMeshData2D data) 
         : m_data(std::move(data)) {
             this->_derivedData();
         }
@@ -195,7 +195,7 @@ public:
                 this->_derivedData();
             }
 
-    TriangleMeshData releaseData() &&
+    TriangleMeshData2D releaseData() &&
     {
         return std::move(m_data);
     }
@@ -206,6 +206,8 @@ public:
 
     const std::vector<Vector2D>& vertices()         const { return m_data.m_vertices; }
     const std::vector<TriangleIndices>& triangles() const { return m_data.m_triangles; }
+
+    const TriangleMeshData2D& data()                  const { return m_data;}
 
     Triangle2D getTriangle(size_t index) const
     {
@@ -317,12 +319,12 @@ public:
 class TriangleMeshBuilder2D 
 {
 private:
-    TriangleMeshData m_data;
+    TriangleMeshData2D m_data;
 public:
 
     TriangleMeshBuilder2D() = default;
 
-    explicit TriangleMeshBuilder2D(TriangleMeshData data) 
+    explicit TriangleMeshBuilder2D(TriangleMeshData2D data) 
         : m_data(std::move(data)) {}
 
     // --- Data Accessors & Mutators ---
@@ -353,18 +355,18 @@ public:
     }
 
     // Move out (consuming/invalidating m_data)
-    TriangleMeshData build() && 
+    TriangleMeshData2D build() && 
     {
         return std::move(m_data);
     }
 
     // ivalue reference
-    TriangleMeshData copyData() const &
+    TriangleMeshData2D copyData() const &
     {
         return m_data;
     }
 
-    const TriangleMeshData& data() const & {
+    const TriangleMeshData2D& data() const & {
         return m_data;
     }
 };

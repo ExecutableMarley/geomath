@@ -78,10 +78,10 @@ real_t circumradiusSquared(const Vector2D& a, const Vector2D& b, const Vector2D&
 
 //[]
 
-bool isDelaunay(const TriangleMesh2D& mesh)
+bool isDelaunay(const TriangleMeshData2D& mesh)
 {
-    const auto& verts = mesh.vertices();
-    const auto& tris = mesh.triangles();
+    const auto& verts = mesh.m_vertices;
+    const auto& tris = mesh.m_triangles;
 
     for (const auto& tri : tris)
     {
@@ -111,9 +111,25 @@ bool isDelaunay(const TriangleMesh2D& mesh)
 
 
 /*
-  Original Algorithm: Delaunator (JavaScript) by Mapbox, licensed under the ISC License
-  Adaptation: Modern C++ translation, based on the above work
-  License: ISC (see THIRD_PARTY_LICENSES.txt)
+ * Original Algorithm: Delaunator (JavaScript) by Mapbox, licensed under the ISC License
+ * Adaptation: Modern C++ translation, based on the above work
+ * Original License:
+ *
+ * ISC License
+ *
+ * Copyright (c) 2025, Mapbox
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any purpose
+ * with or without fee is hereby granted, provided that the above copyright notice
+ * and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+ * REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+ * INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS
+ * OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+ * THIS SOFTWARE.
 */
 
 class Delaunator
@@ -187,11 +203,11 @@ public:
         return triangleTriplets;
     }
 
-    TriangleMesh2D getTriangleMesh(const std::span<const Vector2D> inputPoints)
+    TriangleMeshData2D getTriangleMesh(const std::span<const Vector2D> inputPoints)
     {
-        TriangleMeshData data(inputPoints, getTriangleTriplets());
+        TriangleMeshData2D data(inputPoints, getTriangleTriplets());
         data.validate();
-        return TriangleMesh2D(std::move(data));
+        return data;
     }
 
 private:
@@ -587,10 +603,10 @@ void Delaunator::link(const std::size_t a, const std::size_t b)
     }
 }
 
-TriangleMesh2D delaunay(const std::span<const Vector2D> points)
+TriangleMeshData2D delaunay(const std::span<const Vector2D> points)
 {
     if (points.size() < 3)
-        return TriangleMesh2D(points, {});
+        return TriangleMeshData2D(points, {});
 
     Delaunator dt(points);
     return dt.getTriangleMesh(points);

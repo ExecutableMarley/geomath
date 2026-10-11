@@ -101,7 +101,7 @@ TEST_CASE("TriangleMeshBuilder2D builds mesh data")
         .addVertex(0, 3)
         .addTriangle(0, 1, 2);
 
-    const TriangleMeshData data = std::move(builder).build();
+    const TriangleMeshData2D data = std::move(builder).build();
     TriangleMesh2D mesh(std::move(data));
 
     CHECK(mesh.vertices().size() == 3);
