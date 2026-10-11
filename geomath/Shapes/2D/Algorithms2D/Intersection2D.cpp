@@ -13,6 +13,7 @@
 #include "../Rectangle2D.hpp"
 #include "../Polygon2D.hpp"
 #include "../ConvexPolygon2D.hpp"
+#include "../Variants/ShapeConcepts.hpp"
 #include "../Variants/ShapeVariants.hpp"
 #include "ShapeVariantAlgorithms.hpp"
 
@@ -175,35 +176,17 @@ inline bool intersectBBoxWithConvexShape(const BBox2D& bbox, std::span<const Vec
 
 }
 
-bool intersect(const Ray2D& ray, const Segment2D& segment, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
-{
-    return detail::intersectRayWithSegment(ray, segment.m_start, segment.m_end, t_min, t_max, hitInfo);
-}
 
-bool intersect(const Ray2D& ray, const BBox2D& bbox, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
-{
-    real_t t_enter;
-    real_t t_exit;
-    if (!detail::rayBoundsInterval(ray, bbox, t_min, t_max, t_enter, t_exit))
-        return false;
 
-    if (hitInfo)
+namespace detail
+{
+
+bool intersectRayWithPolygonOptimized(const Ray2D& ray, std::span<const Vector2D> vertices, real_t t_min, real_t t_max)
+{
+    for (int i = 0; i < vertices.size(); i++)
     {
-        real_t hit_t = (t_enter > t_min) ? t_enter : t_exit;
-        hitInfo->t = hit_t;
-        hitInfo->intersectionPoint = ray.m_origin + ray.m_direction * hit_t;
-        hitInfo->normal = bbox.normalAt(hitInfo->intersectionPoint);
-    }
-
-    return true;
-}
-
-bool intersectRayWithPolygonOptimized(const Ray2D& ray, const IPolygonalShape2D& polygon, real_t t_min, real_t t_max)
-{
-    for (int i = 0; i < polygon.vertexCount(); i++)
-    {
-        const Vector2D& p1 = polygon[i];
-        const Vector2D& p2 = polygon[(i + 1) % polygon.vertexCount()];
+        const Vector2D& p1 = vertices[i];
+        const Vector2D& p2 = vertices[(i + 1) % vertices.size()];
 
         if (detail::intersectRayWithSegment(ray, p1, p2, t_min, t_max, NULL))
         {
@@ -213,6 +196,61 @@ bool intersectRayWithPolygonOptimized(const Ray2D& ray, const IPolygonalShape2D&
     return false;
 }
 
+}
+
+bool detail::intersectRayWithPolygon(const Ray2D& ray, std::span<const Vector2D> vertices, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+{
+    if (vertices.size() < 2)
+        return false;
+
+    if (hitInfo == nullptr)
+        return detail::intersectRayWithPolygonOptimized(ray, vertices, t_min, t_max);
+
+    bool hit = false;
+    real_t t = t_max;
+
+    for (int i = 0; i < vertices.size(); i++)
+    {
+        const Vector2D& p1 = vertices[i];
+        const Vector2D& p2 = vertices[(i + 1) % vertices.size()];
+
+        if (detail::intersectRayWithSegment(ray, p1, p2, t_min, t, hitInfo))
+        {
+            hit = true;
+            t = hitInfo->t;
+        }
+    }
+    return hit;
+}
+
+bool detail::intersectSegmentWithSegment(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo)
+{
+    return detail::intersectRayWithSegment(Ray2D(p1, p2 - p1), q1, q2, 0.f, 1.f, hitInfo);
+}
+
+bool detail::intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo)
+{
+    real_t t, u;
+    if (!detail::intersectParams(p1, p2 - p1, q1, q2 - q1, t, u))
+        return false;
+
+    if (!approximatelyGreater(t, real_t{0}) || !approximatelyLess(t, real_t{1}) ||
+        !approximatelyGreater(u, real_t{0}) || !approximatelyLess(u, real_t{1}))
+        return false;
+
+    if (hitInfo)
+    {
+        hitInfo->t = t;
+        hitInfo->intersectionPoint = p1 + (p2 - p1) * t;
+        hitInfo->normal = (q2 - q1).perpendicular().normalize();
+
+        if (hitInfo->normal.dot(p2 - p1) > 0) hitInfo->normal = -hitInfo->normal;
+    }
+
+    return true;
+}
+
+/*
 bool intersect(const Ray2D& ray, const IPolygonalShape2D& polygon, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     if (hitInfo == nullptr)
@@ -234,8 +272,32 @@ bool intersect(const Ray2D& ray, const IPolygonalShape2D& polygon, real_t t_min,
     }
     return hit;
 }
+*/
 
-bool intersect(const Ray2D& ray, const Circle2D& circle, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+bool detail::intersectRayImpl(const Ray2D& ray, const Segment2D& segment, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+{
+    return detail::intersectRayWithSegment(ray, segment.m_start, segment.m_end, t_min, t_max, hitInfo);
+}
+
+bool detail::intersectRayImpl(const Ray2D& ray, const BBox2D& bbox, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+{
+    real_t t_enter;
+    real_t t_exit;
+    if (!detail::rayBoundsInterval(ray, bbox, t_min, t_max, t_enter, t_exit))
+        return false;
+
+    if (hitInfo)
+    {
+        real_t hit_t = (t_enter > t_min) ? t_enter : t_exit;
+        hitInfo->t = hit_t;
+        hitInfo->intersectionPoint = ray.m_origin + ray.m_direction * hit_t;
+        hitInfo->normal = bbox.normalAt(hitInfo->intersectionPoint);
+    }
+
+    return true;
+}
+
+bool detail::intersectRayImpl(const Ray2D& ray, const Circle2D& circle, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     const Vector2D oc = ray.m_origin - circle.m_center;
     const real_t a = ray.m_direction.dot(ray.m_direction);
@@ -265,6 +327,7 @@ bool intersect(const Ray2D& ray, const Circle2D& circle, real_t t_min, real_t t_
     return true;
 }
 
+/*
 bool intersect(const Ray2D& ray, const IBaseShape2D& shape, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     switch(shape.type())
@@ -281,63 +344,8 @@ bool intersect(const Ray2D& ray, const IBaseShape2D& shape, real_t t_min, real_t
             return false;
     }
 }
+*/
 
-bool intersectSegmentWithSegment(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo)
-{
-    return detail::intersectRayWithSegment(Ray2D(p1, p2 - p1), q1, q2, 0.f, 1.f, hitInfo);
-}
-
-bool intersect(const Segment2D& segment1, const Segment2D& segment2, HitInfo2D* hitInfo)
-{
-    return detail::intersectRayWithSegment(Ray2D(segment1.m_start, segment1.deltaVector()), segment2.m_start, segment2.m_end, 0.f, 1.f, hitInfo);
-}
-
-bool intersectSegmentWithSegmentStrict(const Vector2D& p1, const Vector2D& p2, const Vector2D& q1, const Vector2D& q2, HitInfo2D* hitInfo)
-{
-    real_t t, u;
-    if (!detail::intersectParams(p1, p2 - p1, q1, q2 - q1, t, u))
-        return false;
-
-    if (!approximatelyGreater(t, real_t{0}) || !approximatelyLess(t, real_t{1}) ||
-        !approximatelyGreater(u, real_t{0}) || !approximatelyLess(u, real_t{1}))
-        return false;
-
-    if (hitInfo)
-    {
-        hitInfo->t = t;
-        hitInfo->intersectionPoint = p1 + (p2 - p1) * t;
-        hitInfo->normal = (q2 - q1).perpendicular().normalize();
-
-        if (hitInfo->normal.dot(p2 - p1) > 0) hitInfo->normal = -hitInfo->normal;
-    }
-
-    return true;
-}
-
-bool intersect(const Segment2D& segment, const BBox2D& bbox, HitInfo2D* hitInfo)
-{
-    return intersect(Ray2D(segment.m_start, segment.deltaVector()), bbox, 0.f, 1.f, hitInfo);
-}
-
-bool intersect(const Segment2D& segment, const Triangle2D& triangle, HitInfo2D* hitInfo)
-{
-    return intersect(Ray2D(segment.m_start, segment.deltaVector()), triangle, 0.f, 1.f, hitInfo);
-}
-
-bool intersect(const Segment2D& segment, const IPolygonalShape2D& polygon, HitInfo2D* hitInfo)
-{
-    return(intersect(Ray2D(segment.m_start, segment.direction()), polygon, 0.0f, segment.length(), hitInfo));
-}
-
-bool intersect(const Segment2D& segment, const Circle2D& circle, HitInfo2D* hitInfo)
-{
-    return intersect(Ray2D(segment.m_start, segment.deltaVector()), circle, 0.f, 1.f, hitInfo);
-}
-
-bool intersect(const Segment2D& segment, const IBaseShape2D& shape, HitInfo2D* hitInfo)
-{
-    return intersect(Ray2D(segment.m_start, segment.direction()), shape, 0.0f, segment.length(), hitInfo);
-}
 
 bool intersect(const Ray2D& ray, const FiniteShapeVariant2D& shape, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
@@ -358,7 +366,7 @@ bool intersect(const Segment2D& segment, const FiniteShapeVariant2D& shape, HitI
 
 // --- Bounding Box ---
 
-bool intersect(const BBox2D& b1, const BBox2D& b2)
+bool detail::intersectImpl(const BBox2D& b1, const BBox2D& b2)
 {
     //Separating Axis Theorem (SAT)
 #if 0
@@ -376,13 +384,10 @@ bool intersect(const BBox2D& b1, const BBox2D& b2)
 }
 
 
-bool intersect(const BBox2D& bbox, const IPolygonalShape2D& polygon)
+bool detail::intersectBBoxWithPolygon(const BBox2D& bbox, std::span<const Vector2D> vertices, bool convex)
 {
-    if (isConvexPolygonal(polygon.type()))
-    {
-        const ConvexPolygon2D* convex = static_cast<const ConvexPolygon2D*>(&polygon);
-        return detail::intersectBBoxWithConvexShape(bbox, polygon.vertices());
-    }
+    if (convex)
+        return detail::intersectBBoxWithConvexShape(bbox, vertices);
     
     Vector2D box[4] =
     {
@@ -393,10 +398,10 @@ bool intersect(const BBox2D& bbox, const IPolygonalShape2D& polygon)
     };
 
     for (const Vector2D& p : box)
-        if (polygon.contains(p))
+        if (detail::isPointInsidePolygon(p, vertices))
             return true;
 
-    for (const Vector2D& p : polygon.vertices())
+    for (const Vector2D& p : vertices)
         if (bbox.contains(p))
             return true;
 
@@ -408,22 +413,22 @@ bool intersect(const BBox2D& bbox, const IPolygonalShape2D& polygon)
         { box[3], box[0] }
     };
 
-    const size_t n = polygon.vertices().size();
+    const size_t n = vertices.size();
 
     for (size_t i = 0; i < n; ++i)
     {
-        Vector2D a = polygon.vertices()[i];
-        Vector2D b = polygon.vertices()[(i + 1) % n];
+        Vector2D a = vertices[i];
+        Vector2D b = vertices[(i + 1) % n];
 
         for (int j = 0; j < 4; ++j)
-            if (intersectSegmentWithSegment(a, b, boxEdges[j][0], boxEdges[j][1]))
+            if (detail::intersectSegmentWithSegment(a, b, boxEdges[j][0], boxEdges[j][1]))
                 return true;
     }
 
     return false;
 }
 
-bool intersect(const BBox2D& bbox, const Circle2D& circle)
+bool detail::intersectImpl(const BBox2D& bbox, const Circle2D& circle)
 {
     real_t distSq = bbox.minDistanceSquared(circle.m_center);
     real_t rSq = circle.m_radius * circle.m_radius;
@@ -431,6 +436,9 @@ bool intersect(const BBox2D& bbox, const Circle2D& circle)
 }
 
 // --- Polygons --- 
+
+namespace detail
+{
 
 bool intersectConvexPolygonWithConvexPolygon(const std::span<const Vector2D> v1, const std::span<const Vector2D> v2)
 {
@@ -525,79 +533,52 @@ bool intersectPolygonWithPolygon(const std::span<const Vector2D> v1, const std::
    return false;
 }
 
-bool intersectPolygonWithCircle(const std::span<const Vector2D> poly, const Circle2D& circle)
+bool intersectPolygonWithPolygon(std::span<const Vector2D> vertices1, bool convex1,
+    std::span<const Vector2D> vertices2, bool convex2)
 {
-    if (detail::isPointInsidePolygon(circle.m_center, poly))
+    if (convex1 && convex2)
+        return intersectConvexPolygonWithConvexPolygon(vertices1, vertices2);
+    return intersectPolygonWithPolygon(vertices1, vertices2);
+}
+
+bool intersectPolygonWithCircle(std::span<const Vector2D> vertices, bool convex, const Circle2D& circle)
+{
+    if (vertices.size() < 3)
+        return false;
+
+    const bool centerInside = convex
+        ? detail::isPointInsideConvexPolygon(circle.m_center, vertices)
+        : detail::isPointInsidePolygon(circle.m_center, vertices);
+    if (centerInside)
         return true;
 
-    //Todo: Optimize with r^2
-    //real_t r2 = circle.m_radius * circle.m_radius;
-    real_t r = circle.m_radius;
-
-    for (int i = 0; i < poly.size(); ++i)
+    for (size_t i = 0; i < vertices.size(); ++i)
     {
-        const Vector2D& a = poly[i];
-        const Vector2D& b = poly[(i + 1) % poly.size()];
-
-        if (detail::distancePointToSegment(circle.m_center, a, b) <= r)
+        if (detail::distancePointToSegment(circle.m_center, vertices[i], vertices[(i + 1) % vertices.size()]) <= circle.m_radius)
             return true;
     }
     return false;
 }
 
-// --- Polygonal ---
-
-bool intersect(const IPolygonalShape2D& polygon1, const IPolygonalShape2D& polygon2)
-{
-    if (isConvexPolygonal(polygon1.type()) && isConvexPolygonal(polygon2.type()))
-        return intersectConvexPolygonWithConvexPolygon(polygon1.vertices(), polygon2.vertices());
-
-    return intersectPolygonWithPolygon(polygon1.vertices(), polygon2.vertices());
 }
 
 bool intersect(const PolygonalShapeVariant2D& polygon1, const PolygonalShapeVariant2D& polygon2)
 {
-    return std::visit([&](const auto& p1, const auto& p2) {
-        std::span<const Vector2D> verts1 = p1.vertices();
-        std::span<const Vector2D> verts2 = p2.vertices();
-        
-        if (p1.isConvex() && p2.isConvex())
-            return intersectConvexPolygonWithConvexPolygon(verts1, verts2);
-        
-        return intersectPolygonWithPolygon(verts1, verts2);
-    }, polygon1, polygon2 );
-}
-
-bool intersect(const IPolygonalShape2D& polygon, const Circle2D& circle)
-{
-    if (polygon.contains(circle.centroid()))
-        return true;
-
-    //Todo: Optimize with r^2
-    //real_t r2 = circle.m_radius * circle.m_radius;
-    size_t n = polygon.vertexCount();
-    real_t r = circle.m_radius;
-
-    for (int i = 0; i < polygon.vertexCount(); ++i)
-    {
-        const Vector2D& a = polygon[i];
-        const Vector2D& b = polygon[(i + 1) % n];
-
-        if (detail::distancePointToSegment(circle.m_center, a, b) <= r)
-            return true;
-    }
-    return false;
+    return std::visit([](const auto& p1, const auto& p2) {
+        return intersect(p1, p2);
+    }, polygon1, polygon2);
 }
 
 // --- Circles ---
 
-bool intersect(const Circle2D& circle1, const Circle2D& circle2)
+bool detail::intersectImpl(const Circle2D& circle1, const Circle2D& circle2)
 {
     return circle1.intersects(circle2);
 }
 
 // --- Generic ---
 
+/*
 bool intersect(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2)
 {
     const Circle2D* circle1 = shape_cast<Circle2D>(&shape1);
@@ -619,38 +600,13 @@ bool intersect(const IFiniteShape2D& shape1, const IFiniteShape2D& shape2)
 
     //Todo: Consider behaviour
     return false;
-}
+}*/
 
 bool intersect(const FiniteShapeVariant2D& shape1, const FiniteShapeVariant2D& shape2)
 {
     return std::visit([](const auto& shape1, const auto& shape2)
     {
-        using Shape1 = std::decay_t<decltype(shape1)>;
-        using Shape2 = std::decay_t<decltype(shape2)>;
-        constexpr bool shape1IsCircle = std::is_same_v<Shape1, Circle2D>;
-        constexpr bool shape2IsCircle = std::is_same_v<Shape2, Circle2D>;
-
-        if constexpr (shape1IsCircle && shape2IsCircle)
-        {
-            return intersect(shape1, shape2);
-        }
-        else if constexpr (shape1IsCircle)
-        {
-            return intersectPolygonWithCircle(shape2.vertices(), shape1);
-        }
-        else if constexpr (shape2IsCircle)
-        {
-            return intersectPolygonWithCircle(shape1.vertices(), shape2);
-        }
-        else
-        {
-            const auto vertices1 = shape1.vertices();
-            const auto vertices2 = shape2.vertices();
-            if (shape1.isConvex() && shape2.isConvex())
-                return intersectConvexPolygonWithConvexPolygon(vertices1, vertices2);
-
-            return intersectPolygonWithPolygon(vertices1, vertices2);
-        }
+        return intersect(shape1, shape2);
     }, shape1, shape2);
 }
     

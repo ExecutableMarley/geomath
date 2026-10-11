@@ -207,44 +207,44 @@ real_t distanceSegmentToPolygon(const Segment2D& segment, std::span<const Vector
     return detail::distanceSegmentToEdgeList(segment, vertices, true, closestPoint1, closestPoint2);
 }
 
-} // namespace detail
-
-
 // Distance calculation algorithms
 
-real_t distance(const Vector2D& point, const Segment2D& segment, Vector2D* closestPoint)
+real_t distanceImpl(const Vector2D& point, const Segment2D& segment, Vector2D* c1, Vector2D* c2)
 {
-    return detail::distancePointToSegment(point, segment.m_start, segment.m_end, closestPoint);
+    if (c1) *c1 = point;
+    return detail::distancePointToSegment(point, segment.m_start, segment.m_end, c2);
 }
 
-real_t distance(const Segment2D& segment1, const Segment2D& segment2, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t distanceImpl(const Segment2D& segment1, const Segment2D& segment2, Vector2D* c1, Vector2D* c2)
 {
-    return detail::distanceSegmentToSegment(segment1.m_start, segment1.m_end, segment2.m_start, segment2.m_end, closestPoint1, closestPoint2);
+    return detail::distanceSegmentToSegment(segment1.m_start, segment1.m_end, segment2.m_start, segment2.m_end, c1, c2);
 }
 
-real_t distance(const Vector2D& point, const BBox2D& bbox, Vector2D* closestPoint)
+real_t distanceImpl(const Vector2D& point, const BBox2D& bbox, Vector2D* c1, Vector2D* c2)
 {
     Vector2D c = bbox.closestPoint(point);
-    if (closestPoint) *closestPoint = c;
+    if (c1) *c1 = point;
+    if (c2) *c2 = c;
     return point.distance(c);
 }
 
-real_t distance(const Vector2D& point, const Circle2D& circle, Vector2D* closestPoint)
+real_t distanceImpl(const Vector2D& point, const Circle2D& circle, Vector2D* c1, Vector2D* c2)
 {
     Vector2D delta = point - circle.m_center;
     real_t dist = delta.length();
 
+    if (c1) *c1 = point;
+
     if (dist <= circle.m_radius)
     {
-        if (closestPoint) *closestPoint = point;
+        if (c2) *c2 = point;
         return real_t{0};
     }
 
     //real_t dist = std::sqrt(distSq);
     Vector2D dir = delta / dist;
 
-    if (closestPoint)
-        *closestPoint = circle.m_center + dir * circle.m_radius;
+    if (c2) *c2 = circle.m_center + dir * circle.m_radius;
 
     return std::abs(dist - circle.m_radius);
 }
@@ -254,7 +254,7 @@ real_t boundaryDistance(const Segment2D& segment, const BBox2D& bbox, Vector2D* 
     return detail::distanceSegmentToEdgeList(segment, bbox.corners(), true, closestPoint1, closestPoint2);
 }
 
-real_t distance(const Segment2D& segment, const BBox2D& bbox, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t distanceImpl(const Segment2D& segment, const BBox2D& bbox, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     if (isPointInsideBBox(segment.m_start, bbox))
     {
@@ -266,7 +266,7 @@ real_t distance(const Segment2D& segment, const BBox2D& bbox, Vector2D* closestP
     return detail::distanceSegmentToEdgeList(segment, bbox.corners(), true, closestPoint1, closestPoint2);
 }
 
-real_t distance(const Segment2D& segment, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2)
+real_t distanceImpl(const Segment2D& segment, const Circle2D& circle, Vector2D* closestPoint1, Vector2D* closestPoint2)
 {
     Vector2D p;
     real_t dist = detail::distancePointToSegment(circle.m_center, segment.m_start, segment.m_end, &p);
@@ -293,6 +293,9 @@ real_t distance(const Segment2D& segment, const Circle2D& circle, Vector2D* clos
 
     return len - circle.m_radius;
 }
+
+} // namespace detail
+
 
 
 real_t detail::distanceImpl(const BBox2D& a, const BBox2D& b, Vector2D* closestPoint1, Vector2D* closestPoint2)
@@ -675,7 +678,7 @@ real_t detail::distancePolygonToCircle(std::span<const Vector2D> vertices, bool 
     {
         Vector2D p1, p2;
         const Segment2D edge(vertices[i], vertices[(i + 1) % vertices.size()]);
-        const real_t d = distance(edge, circle2, &p1, &p2);
+        const real_t d = distanceImpl(edge, circle2, &p1, &p2);
         if (d < minDist)
         {
             minDist = d;

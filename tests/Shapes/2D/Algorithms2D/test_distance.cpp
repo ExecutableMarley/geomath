@@ -25,28 +25,28 @@ TEST_CASE("distance point-segment")
 
     SUBCASE("point projects to segment endpoint")
     {
-        real_t d1 = distance(Vector2D(0, 0), seg, &closest);
+        real_t d1 = distance(Vector2D(0, 0), seg, nullptr, &closest);
         CHECK(doctest::Approx(d1) == real_t{1.0});
         CHECK(closest == Vector2D(1, 0));
     }
 
     SUBCASE("point on the segment interior")
     {
-        real_t dInside = distance(Vector2D(1, 0.5), seg, &closest);
+        real_t dInside = distance(Vector2D(1, 0.5), seg, nullptr, &closest);
         CHECK(doctest::Approx(dInside) == real_t{0.0});
         CHECK(closest == Vector2D(1, 0.5));
     }
 
     SUBCASE("point projects orthogonally onto interior")
     {
-        real_t dPerp = distance(Vector2D(3, 0.5), seg, &closest);
+        real_t dPerp = distance(Vector2D(3, 0.5), seg, nullptr, &closest);
         CHECK(doctest::Approx(dPerp) == real_t{2.0});
         CHECK(closest == Vector2D(1, 0.5));
     }
 
     SUBCASE("point beyond top endpoint")
     {
-        real_t dFarTop = distance(Vector2D(1, 3), seg, &closest);
+        real_t dFarTop = distance(Vector2D(1, 3), seg, nullptr, &closest);
         CHECK(doctest::Approx(dFarTop) == real_t{2.0});
         CHECK(closest == Vector2D(1, 1));
     }
@@ -59,21 +59,21 @@ TEST_CASE("distance point-bbox")
 
     SUBCASE("point outside corner (top-right)")
     {
-        real_t d1 = distance(Vector2D(2, 3), bbox, &closest);
+        real_t d1 = distance(Vector2D(2, 3), bbox, nullptr, &closest);
         CHECK(doctest::Approx(d1) == std::sqrt(real_t{5.0}));
         CHECK(closest == Vector2D(1, 1));
     }
 
     SUBCASE("point strictly inside bbox")
     {
-        real_t dInside = distance(Vector2D(0.5, 0.5), bbox, &closest);
+        real_t dInside = distance(Vector2D(0.5, 0.5), bbox, nullptr, &closest);
         CHECK(doctest::Approx(dInside) == real_t{0.0});
         CHECK(closest == Vector2D(0.5, 0.5));
     }
 
     SUBCASE("point outside edge (left)")
     {
-        real_t dLeft = distance(Vector2D(-2, 0.5), bbox, &closest);
+        real_t dLeft = distance(Vector2D(-2, 0.5), bbox, NULL, &closest);
         CHECK(doctest::Approx(dLeft) == real_t{2.0});
         CHECK(closest == Vector2D(0, 0.5));
     }
@@ -89,21 +89,21 @@ TEST_CASE("distance point-polygon and point-circle")
 
         SUBCASE("point inside triangle")
         {
-            real_t dInside = distance(Vector2D(0.5, 0.5), tri, &closest);
+            real_t dInside = distance(Vector2D(0.5, 0.5), tri, nullptr, &closest);
             CHECK(doctest::Approx(dInside) == real_t{0.0});
             CHECK(closest == Vector2D(0.5, 0.5));
         }
 
         SUBCASE("point on hypotenuse boundary")
         {
-            real_t dOnEdge = distance(Vector2D(1, 1), tri, &closest);
+            real_t dOnEdge = distance(Vector2D(1, 1), tri, nullptr, &closest);
             CHECK(doctest::Approx(dOnEdge) == real_t{0.0});
             CHECK(closest == Vector2D(1, 1));
         }
 
         SUBCASE("point outside triangle hypotenuse")
         {
-            real_t dOutside = distance(Vector2D(3, 3), tri, &closest);
+            real_t dOutside = distance(Vector2D(3, 3), tri, nullptr, &closest);
             CHECK(doctest::Approx(dOutside) == std::sqrt(real_t{8.0}));
             CHECK(closest == Vector2D(1, 1)); // Closest point on hypotenuse x + y = 2
         }
@@ -115,21 +115,21 @@ TEST_CASE("distance point-polygon and point-circle")
 
         SUBCASE("point outside circle")
         {
-            real_t dc1 = distance(Vector2D(0, 0), circle, &closest);
+            real_t dc1 = distance(Vector2D(0, 0), circle, nullptr, &closest);
             CHECK(doctest::Approx(dc1) == real_t{1.0});
             CHECK(closest == Vector2D(1, 0));
         }
 
         SUBCASE("point at circle center")
         {
-            real_t dcCenter = distance(Vector2D(2, 0), circle, &closest);
+            real_t dcCenter = distance(Vector2D(2, 0), circle, nullptr, &closest);
             CHECK(doctest::Approx(dcCenter) == real_t{0.0});
             CHECK(closest == Vector2D(2, 0));
         }
 
         SUBCASE("point inside circle but non-center")
         {
-            real_t dcInside = distance(Vector2D(2.5, 0), circle, &closest);
+            real_t dcInside = distance(Vector2D(2.5, 0), circle, nullptr, &closest);
             CHECK(doctest::Approx(dcInside) == real_t{0.0});
             CHECK(closest == Vector2D(2.5, 0));
         }

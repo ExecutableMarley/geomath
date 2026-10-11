@@ -208,24 +208,10 @@ bool isPointInsidePolygon(const Vector2D& point, const Polygon2D& polygon)
     return detail::isPointInsidePolygon(point, polygon.vertices());
 }
 
-/*
-bool isPointInsidePolygon(const Vector2D& point, const IPolygonalShape2D& polygon)
-{
-    return detail::isPointInsidePolygon(point, polygon.vertices());
-}
-*/
-
 bool isPointInsideCircle(const Vector2D& point, const Circle2D& circle)
 {
     return (point - circle.m_center).lengthSquared() <= circle.m_radius * circle.m_radius;
 }
-
-/*
-bool isPointInShape(const Vector2D& point, const IBaseShape2D& shape)
-{
-    return shape.contains(point);
-}
-*/
 
 // Segment inside shape
 
@@ -346,38 +332,6 @@ bool isCircleInsidePolygon(const Circle2D& circle, const std::span<const Vector2
     }
     return true;
 }
-
-/*
-bool isShapeInsideConvexPolygon(const IFiniteShape2D& shape, const std::span<const Vector2D> convexPoly)
-{
-    if (isPolygonalShape(shape.type()))
-    {
-        return detail::isPolygonInsideConvexPolygon(shape.polygonal()->vertices(), convexPoly);
-    }
-    else if (shape.type() == SHAPE2D_CIRCLE)
-    {
-        return isCircleInsideConvexPolygon(*shape.shape_cast<Circle2D>(), convexPoly);
-    }
-    assert(false && "Unreachable code reached!");
-    return false;
-}
-*/
-
-/*
-bool isShapeInsidePolygon(const IFiniteShape2D& shape, const std::span<const Vector2D> poly)
-{
-    if (isPolygonalShape(shape.type()))
-    {
-        return detail::isPolygonInsidePolygon(shape.polygonal()->vertices(), poly);
-    }
-    else if (shape.type() == SHAPE2D_CIRCLE)
-    {
-        return isCircleInsidePolygon(*shape.shape_cast<Circle2D>(), poly);
-    }
-    assert(false && "Unreachable code reached!");
-    return false;
-}
-    */
 
 bool isBBoxInsideCircle(const BBox2D& bbox, const Circle2D& circle)
 {
