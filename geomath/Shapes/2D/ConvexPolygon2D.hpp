@@ -334,7 +334,7 @@ private:
     }
 };
 
-static_assert(FiniteShape2D<Polygon2D>);
+static_assert(FiniteShape2D<ConvexPolygon2D>);
 
 } // namespace Math
 

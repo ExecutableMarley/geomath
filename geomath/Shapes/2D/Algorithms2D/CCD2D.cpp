@@ -198,24 +198,9 @@ SweepResult2D sweepConservativeAdvancementGeneric(
         Vector2D cloA, cloB;
         real_t d;
 
-        // Todo: Ugly heap allocation
-        // Best way to get rid of it would be distance functions that support optional transforms
-        // That is a task for future me though
-        /*
-        if constexpr (std::is_base_of_v<IFiniteShape2D, A> &&
-                      std::is_base_of_v<IFiniteShape2D, B>)
-        {
-            std::unique_ptr<IFiniteShape2D> currentB = b.clone();
-            currentB->translate(relativeVelocity * t);
-            d = distance(a, *currentB, &cloA, &cloB);
-        }
-        else
-        {
-        */
-            B currentB = b;
-            currentB.translate(relativeVelocity * t);
-            d = distance(a, currentB, &cloA, &cloB);
-        //}
+        B currentB = b;
+        currentB.translate(relativeVelocity * t);
+        d = distance(a, currentB, &cloA, &cloB);
 
         if (d <= epsilon)
         {
@@ -313,23 +298,5 @@ SweepResult2D sweep(
         return sweep(a, va, b, vb, maxTime, maxIterations, epsilon);
     }, shapeA, shapeB);
 }
-
-// Todo: Consider the correct place for this
-
-BBox2D sweptBounds(const BBox2D& bounds,
-                   const Vector2D& displacement)
-{
-    return {
-        Vector2D::min(bounds.m_min, bounds.m_min + displacement),
-        Vector2D::max(bounds.m_max, bounds.m_max + displacement)};
-}
-
-BBox2D sweptBounds(const IFiniteShape2D& shape,
-                   Vector2D velocity,
-                   real_t dt)
-{
-    return sweptBounds(shape.boundingBox(), velocity * dt);
-}
-
 
 }
