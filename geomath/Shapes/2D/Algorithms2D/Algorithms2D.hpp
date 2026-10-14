@@ -365,6 +365,16 @@ bool intersect(const A& a, const B& b)
 // CCD (sweep)
 //================================
 
+namespace detail
+{
+    SweepResult2D SolveCircleToCircleCCD(const Circle2D& a, const Vector2D& velA,
+        const Circle2D& b, const Vector2D& velB, real_t maxTime);
+
+    SweepResult2D SolveBBoxToBBoxCCD(const BBox2D& a, const Vector2D& velA,
+        const BBox2D& b, const Vector2D& velB, real_t maxTime);
+}
+
+
 /*
 SweepResult sweepConservativeAdvancement(
     const BBox2D& a, Vector2D velocityA,

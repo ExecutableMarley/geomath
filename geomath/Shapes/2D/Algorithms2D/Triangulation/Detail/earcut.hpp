@@ -1,3 +1,15 @@
+#pragma once
+
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <limits>
+#include <memory>
+#include <utility>
+#include <vector>
+
 /*
  * Copyright (c) 2015, Mapbox (ISC License)
 
@@ -14,17 +26,6 @@
  * THIS SOFTWARE.
  */
 
-#pragma once
-
-#include <algorithm>
-#include <cassert>
-#include <cmath>
-#include <cstddef>
-#include <cstdint>
-#include <limits>
-#include <memory>
-#include <utility>
-#include <vector>
 
 namespace mapbox {
 

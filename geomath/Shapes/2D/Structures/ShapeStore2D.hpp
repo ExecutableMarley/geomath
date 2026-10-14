@@ -1,15 +1,17 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-#include <functional>
-
-#include "../Interfaces/IFiniteShape2D.hpp"
+//#include "../Interfaces/IFiniteShape2D.hpp"
+#include "../Variants/ShapeConcepts.hpp"
+#include "../Variants/ShapeVariants.hpp"
 #include "../BBox2D.hpp"
 #include "../Triangle2D.hpp"
 #include "../Rectangle2D.hpp"
 #include "../Polygon2D.hpp"
 #include "../Circle2D.hpp"
+
+#include <memory>
+#include <vector>
+#include <functional>
 
 namespace Arns
 {
@@ -50,7 +52,7 @@ struct ShapeObject
 class IShapeResolver2D
 {
 public:
-    virtual const IFiniteShape2D* resolve(ShapeID id) const = 0;
+    virtual const FiniteShapePtrVariant2D resolve(ShapeID id) const = 0;
     virtual ~IShapeResolver2D() = default;
 };
 
@@ -144,21 +146,25 @@ public:
     ShapeID add(const Triangle2D& t)
     {
         auto h = _triangles.add(t);
-        //return { ShapeType2D::SHAPE2D_TRIANGLE, h.index, h.generation };
         return insertHandle({ ShapeType2D::SHAPE2D_TRIANGLE, h.index } );
     }
 
     ShapeID add(const Rectangle2D& r)
     {
         auto h = _rectangles.add(r);
-        //return { ShapeType2D::SHAPE2D_RECTANGLE, h.index, h.generation };
         return insertHandle({ ShapeType2D::SHAPE2D_RECTANGLE, h.index } );
     }
 
     ShapeID add(const Polygon2D& p)
     {
-        auto h = _polygons.add(p);
+        auto h = _generalPoly.add(p);
         return insertHandle({ ShapeType2D::SHAPE2D_POLYGON, h.index } );
+    }
+
+    ShapeID add(const ConvexPolygon2D& p)
+    {
+        auto h = _convexPoly.add(p);
+        return insertHandle({ ShapeType2D::SHAPE2D_CONVEX_POLYGON, h.index } );
     }
 
     ShapeID add(const Circle2D& c)
@@ -167,17 +173,9 @@ public:
         return insertHandle({ ShapeType2D::SHAPE2D_CIRCLE, h.index } );
     }
 
-    ShapeID add(const IFiniteShape2D& shape)
+    ShapeID add(const FiniteShapeVariant2D& shape)
     {
-        switch(shape.type())
-        {
-        case ShapeType2D::SHAPE2D_CIRCLE:    return add(*shape.shape_cast<Circle2D>());
-        case ShapeType2D::SHAPE2D_TRIANGLE:  return add(*shape.shape_cast<Triangle2D>());
-        case ShapeType2D::SHAPE2D_RECTANGLE: return add(*shape.shape_cast<Rectangle2D>());
-        case ShapeType2D::SHAPE2D_POLYGON:   return add(*shape.shape_cast<Polygon2D>());
-        case ShapeType2D::SHAPE2D_CONVEX_POLYGON: return ShapeID::invalid();
-        }
-        return ShapeID::invalid();
+        return std::visit([&](const auto &shape) -> ShapeID { return add(shape); }, shape);
     }
 
 private:
@@ -212,8 +210,8 @@ private:
         case ShapeType2D::SHAPE2D_CIRCLE:    _circles.remove(h.index); break;
         case ShapeType2D::SHAPE2D_TRIANGLE:  _triangles.remove(h.index); break;
         case ShapeType2D::SHAPE2D_RECTANGLE: _rectangles.remove(h.index); break;
-        case ShapeType2D::SHAPE2D_POLYGON:   _polygons.remove(h.index); break;
-        case ShapeType2D::SHAPE2D_CONVEX_POLYGON: break;
+        case ShapeType2D::SHAPE2D_POLYGON:   _generalPoly.remove(h.index); break;
+        case ShapeType2D::SHAPE2D_CONVEX_POLYGON: _convexPoly.remove(h.index); break;
         }
     }
 
@@ -270,9 +268,10 @@ public:
             if (auto* p = _rectangles.get({h.index})) fn(*p);
             break;
         case ShapeType2D::SHAPE2D_POLYGON:
-            if (auto* p = _polygons.get({h.index})) fn(*p);
+            if (auto* p = _generalPoly.get({h.index})) fn(*p);
             break;
         case ShapeType2D::SHAPE2D_CONVEX_POLYGON:
+            if (auto* p = _convexPoly.get({h.index})) fn(*p);
             break;
         }
     }
@@ -300,15 +299,15 @@ public:
         case ShapeType2D::SHAPE2D_CIRCLE:    return _circles.get({h.index});
         case ShapeType2D::SHAPE2D_TRIANGLE:  return _triangles.get({h.index});
         case ShapeType2D::SHAPE2D_RECTANGLE: return _rectangles.get({h.index});
-        case ShapeType2D::SHAPE2D_POLYGON:   return _polygons.get({h.index});
-        case ShapeType2D::SHAPE2D_CONVEX_POLYGON: nullptr;
+        case ShapeType2D::SHAPE2D_POLYGON:   return _generalPoly.get({h.index});
+        case ShapeType2D::SHAPE2D_CONVEX_POLYGON: return _convexPoly.get({h.index});
         }
         return nullptr;
     }
 
-    const IFiniteShape2D* get(ShapeID id) const
+    const FiniteShapePtrVariant2D get(ShapeID id) const
     {
-        if (!isValid(id)) return nullptr;
+        if (!isValid(id)) return std::monostate{};
         auto h = _handleMap[id.index].handle;
 
         switch(h.type)
@@ -316,19 +315,20 @@ public:
         case ShapeType2D::SHAPE2D_CIRCLE:    return _circles.get({h.index});
         case ShapeType2D::SHAPE2D_TRIANGLE:  return _triangles.get({h.index});
         case ShapeType2D::SHAPE2D_RECTANGLE: return _rectangles.get({h.index});
-        case ShapeType2D::SHAPE2D_POLYGON:   return _polygons.get({h.index});
-        case ShapeType2D::SHAPE2D_CONVEX_POLYGON: nullptr;
+        case ShapeType2D::SHAPE2D_POLYGON:   return _generalPoly.get({h.index});
+        case ShapeType2D::SHAPE2D_CONVEX_POLYGON: return _convexPoly.get({h.index});
         }
-        return nullptr;
+        return std::monostate{};
     }
 
-    const IFiniteShape2D* resolve(ShapeID id) const override { return get(id); }
+    const FiniteShapePtrVariant2D resolve(ShapeID id) const override { return get(id); }
 
 private:
-    SlotVector2D<Circle2D>    _circles;
-    SlotVector2D<Triangle2D>  _triangles;
-    SlotVector2D<Rectangle2D> _rectangles;
-    SlotVector2D<Polygon2D>   _polygons;
+    SlotVector2D<Circle2D>        _circles;
+    SlotVector2D<Triangle2D>      _triangles;
+    SlotVector2D<Rectangle2D>     _rectangles;
+    SlotVector2D<Polygon2D>       _generalPoly;
+    SlotVector2D<ConvexPolygon2D> _convexPoly;
 
 private:
     std::vector<ShapeObject> _handleMap;

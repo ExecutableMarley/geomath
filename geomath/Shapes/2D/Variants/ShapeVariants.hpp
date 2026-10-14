@@ -32,6 +32,15 @@ using FiniteShapeVariant2D = std::variant<
     ConvexPolygon2D
 >;
 
+using FiniteShapePtrVariant2D = std::variant<
+    std::monostate,
+    const Circle2D*,
+    const Triangle2D*,
+    const Rectangle2D*,
+    const Polygon2D*,
+    const ConvexPolygon2D*
+>;
+
 using ShapeVariant2D = FiniteShapeVariant2D;//Todo: Move this
 
 using GeometryVariant2D = std::variant<

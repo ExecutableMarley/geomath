@@ -29,7 +29,7 @@ namespace Arns::geomath
 //Todo: Refactor the specialized versions at some point to fit them in
 
 
-SweepResult2D SolveCircleToCircleCCD(const Circle2D& a, const Vector2D& velA,
+SweepResult2D detail::SolveCircleToCircleCCD(const Circle2D& a, const Vector2D& velA,
     const Circle2D& b, const Vector2D& velB, real_t maxTime) 
 {
     SweepResult2D result;
@@ -87,7 +87,7 @@ SweepResult2D SolveCircleToCircleCCD(const Circle2D& a, const Vector2D& velA,
     return result;
 }
 
-SweepResult2D SolveBBoxToBBoxCCD(const BBox2D& a, const Vector2D& velA,
+SweepResult2D detail::SolveBBoxToBBoxCCD(const BBox2D& a, const Vector2D& velA,
     const BBox2D& b, const Vector2D& velB, real_t maxTime) 
 {
     SweepResult2D result;
@@ -248,7 +248,7 @@ struct SweepTraits<Circle2D, Circle2D> {
         const Circle2D& b, Vector2D vb,
         real_t maxTime, int, real_t)
     {
-        return SolveCircleToCircleCCD(a, va, b, vb, maxTime);
+        return detail::SolveCircleToCircleCCD(a, va, b, vb, maxTime);
     }
 };
 
