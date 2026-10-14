@@ -143,6 +143,12 @@ struct Vector2D
         return *this;
     }
 
+    Vector2D& reflect(const Vector2D& normal)
+    {
+        *this -= normal * (2 * dot(normal));
+        return *this;
+    }
+
     // --- Derived Vectors ---
 
     Vector2D copy() const

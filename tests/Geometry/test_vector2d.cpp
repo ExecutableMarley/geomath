@@ -120,6 +120,15 @@ TEST_SUITE("Vector2D")
         CHECK(point == Vector2D(1, 1));
     }
 
+    TEST_CASE("Transform / Modification (reflection)")
+    {
+        Vector2D value(3, 4);
+        Vector2D& result = value.reflect(Vector2D::unitX());
+
+        CHECK(value == Vector2D(-3, 4));
+        CHECK(&result == &value);
+    }
+
     TEST_CASE("Constants & Helpers")
     {
         CHECK(Vector2D::zero() == Vector2D(0, 0));
