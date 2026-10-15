@@ -26,8 +26,6 @@ namespace Arns::geomath
 
 //Post impact velocity response?
 
-//Todo: Refactor the specialized versions at some point to fit them in
-
 
 SweepResult2D detail::SolveCircleToCircleCCD(const Circle2D& a, const Vector2D& velA,
     const Circle2D& b, const Vector2D& velB, real_t maxTime) 
@@ -39,12 +37,26 @@ SweepResult2D detail::SolveCircleToCircleCCD(const Circle2D& a, const Vector2D& 
     real_t R = a.m_radius + b.m_radius;
 
     real_t c = p0.dot(p0) - R * R;
+    real_t approach = p0.dot(v); // Half of b_coeff
+    bool shouldReportImmediateHit = false;
 
-    // Initial overlap check (t = 0)
-    if (!approximatelyGreaterAbs(c, real_t{0})) 
+    if (c < real_t{0}) // Geometric overlap on TOI = 0
+    {
+        shouldReportImmediateHit = true;
+    }
+    else if (!approximatelyGreaterAbs(c, real_t{0})) // Touching at Toi = 0
+    {
+        // Check if approaching
+        if (approximatelyLess(approach, real_t{0}) || approximatelyZero(approach))
+        {
+            shouldReportImmediateHit = true;
+        }
+    }
+
+    if (shouldReportImmediateHit)
     {
         result.hit = true;
-        result.toi = 0;
+        result.toi = real_t{0};
         real_t dist = p0.length();
         result.normal = approximatelyZero(dist) ? Vector2D{1, 0} : -p0 / dist;
         result.point = b.m_center - result.normal * b.m_radius;
@@ -96,6 +108,50 @@ SweepResult2D detail::SolveBBoxToBBoxCCD(const BBox2D& a, const Vector2D& velA,
     Vector2D E = a.halfExtents() + b.halfExtents();
     Vector2D v = velA - velB;
 
+    bool isInsideX = approximatelyBetween(p0.x, -E.x, E.x);
+    bool isInsideY = approximatelyBetween(p0.y, -E.y, E.y);
+
+    if (isInsideX && isInsideY)
+    {
+        bool isStrictlyInside = (p0.x > -E.x && p0.x < E.x) &&
+                                (p0.y > -E.y && p0.y < E.y);
+
+        if (!isStrictlyInside)
+        {
+            bool separating = false;
+
+            if (approximatelyZero(std::abs(std::abs(p0.x) - E.x)))
+            {
+                if ((p0.x > real_t{0} && v.x > real_t{0}) || (p0.x < real_t{0} && v.x < real_t{0}))
+                    separating = true;
+            }
+            if (approximatelyZero(std::abs(std::abs(p0.y) - E.y)))
+            {
+                if ((p0.y > real_t{0} && v.y > real_t{0}) || (p0.y < real_t{0} && v.y < real_t{0}))
+                    separating = true;
+            }
+
+            if (separating)
+            {
+                return result; // Moving apart
+            }
+        }
+
+        result.hit = true;
+        result.toi = real_t{0};
+        Vector2D pen = E - p0;
+        if (pen.x < pen.y)
+        {
+            result.normal = (p0.x < real_t{0}) ? Vector2D{-1, 0} : Vector2D{1, 0};
+        }
+        else
+        {
+            result.normal = (p0.y < real_t{0}) ? Vector2D{0, -1} : Vector2D{0, 1};
+        }
+        result.point = b.closestPoint(a.centroid());
+        return result;
+    }
+
     real_t tMin = real_t{0};
     real_t tMax = maxTime;
     Vector2D hitNormal{0, 0};
@@ -145,6 +201,7 @@ SweepResult2D detail::SolveBBoxToBBoxCCD(const BBox2D& a, const Vector2D& velA,
         }
     }
 
+    /*
     // Check if shapes were already overlapping at t = 0
     if (approximatelyBetween(p0.x, -E.x, E.x) && approximatelyBetween(p0.y, -E.y, E.y))
     {
@@ -154,6 +211,7 @@ SweepResult2D detail::SolveBBoxToBBoxCCD(const BBox2D& a, const Vector2D& velA,
         result.point = b.closestPoint(a.centroid());
         return result;
     }
+    */
 
     if (approximatelyBetween(tMin, real_t{0}, maxTime))
     {
@@ -188,10 +246,47 @@ SweepResult2D sweepConservativeAdvancementGeneric(
     const Vector2D relativeVelocity = velocityB - velocityA;
     const real_t speed = relativeVelocity.length();
 
-    real_t t = 0;
+    // Note: This does not detect deep penetration. We might ignore things that should be handled 
+    // As collision.
+    // Todo: Proper DCD with MTV to reuse here
 
+    Vector2D cloA, cloB;
+    real_t d = distance(a, b, &cloA, &cloB);
+    if (d <= epsilon)
+    {
+        Vector2D normalDelta = cloA - cloB;
+        const real_t normalLengthSquared = normalDelta.lengthSquared();
+        const Vector2D normal = normalLengthSquared > epsilon * epsilon
+            ? normalDelta.normalize()
+            : speed > epsilon ? (-relativeVelocity).normalize() : Vector2D{1, 0};
+
+        // Check if they are separating at t = 0
+        real_t separationSpeed = normal.dot(relativeVelocity);
+
+        if (separationSpeed >= -epsilon)
+        {
+            // Moving apart -> No Collision
+            return {};
+        }
+
+        // Approaching
+        return {
+            .hit = true,
+            .toi = real_t{0},
+            .normal = normal,
+            .point = cloB
+        };
+    }
+
+    if (speed <= epsilon)
+    {
+        return {};
+    }
+
+    real_t t = 0;
     for (int i = 0; i < maxIterations; ++i)
     {
+        t += d / speed;
         if (t > maxTime)
             break;
 
@@ -223,8 +318,8 @@ SweepResult2D sweepConservativeAdvancementGeneric(
 
         t += d / speed;
 
-        if (t > maxTime)
-            break;
+        //if (t > maxTime)
+          //  break;
     }
 
     return {};

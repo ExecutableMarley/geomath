@@ -47,7 +47,7 @@ struct SweepResult2D
 {
     bool hit = false;
     real_t toi = 1.0;
-    Vector2D normal{};
+    Vector2D normal{}; // a to b
     Vector2D point{};
 };
 
