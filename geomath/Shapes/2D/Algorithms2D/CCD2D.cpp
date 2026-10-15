@@ -47,7 +47,7 @@ SweepResult2D detail::SolveCircleToCircleCCD(const Circle2D& a, const Vector2D& 
     else if (!approximatelyGreaterAbs(c, real_t{0})) // Touching at Toi = 0
     {
         // Check if approaching
-        if (approximatelyLess(approach, real_t{0}) || approximatelyZero(approach))
+        if (approximatelyLess(approach, real_t{0}))
         {
             shouldReportImmediateHit = true;
         }
