@@ -1,6 +1,7 @@
 #pragma once
 
 //#include "../Interfaces/IFiniteShape2D.hpp"
+#include "Shapes/Common/SlotID.hpp"
 #include "../Variants/ShapeConcepts.hpp"
 #include "../Variants/ShapeVariants.hpp"
 #include "../BBox2D.hpp"
@@ -19,21 +20,6 @@ namespace Arns
 namespace geomath
 {
 
-struct ShapeID
-{
-    uint32_t index;
-    uint32_t generation;
-
-    static constexpr ShapeID invalid() 
-    {
-        return ShapeID{std::numeric_limits<uint32_t>::max(), 0};
-    }
-
-    bool operator==(const ShapeID& other) const
-    {
-        return index == other.index && generation == other.generation;
-    }
-};
 
 struct ShapeHandle2D
 {
