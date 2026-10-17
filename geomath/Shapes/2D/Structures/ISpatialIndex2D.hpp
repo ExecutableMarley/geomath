@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Containers/SlotID.hpp"
 #include "../Interfaces/IFiniteShape2D.hpp"
 #include "../BBox2D.hpp"
 #include "../Ray2D.hpp"
@@ -60,6 +61,7 @@ public:
     using ShapeFilter    = std::function<bool(const ShapeID& id)>;
     using ShapeCallback  = std::function<bool(const ShapeID& id)>;
     using RayHitCallback = std::function<bool(const ShapeID& id, real_t t)>;
+    using PairCallback   = std::function<bool(ShapeID idA, ShapeID idB)>;
 
     virtual void query_range(const BBox2D& queryArea, const ShapeCallback& callback,
         const ShapeFilter& filter = {}) const = 0;

@@ -1,7 +1,7 @@
 #pragma once
 
 //#include "../Interfaces/IFiniteShape2D.hpp"
-#include "Shapes/Common/SlotID.hpp"
+#include "Containers/SlotID.hpp"
 #include "../Variants/ShapeConcepts.hpp"
 #include "../Variants/ShapeVariants.hpp"
 #include "../BBox2D.hpp"
