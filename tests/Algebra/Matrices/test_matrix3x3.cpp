@@ -226,8 +226,9 @@ TEST_SUITE("Matrix3x3")
         {
             Matrix3x3 translationMatrix = Matrix3x3::createTranslation2D(Vector2D(5, 10));
             Vector2D point(2, 3);
-            Vector2D transformedPoint = translationMatrix * point;
-            CHECK(transformedPoint == Vector2D(7, 13));
+            CHECK(translationMatrix * point == Vector2D(7, 13));
+            CHECK(translationMatrix.transformPoint(point) == Vector2D(7, 13));
+            CHECK(translationMatrix.transformVector(point) == Vector2D(2, 3));
         }
 
         SUBCASE("Scaling")
@@ -295,6 +296,12 @@ TEST_SUITE("Matrix3x3")
             Vector3D point(1, 0, 0);
             Vector3D transformedPoint = rotationMatrix * point;
             CHECK(transformedPoint == Vector3D(0, 1, 0));
+        }
+
+        SUBCASE("Rotation around an arbitrary axis")
+        {
+            const Matrix3x3 rotationMatrix = Matrix3x3::createRotation3DRads(PI / real_t{2}, Vector3D(0, 0, 1));
+            CHECK(rotationMatrix * Vector3D(1, 0, 0) == Vector3D(0, 1, 0));
         }
     }
 }

@@ -245,8 +245,9 @@ TEST_SUITE("Matrix4x4")
         {
             Matrix4x4 translationMatrix = Matrix4x4::createTranslation3D(5, 10, 15);
             Vector3D point(2, 3, 4);
-            Vector3D transformedPoint = translationMatrix * point;
-            CHECK(transformedPoint == Vector3D(7, 13, 19));
+            CHECK(translationMatrix * point == Vector3D(7, 13, 19));
+            CHECK(translationMatrix.transformPoint(point) == Vector3D(7, 13, 19));
+            CHECK(translationMatrix.transformVector(point) == Vector3D(2, 3, 4));
         }
 
         SUBCASE("Scaling")
@@ -279,6 +280,22 @@ TEST_SUITE("Matrix4x4")
             Vector3D point(1, 0, 0);
             Vector3D transformedPoint = rotationMatrix * point;
             CHECK(transformedPoint == Vector3D(0, 1, 0));
+        }
+
+        SUBCASE("Rotation around an arbitrary axis")
+        {
+            const Matrix4x4 rotationMatrix = Matrix4x4::createRotation3DRads(PI / real_t{2}, Vector3D(0, 0, 1));
+            CHECK(rotationMatrix * Vector3D(1, 0, 0) == Vector3D(0, 1, 0));
+        }
+
+        SUBCASE("Combined transform")
+        {
+            const Matrix4x4 combinedTransform =
+                Matrix4x4::createTranslation3D(5, 10, 15) *
+                Matrix4x4::createRotationZDegs(90) *
+                Matrix4x4::createScale3D(2, 3, 4);
+
+            CHECK(combinedTransform * Vector3D(1, 1, 1) == Vector3D(2, 12, 19));
         }
     }
 }
