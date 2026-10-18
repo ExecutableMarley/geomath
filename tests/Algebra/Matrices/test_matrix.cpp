@@ -8,14 +8,14 @@ using namespace Arns::geomath;
 
 TEST_SUITE("Matrix")
 {
-    TEST_CASE("Matrix default constructor")
+    TEST_CASE("Default constructor")
     {
         Matrix mat;
         CHECK(mat.rows() == 0);
         CHECK(mat.columns() == 0);
     }
 
-    TEST_CASE("Matrix constructor with dimensions and initial value")
+    TEST_CASE("Constructor with dimensions and initial value")
     {
         Matrix mat(2, 3, real_t{1});
         CHECK(mat.rows() == 2);
@@ -29,7 +29,7 @@ TEST_SUITE("Matrix")
         CHECK(allElementsCorrect);
     }
 
-    TEST_CASE("Matrix constructor with dimensions and data vector")
+    TEST_CASE("Constructor with dimensions and data vector")
     {
         std::vector<real_t> data = {1, 2, 3, 4, 5, 6};
         Matrix mat(2, 3, data);
@@ -44,7 +44,7 @@ TEST_SUITE("Matrix")
         CHECK(allElementsCorrect);
     }
 
-    TEST_CASE("Matrix copy constructor")
+    TEST_CASE("Copy constructor")
     {
         Matrix mat1(2, 2, 5.0f);
         Matrix mat2(mat1);
@@ -55,7 +55,7 @@ TEST_SUITE("Matrix")
                 CHECK(mat2(i, j) == doctest::Approx(5.0f));
     }
 
-    TEST_CASE("Matrix from IMatrix")
+    TEST_CASE("From IMatrix")
     {
         Matrix3x3 m3x3(1, 2, 3,
                        4, 5, 6,
@@ -68,7 +68,7 @@ TEST_SUITE("Matrix")
                 CHECK(m(i, j) == doctest::Approx(m3x3(i, j)));
     }
 
-    TEST_CASE("Matrix transpose")
+    TEST_CASE("Transpose")
     {
         Matrix mat(2, 3);
         mat(0, 0) = 1; mat(0, 1) = 2; mat(0, 2) = 3;

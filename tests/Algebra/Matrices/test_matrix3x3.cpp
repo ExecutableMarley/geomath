@@ -8,7 +8,7 @@ using namespace Arns::geomath;
 
 TEST_SUITE("Matrix3x3")
 {
-    TEST_CASE("Matrix3x3 default constructor")
+    TEST_CASE("Default constructor")
     {
         Matrix3x3 mat;
         CHECK(mat.rows() == 3);
@@ -22,7 +22,7 @@ TEST_SUITE("Matrix3x3")
         CHECK(allElementsZero);
     }
 
-    TEST_CASE("Matrix3x3 constructor with initial value")
+    TEST_CASE("Constructor with initial value")
     {
         Matrix3x3 mat(real_t{5});
         CHECK(mat.rows() == 3);
@@ -36,7 +36,7 @@ TEST_SUITE("Matrix3x3")
         CHECK(allElementsCorrect);
     }
 
-    TEST_CASE("Matrix3x3 constructor with individual values")
+    TEST_CASE("Constructor with individual values")
     {
         Matrix3x3 mat(1, 2, 3,
                       4, 5, 6,
@@ -54,7 +54,7 @@ TEST_SUITE("Matrix3x3")
         CHECK(allElementsCorrect);
     }
 
-    TEST_CASE("Matrix3x3 copy constructor")
+    TEST_CASE("Copy constructor")
     {
         Matrix3x3 mat1(1, 2, 3,
                        4, 5, 6,
@@ -71,7 +71,7 @@ TEST_SUITE("Matrix3x3")
         CHECK(allElementsCorrect);
     }
 
-    TEST_CASE("Matrix3x3 from IMatrix")
+    TEST_CASE("From IMatrix")
     {
         Matrix mat(3, 3, std::vector<real_t>{1, 2, 3, 4, 5, 6, 7, 8, 9});
         Matrix3x3 mat3x3(mat);
@@ -86,7 +86,7 @@ TEST_SUITE("Matrix3x3")
         CHECK(allElementsCorrect);
     }
 
-    TEST_CASE("Matrix3x3 transpose")
+    TEST_CASE("Transpose")
     {
         Matrix3x3 mat(1, 2, 3,
                       4, 5, 6,
@@ -100,7 +100,7 @@ TEST_SUITE("Matrix3x3")
         CHECK(mat.transpose() == expected);
     }
 
-    TEST_CASE("Matrix3x3 determinant")
+    TEST_CASE("Determinant")
     {
         Matrix3x3 mat(1, 2, 3,
                       0, 1, 4,
@@ -112,7 +112,7 @@ TEST_SUITE("Matrix3x3")
                                       3 * (0 * 6 - 1 * 5)));
     }
 
-    TEST_CASE("Matrix3x3 Inverse")
+    TEST_CASE("Inverse")
     {
         Matrix3x3 mat(1, 2, 3,
                       0, 1, 4,
@@ -128,7 +128,7 @@ TEST_SUITE("Matrix3x3")
         CHECK(mat * inv == Matrix3x3::identity());
     }
 
-    TEST_CASE("Matrix3x3 Inverse of non-invertible matrix")
+    TEST_CASE("Inverse of non-invertible matrix")
     {
         Matrix3x3 mat(1, 2, 3,
                       4, 5, 6,

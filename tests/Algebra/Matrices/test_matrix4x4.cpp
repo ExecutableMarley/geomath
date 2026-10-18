@@ -8,7 +8,7 @@ using namespace Arns::geomath;
 
 TEST_SUITE("Matrix4x4")
 {
-    TEST_CASE("Matrix4x4 default constructor")
+    TEST_CASE("Default constructor")
     {
         Matrix4x4 mat;
         CHECK(mat.rows() == 4);
@@ -22,7 +22,7 @@ TEST_SUITE("Matrix4x4")
         CHECK(allElementsZero);
     }
 
-    TEST_CASE("Matrix4x4 constructor with initial value")
+    TEST_CASE("Constructor with initial value")
     {
         Matrix4x4 mat(real_t{5});
         CHECK(mat.rows() == 4);
@@ -36,7 +36,7 @@ TEST_SUITE("Matrix4x4")
         CHECK(allElementsCorrect);
     }
 
-    TEST_CASE("Matrix4x4 constructor with individual values")
+    TEST_CASE("Constructor with individual values")
     {
         Matrix4x4 mat(1, 2, 3, 4,
                       5, 6, 7, 8,
@@ -56,7 +56,7 @@ TEST_SUITE("Matrix4x4")
         CHECK(allElementsCorrect);
     }
 
-    TEST_CASE("Matrix4x4 copy constructor")
+    TEST_CASE("Copy constructor")
     {
         Matrix4x4 mat1(1, 2, 3, 4,
                        5, 6, 7, 8,
@@ -74,7 +74,7 @@ TEST_SUITE("Matrix4x4")
         CHECK(allElementsCorrect);
     }
 
-    TEST_CASE("Matrix4x4 from IMatrix")
+    TEST_CASE("From IMatrix")
     {
         Matrix mat(4, 4, std::vector<real_t>{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16});
         Matrix4x4 mat4x4(mat);
@@ -89,7 +89,7 @@ TEST_SUITE("Matrix4x4")
         CHECK(allElementsCorrect);
     }
 
-    TEST_CASE("Matrix4x4 transpose")
+    TEST_CASE("Transpose")
     {
         Matrix4x4 mat(1, 2, 3, 4,
                       5, 6, 7, 8,
@@ -105,7 +105,7 @@ TEST_SUITE("Matrix4x4")
         CHECK(transposed == expected);
     }
 
-    TEST_CASE("Matrix4x4 determinant")
+    TEST_CASE("Determinant")
     {
         Matrix4x4 mat(1, 2, 3, 4,
                       5, 6, 7, 8,
@@ -115,7 +115,7 @@ TEST_SUITE("Matrix4x4")
         CHECK(mat.determinant() == doctest::Approx(72));
     }
 
-    TEST_CASE("Matrix4x4 Inverse")
+    TEST_CASE("Inverse")
     {
         Matrix4x4 mat(3, 4, 5, 6,
                       6, 6, 5, 5,
@@ -132,7 +132,7 @@ TEST_SUITE("Matrix4x4")
         CHECK(mat * inv == Matrix4x4::identity());
     }
 
-    TEST_CASE("Matrix4x4 Inverse of non-invertible matrix")
+    TEST_CASE("Inverse of non-invertible matrix")
     {
         Matrix4x4 mat(1, 2, 3, 4,
                       5, 6, 7, 8,
