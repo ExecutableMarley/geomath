@@ -6,6 +6,8 @@
 
 using namespace Arns::geomath;
 
+static_assert(!VectorLike<real_t>);
+
 TEST_SUITE("Matrix3x3")
 {
     TEST_CASE("Default constructor")
@@ -226,9 +228,9 @@ TEST_SUITE("Matrix3x3")
         {
             Matrix3x3 translationMatrix = Matrix3x3::createTranslation2D(Vector2D(5, 10));
             Vector2D point(2, 3);
-            CHECK(translationMatrix * point == Vector2D(7, 13));
-            CHECK(translationMatrix.transformPoint(point) == Vector2D(7, 13));
+            CHECK(translationMatrix * point == Vector2D(2, 3));
             CHECK(translationMatrix.transformVector(point) == Vector2D(2, 3));
+            CHECK(translationMatrix.transformPoint(point) == Vector2D(7, 13));
         }
 
         SUBCASE("Scaling")
@@ -257,7 +259,7 @@ TEST_SUITE("Matrix3x3")
             Matrix3x3 combinedTransform = translationMatrix * rotationMatrix * scalingMatrix;
 
             Vector2D point(1, 1);
-            Vector2D transformedPoint = combinedTransform * point;
+            Vector2D transformedPoint = combinedTransform.transformPoint(point);
 
             // Expected result after scaling (2, 3), rotating 90 degrees, and translating (5, 10)
             CHECK(transformedPoint == Vector2D(2, 12));

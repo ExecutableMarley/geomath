@@ -143,9 +143,14 @@ public:
 
     Vector2D transformPoint(const Vector2D& vec) const
     {
-        return Vector2D(
-            m_data[0][0] * vec.x + m_data[0][1] * vec.y + m_data[0][2] * 1,
-            m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2] * 1);
+        real_t resultX = m_data[0][0] * vec.x + m_data[0][1] * vec.y + m_data[0][2];
+        real_t resultY = m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2];
+        real_t resultW = m_data[2][0] * vec.x + m_data[2][1] * vec.y + m_data[2][2];
+
+        // Normalization
+        if (!approximatelyZero(resultW) && !approximatelyEqual(resultW, real_t{1}))
+            return Vector2D(resultX / resultW, resultY / resultW);
+        return Vector2D(resultX, resultY);
     }
 
     Vector2D transformVector(const Vector2D& vec) const
@@ -246,13 +251,10 @@ public:
 
     Vector2D operator*(const Vector2D& other) const
     {
-        real_t resultX = m_data[0][0] * other.x + m_data[0][1] * other.y + m_data[0][2];
-        real_t resultY = m_data[1][0] * other.x + m_data[1][1] * other.y + m_data[1][2];
-        real_t resultW = m_data[2][0] * other.x + m_data[2][1] * other.y + m_data[2][2];
+        real_t resultX = m_data[0][0] * other.x + m_data[0][1] * other.y;
+        real_t resultY = m_data[1][0] * other.x + m_data[1][1] * other.y;
+        real_t resultW = m_data[2][0] * other.x + m_data[2][1] * other.y;
 
-        // Normalization
-        if (!approximatelyZero(resultW) && !approximatelyEqual(resultW, real_t{1}))
-            return Vector2D(resultX / resultW, resultY / resultW);
         return Vector2D(resultX, resultY);
     }
 

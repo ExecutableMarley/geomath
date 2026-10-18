@@ -219,10 +219,15 @@ public:
 
     Vector3D transformPoint(const Vector3D& vec) const
     {
-        return Vector3D(
-            m_data[0][0] * vec.x + m_data[0][1] * vec.y + m_data[0][2] * vec.z + m_data[0][3],
-            m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2] * vec.z + m_data[1][3],
-            m_data[2][0] * vec.x + m_data[2][1] * vec.y + m_data[2][2] * vec.z + m_data[2][3]);
+        real_t resultX = m_data[0][0] * vec.x + m_data[0][1] * vec.y + m_data[0][2] * vec.z + m_data[0][3];
+        real_t resultY = m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2] * vec.z + m_data[1][3];
+        real_t resultZ = m_data[2][0] * vec.x + m_data[2][1] * vec.y + m_data[2][2] * vec.z + m_data[2][3];
+        real_t resultW = m_data[3][0] * vec.x + m_data[3][1] * vec.y + m_data[3][2] * vec.z + m_data[3][3];
+
+        // Normalization
+        if (!approximatelyZero(resultW) && !approximatelyEqual(resultW, real_t{1}))
+            return Vector3D(resultX / resultW, resultY / resultW, resultZ / resultW);
+        return Vector3D(resultX, resultY, resultZ);
     }
 
     Vector3D transformVector(const Vector3D& vec) const
@@ -321,9 +326,9 @@ public:
     Vector3D operator*(const Vector3D& vec) const
     {
         return Vector3D(
-            m_data[0][0] * vec.x + m_data[0][1] * vec.y + m_data[0][2] * vec.z + m_data[0][3],
-            m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2] * vec.z + m_data[1][3],
-            m_data[2][0] * vec.x + m_data[2][1] * vec.y + m_data[2][2] * vec.z + m_data[2][3]);
+            m_data[0][0] * vec.x + m_data[0][1] * vec.y + m_data[0][2] * vec.z,
+            m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2] * vec.z,
+            m_data[2][0] * vec.x + m_data[2][1] * vec.y + m_data[2][2] * vec.z);
     }
 
     Matrix4x4 operator*(real_t scalar) const
