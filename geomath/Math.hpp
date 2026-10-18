@@ -60,6 +60,9 @@
 #include "Shapes/2D/Algorithms2D/Triangulation/Triangulation.hpp"
 #include "Shapes/2D/Structures/ShapeStore2D.hpp"
 #include "Shapes/2D/Structures/ISpatialIndex2D.hpp"
+#include "Shapes/2D/Structures/Spatial/BVH2D.hpp"
+#include "Shapes/2D/Structures/Spatial/RTree.hpp"
+#include "Shapes/2D/Structures/Spatial/TransientQuadTree2D.hpp"
 
 // 3D
 #include "Shapes/3D/Algorithms3D/Algorithms3D.hpp"
