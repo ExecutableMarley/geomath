@@ -26,7 +26,7 @@ namespace Arns::geomath
 
 //Post impact velocity response?
 
-
+// Todo: This still occasionally detects separating and minimal overlapping circles occasionally
 SweepResult2D detail::SolveCircleToCircleCCD(const Circle2D& a, const Vector2D& velA,
     const Circle2D& b, const Vector2D& velB, real_t maxTime) 
 {
@@ -40,7 +40,7 @@ SweepResult2D detail::SolveCircleToCircleCCD(const Circle2D& a, const Vector2D& 
     real_t approach = p0.dot(v); // Half of b_coeff
     bool shouldReportImmediateHit = false;
 
-    if (c < real_t{0}) // Geometric overlap on TOI = 0
+    if (approximatelyLess(c, real_t{0})) // Geometric overlap on TOI = 0
     {
         shouldReportImmediateHit = true;
     }
