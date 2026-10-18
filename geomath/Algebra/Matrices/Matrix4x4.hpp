@@ -220,9 +220,9 @@ public:
     Vector3D transformPoint(const Vector3D& vec) const
     {
         return Vector3D(
-            m_data[0][0] * vec.x + m_data[0][1] * vec.y + m_data[0][2] * 1,
-            m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2] * 1,
-            m_data[2][0] * vec.x + m_data[2][1] * vec.y + m_data[2][2] * 1);
+            m_data[0][0] * vec.x + m_data[0][1] * vec.y + m_data[0][2] * vec.z + m_data[0][3],
+            m_data[1][0] * vec.x + m_data[1][1] * vec.y + m_data[1][2] * vec.z + m_data[1][3],
+            m_data[2][0] * vec.x + m_data[2][1] * vec.y + m_data[2][2] * vec.z + m_data[2][3]);
     }
 
     Vector3D transformVector(const Vector3D& vec) const
