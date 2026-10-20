@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../CommonMath.hpp"
+#include "VectorConcepts.hpp"
 #include "Formatting/Formatting.hpp"
 #include <math.h>
 #include <ostream>
@@ -27,6 +28,22 @@ struct Vector2D
     constexpr Vector2D() : x(0), y(0) {}
 
     constexpr Vector2D(real_t x, real_t y) : x(x), y(y) {}
+
+    // --- Data Accessors & Mutators ---
+
+    static constexpr size_t size() { return 2; }
+
+    real_t& operator[](size_t index)
+    {
+        if (index >= size()) throw std::out_of_range("Vector2D index out of range");
+        return index == 0 ? x : y;
+    }
+
+    const real_t& operator[](size_t index) const
+    {
+        if (index >= size()) throw std::out_of_range("Vector2D index out of range");
+        return index == 0 ? x : y;
+    }
 
     // --- Geometric Properties ---
 
@@ -286,6 +303,8 @@ struct Vector2D
         return os << "[" << vec.x << ", " << vec.y << "]";
     }
 };
+
+static_assert(VectorLike<Vector2D>);
 
 inline Vector2D operator *(real_t scalar, const Vector2D& vector)
 {

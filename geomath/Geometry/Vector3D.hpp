@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../CommonMath.hpp"
+#include "VectorConcepts.hpp"
 #include "Formatting/Formatting.hpp"
 #include <math.h>
 #include <ostream>
@@ -28,6 +29,22 @@ struct Vector3D
     constexpr Vector3D() : x(0), y(0), z(0) {}
 
     constexpr Vector3D(real_t x, real_t y, real_t z) : x(x), y(y), z(z) {}
+
+    // --- Data Accessors & Mutators ---
+
+    static constexpr size_t size() { return 3; }
+
+    real_t& operator[](size_t index)
+    {
+        if (index >= size()) throw std::out_of_range("Vector3D index out of range");
+        return index == 0 ? x : (index == 1 ? y : z);
+    }
+
+    const real_t& operator[](size_t index) const
+    {
+        if (index >= size()) throw std::out_of_range("Vector3D index out of range");
+        return index == 0 ? x : (index == 1 ? y : z);
+    }
 
     // --- Geometric Properties ---
 
@@ -304,6 +321,8 @@ struct Vector3D
         return os << "[" << vec.x << ", " << vec.y << ", " << vec.z << "]";
     }
 };
+
+static_assert(VectorLike<Vector3D>);
 
 inline Vector3D operator *(real_t scalar, const Vector3D& vector)
 {

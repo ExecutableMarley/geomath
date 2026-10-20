@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../CommonMath.hpp"
+#include "VectorConcepts.hpp"
 #include "Formatting/Formatting.hpp"
 #include <math.h>
 #include <ostream>
@@ -29,6 +30,22 @@ struct Vector4D
     constexpr Vector4D() : x(0), y(0), z(0), w(0) {}
 
     constexpr Vector4D(real_t x, real_t y, real_t z, real_t w) : x(x), y(y), z(z), w(w) {}
+
+    // --- Data Accessors & Mutators ---
+
+    static constexpr size_t size() { return 4; }
+
+    real_t& operator[](size_t index)
+    {
+        if (index >= size()) throw std::out_of_range("Vector4D index out of range");
+        return index == 0 ? x : (index == 1 ? y : (index == 2 ? z : w));
+    }
+
+    const real_t& operator[](size_t index) const
+    {
+        if (index >= size()) throw std::out_of_range("Vector4D index out of range");
+        return index == 0 ? x : (index == 1 ? y : (index == 2 ? z : w));
+    }
 
     // --- Geometric Properties ---
 
@@ -231,6 +248,8 @@ struct Vector4D
         return os << "[" << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << "]";
     }
 };
+
+static_assert(VectorLike<Vector4D>);
 
 inline Vector4D operator *(real_t scalar, const Vector4D& vector)
 {

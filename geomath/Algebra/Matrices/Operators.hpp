@@ -50,6 +50,24 @@ inline Matrix operator*(const IMatrix& lhs, const IMatrix& rhs)
     return result;
 }
 
+template <VectorLike Vector>
+Vector operator*(const IMatrix& matrix, const Vector& vector)
+{
+    const std::size_t dimensions = Vector::size();
+    if (!matrix.columns() == dimensions)
+        throw std::invalid_argument("Matrix dimensions do not match vector size.");
+
+    Vector result{};
+    for (std::size_t row = 0; row < dimensions; ++row)
+    {
+        real_t value = 0;
+        for (std::size_t column = 0; column < dimensions; ++column)
+            result[row] += matrix(row, column) * vector[column];
+    }
+
+    return result;
+}
+
 inline Matrix operator*(const IMatrix& lhs, real_t scalar)
 {
     Matrix result(lhs.rows(), lhs.columns());

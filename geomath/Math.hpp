@@ -27,6 +27,7 @@
 
 #include "CommonMath.hpp"
 
+#include "Geometry/VectorConcepts.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "Geometry/Vector3D.hpp"
 #include "Geometry/Vector4D.hpp"
@@ -40,6 +41,8 @@
 #include "Algebra/ViewMatrix.hpp"
 #include "Algebra/EulerAngles.hpp"
 #include "Algebra/Quaternion.hpp"
+
+#include "Containers/SparseSlotVector.hpp"
 
 // 2D
 #include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"

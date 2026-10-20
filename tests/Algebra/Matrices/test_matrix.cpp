@@ -3,6 +3,7 @@
 #include "Algebra/Matrices/Matrix3x3.hpp"
 #include "Algebra/Matrices/Matrix4x4.hpp"
 #include "Algebra/Matrices/Operators.hpp"
+#include "Geometry/Vector3D.hpp"
 
 using namespace Arns::geomath;
 
@@ -191,7 +192,6 @@ TEST_SUITE("Matrix")
             CHECK(mat * scalar == expected);
         }
 
-        /* Todo: 
         SUBCASE("Matrix and Vector multiplication")
         {
             Matrix mat = {{1, 2, 3},
@@ -201,7 +201,7 @@ TEST_SUITE("Matrix")
 
             Vector3D expected(14, 32, 50);
             CHECK(mat * vec == expected);
-        }*/
+        }
 
         SUBCASE("Scalar division")
         {
