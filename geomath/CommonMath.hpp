@@ -349,13 +349,13 @@ inline bool intervalsOverlap(const T& minA, const T& maxA, const T& minB, const 
 }
 
 template <typename T>
-inline T degToRad(T degrees)
+constexpr T degToRad(T degrees)
 {
     return degrees * (PI / real_t{180.0});
 }
 
 template <typename T>
-inline T radToDeg(T radians)
+constexpr T radToDeg(T radians)
 {
     return radians * (real_t{180.0} / PI);
 }
