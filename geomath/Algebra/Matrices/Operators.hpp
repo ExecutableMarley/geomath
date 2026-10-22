@@ -53,7 +53,7 @@ inline Matrix operator*(const IMatrix& lhs, const IMatrix& rhs)
 template <VectorLike Vector>
 Vector operator*(const IMatrix& matrix, const Vector& vector)
 {
-    const std::size_t dimensions = Vector::size();
+    const std::size_t dimensions = Vector::dimensions();
     if (!matrix.columns() == dimensions)
         throw std::invalid_argument("Matrix dimensions do not match vector size.");
 

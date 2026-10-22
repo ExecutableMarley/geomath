@@ -32,17 +32,17 @@ struct Vector3D
 
     // --- Data Accessors & Mutators ---
 
-    static constexpr size_t size() { return 3; }
+    static constexpr size_t dimensions() { return 3; }
 
     real_t& operator[](size_t index)
     {
-        if (index >= size()) throw std::out_of_range("Vector3D index out of range");
+        if (index >= dimensions()) throw std::out_of_range("Vector3D index out of range");
         return index == 0 ? x : (index == 1 ? y : z);
     }
 
     const real_t& operator[](size_t index) const
     {
-        if (index >= size()) throw std::out_of_range("Vector3D index out of range");
+        if (index >= dimensions()) throw std::out_of_range("Vector3D index out of range");
         return index == 0 ? x : (index == 1 ? y : z);
     }
 

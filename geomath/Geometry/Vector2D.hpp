@@ -31,17 +31,17 @@ struct Vector2D
 
     // --- Data Accessors & Mutators ---
 
-    static constexpr size_t size() { return 2; }
+    static constexpr size_t dimensions() { return 2; }
 
     real_t& operator[](size_t index)
     {
-        if (index >= size()) throw std::out_of_range("Vector2D index out of range");
+        if (index >= dimensions()) throw std::out_of_range("Vector2D index out of range");
         return index == 0 ? x : y;
     }
 
     const real_t& operator[](size_t index) const
     {
-        if (index >= size()) throw std::out_of_range("Vector2D index out of range");
+        if (index >= dimensions()) throw std::out_of_range("Vector2D index out of range");
         return index == 0 ? x : y;
     }
 
