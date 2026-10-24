@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Marley Arns
+ * Licensed under the MIT License.
+*/
+
 #pragma once
 
 #include "CommonMath.hpp"
@@ -5,7 +10,6 @@
 #include "Algebra/Transform2D.hpp"
 #include "Shapes/Common/TriangleIndices.hpp"
 #include "Shapes/2D/BBox2D.hpp"
-#include "Shapes/2D/Interfaces/IFiniteShape2D.hpp"
 #include "Shapes/2D/Triangle2D.hpp"
 
 #include <math.h>
@@ -17,7 +21,6 @@
 namespace Arns::geomath
 {
 
-// Todo: Should have the same structure as TriangleMesh3D
 
 struct TriangleMeshData2D
 {
@@ -29,19 +32,11 @@ struct TriangleMeshData2D
     TriangleMeshData2D(std::span<const Vector2D> vertices, std::span<const TriangleIndices> triangles) :
         m_vertices(vertices.begin(), vertices.end()), m_triangles(triangles.begin(), triangles.end()) {}
 
-    TriangleMeshData2D(std::span<const Vector2D> vertices,
-        std::initializer_list<TriangleIndices> triangles)
-        : m_vertices(vertices.begin(), vertices.end()),
-          m_triangles(triangles)
-    {}
+    TriangleMeshData2D(std::span<const Vector2D> vertices, std::initializer_list<TriangleIndices> triangles)
+        : m_vertices(vertices.begin(), vertices.end()), m_triangles(triangles) {}
 
-    TriangleMeshData2D(
-        std::initializer_list<Vector2D> vertices,
-        std::initializer_list<TriangleIndices> triangles)
-        : m_vertices(vertices),
-          m_triangles(triangles)
-    {
-    }
+    TriangleMeshData2D(std::initializer_list<Vector2D> vertices, std::initializer_list<TriangleIndices> triangles)
+        : m_vertices(vertices), m_triangles(triangles) {}
 
     void reserve(size_t numVertices, size_t numTriangles) 
     {
@@ -52,7 +47,7 @@ struct TriangleMeshData2D
     bool isValid() const 
     {
         const size_t vertexCount = m_vertices.size();
-        for (const auto& t : m_triangles) 
+        for (const TriangleIndices& t : m_triangles) 
         {
             if (static_cast<size_t>(t.v0) >= vertexCount ||
                 static_cast<size_t>(t.v1) >= vertexCount ||
@@ -115,7 +110,7 @@ private:
 
     // Derived local data from Mesh
 
-    BBox2D m_localBounds;
+    BBox2D   m_localBounds;
     real_t   m_area;
     Vector2D m_centroid;
     
@@ -158,11 +153,13 @@ private:
             const Vector2D triangleCentroid = (v0 + v1 + v2) / real_t{3};
 
             weightedCentroid += triangleCentroid * triangleArea;
-            totalArea += triangleArea;
+            totalArea        += triangleArea;
         }
 
         this->m_area = totalArea;
-        this->m_centroid = weightedCentroid / totalArea;
+
+        if (!approximatelyZero(totalArea))
+            this->m_centroid = weightedCentroid / totalArea;
     }
 
 public:
@@ -206,8 +203,7 @@ public:
 
     const std::vector<Vector2D>& vertices()         const { return m_data.m_vertices; }
     const std::vector<TriangleIndices>& triangles() const { return m_data.m_triangles; }
-
-    const TriangleMeshData2D& data()                  const { return m_data;}
+    const TriangleMeshData2D& data()                const { return m_data;}
 
     Triangle2D getTriangle(size_t index) const
     {
@@ -254,8 +250,6 @@ public:
         return m_worldBounds;
     }
 
-    // area
-
     // --- Transform / modification ---
 
     TriangleMesh2D& translate(const Vector2D& translation)
@@ -293,7 +287,6 @@ public:
         return *this;
     }
 
-    //bake
     void bakeTransform()
     {
         for (auto& v : m_data.m_vertices)
@@ -323,9 +316,7 @@ private:
 public:
 
     TriangleMeshBuilder2D() = default;
-
-    explicit TriangleMeshBuilder2D(TriangleMeshData2D data) 
-        : m_data(std::move(data)) {}
+    explicit TriangleMeshBuilder2D(TriangleMeshData2D data) : m_data(std::move(data)) {}
 
     // --- Data Accessors & Mutators ---
 
@@ -335,7 +326,7 @@ public:
     }
 
     TriangleMeshBuilder2D& addVertex(real_t x, real_t y) {
-        m_data.m_vertices.push_back({x, y});
+        m_data.m_vertices.emplace_back(x, y);
         return *this;
     }
 
@@ -345,7 +336,7 @@ public:
     }
 
     TriangleMeshBuilder2D& addTriangle(uint32_t i0, uint32_t i1, uint32_t i2) {
-        m_data.m_triangles.push_back({i0, i1, i2});
+        m_data.m_triangles.emplace_back(i0, i1, i2);
         return *this;
     }
 
