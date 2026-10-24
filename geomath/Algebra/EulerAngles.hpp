@@ -31,23 +31,13 @@ public:
 
     // --- Geometric Properties ---
 
-    /*
-    real_t length() const
+    real_t distance(const EulerAngles& other) const
     {
-        return sqrt(m_pitch * m_pitch + m_yaw * m_yaw + m_roll * m_roll);
+        const EulerAngles delta = shortestDeltaTo(other);
+        return sqrt(delta.m_pitch.value * delta.m_pitch.value +
+            delta.m_yaw.value * delta.m_yaw.value +
+            delta.m_roll.value * delta.m_roll.value);
     }
-
-    real_t lengthSquared() const
-    {
-        return m_pitch * m_pitch + m_yaw * m_yaw + m_roll * m_roll;
-    }
-    */
-
-    /*
-    real_t distance(const EulerAngles &other) const
-    {
-        return (*this - other).length();
-    }*/
 
     // proper min angle distance
 
@@ -95,7 +85,13 @@ public:
             m_roll + (other.m_roll - m_roll) * t).normalize();
     }
 
-    // Shortest Delta angle
+    EulerAngles shortestDeltaTo(const EulerAngles& target) const
+    {
+        return EulerAngles(
+            angleDifference(m_pitch, target.m_pitch),
+            angleDifference(m_yaw, target.m_yaw),
+            angleDifference(m_roll, target.m_roll));
+    }
 
     // --- Operators ---
 
