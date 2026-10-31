@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <math.h>
 
 #include "Geometry/Vector3D.hpp"
@@ -21,11 +22,15 @@ public:
     Vector3D m_min;
     Vector3D m_max;
 
+    // --- Constructors ---
+
     BBox3D() : m_min(), m_max() {}
 
     BBox3D(const Vector3D &min, const Vector3D &max) : m_min(min), m_max(max) {}
 
     BBox3D(const Vector3D &center, real_t halfSize) : m_min(center - Vector3D(halfSize, halfSize, halfSize)), m_max(center + Vector3D(halfSize, halfSize, halfSize)) {}
+
+    // --- Derived geometry ---
 
     Vector3D halfSize() const
     {
@@ -53,6 +58,10 @@ public:
     {
         return (m_min + m_max) * 0.5f;
     }
+
+    // --- State Queries ---
+
+    // --- Transform / modification ---
 
     BBox3D& translate(const Vector3D &translation)
     {
@@ -96,6 +105,25 @@ public:
         return normal;
     }*/
 
+    // --- Lifecycle / Factory Methods ---
+
+    // --- ---
+
+    real_t minDistanceSquared(const Vector3D& point) const
+    {
+        const real_t dx = std::max(real_t{0}, std::max(m_min.x - point.x, point.x - m_max.x));
+        const real_t dy = std::max(real_t{0}, std::max(m_min.y - point.y, point.y - m_max.y));
+        const real_t dz = std::max(real_t{0}, std::max(m_min.z - point.z, point.z - m_max.z));
+        return dx * dx + dy * dy + dz * dz;
+    }
+
+    real_t minDistance(const Vector3D& point) const
+    {
+        return sqrt(minDistanceSquared(point));
+    }
+
+    // --- ---
+
     bool contains(const Vector3D &point) const
     {
         return point.x >= m_min.x && point.x <= m_max.x && point.y >= m_min.y && point.y <= m_max.y && point.z >= m_min.z && point.z <= m_max.z;
@@ -111,7 +139,11 @@ public:
         return m_min.x <= box.m_max.x && m_max.x >= box.m_min.x && m_min.y <= box.m_max.y && m_max.y >= box.m_min.y && m_min.z <= box.m_max.z && m_max.z >= box.m_min.z;
     }
 
-    // Static functions
+    // --- Comparison Operators ---
+
+    // --- Stream Output ---
+
+    // --- Static factory Functions ---
 
     static BBox3D merge(const BBox3D &box1, const BBox3D &box2)
     {
