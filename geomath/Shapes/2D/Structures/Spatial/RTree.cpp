@@ -397,7 +397,7 @@ void RTree2D::query_ray(const Ray2D& ray, real_t t_min, real_t t_max,
                     continue;
 
                 HitInfo2D hitInfo;
-                if (intersect(ray, entry.bounds, t_min, t_max, &hitInfo))
+                if (raycast(ray, entry.bounds, t_min, t_max, &hitInfo))
                     candidates.push({ hitInfo.t, InvalidNode, entry.shape, false, sequence++ });
             }
             continue;

@@ -239,7 +239,7 @@ bool isSegmentInsidePolygon(const Segment2D &segment, const Polygon2D& polygon)
 
     if (!polygon.isConvex())
     {
-        return !intersect(segment, polygon);
+        return !raycast(segment, polygon);
     }
     
     return true;

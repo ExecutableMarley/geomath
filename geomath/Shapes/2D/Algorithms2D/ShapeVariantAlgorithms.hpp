@@ -26,10 +26,10 @@ bool isShapeInsideShape(const FiniteShapeVariant2D& inner, const FiniteShapeVari
 
 //
 
-bool intersect(const Ray2D& ray, const FiniteShapeVariant2D& shape, 
+bool raycast(const Ray2D& ray, const FiniteShapeVariant2D& shape, 
     real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D* hitInfo = nullptr);
 
-bool intersect(const Segment2D& segment, const FiniteShapeVariant2D& shape, HitInfo2D* hitInfo = nullptr);
+bool raycast(const Segment2D& segment, const FiniteShapeVariant2D& shape, HitInfo2D* hitInfo = nullptr);
 
 bool intersect(const FiniteShapeVariant2D& shape1, const FiniteShapeVariant2D& shape2);
 

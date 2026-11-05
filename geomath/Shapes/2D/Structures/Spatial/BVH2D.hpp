@@ -144,7 +144,7 @@ public:
 				if (filter && !filter(entry.shape))
 					continue;
 				HitInfo2D hitInfo;
-				if (intersect(ray, entry.bounds, t_min, t_max, &hitInfo))
+				if (raycast(ray, entry.bounds, t_min, t_max, &hitInfo))
 					queue.push({ hitInfo.t, true, (node.firstEntry + i) });
 			}
 			pushRayNode(queue, ray, t_min, t_max, node.left);

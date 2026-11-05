@@ -12,6 +12,8 @@
 namespace Arns::geomath
 {
 
+/* Note: this is unfinished. Use TransientQuadTree instead
+
 using NodeIndex = uint32_t;
 
 static constexpr NodeIndex INVALID_NODE = std::numeric_limits<NodeIndex>::max();
@@ -127,10 +129,10 @@ public:
 
         const NodeIndex firstChild = static_cast<NodeIndex>(_nodes.size());
 
-        _nodes.push_back(QuadTreeNode(BBox2D( Vector2D{x, y}, subWidth, subHeight)));
-        _nodes.push_back(QuadTreeNode(BBox2D( Vector2D{x + subWidth, y}, subWidth, subHeight)));
-        _nodes.push_back(QuadTreeNode(BBox2D( Vector2D{x, y + subHeight}, subWidth, subHeight)));
-        _nodes.push_back(QuadTreeNode(BBox2D( Vector2D{x + subWidth, y + subHeight}, subWidth, subHeight)));
+        _nodes.push_back(QuadTreeNode(BBox2D::fromMinSize( Vector2D{x, y}, {subWidth, subHeight} )));
+        _nodes.push_back(QuadTreeNode(BBox2D::fromMinSize( Vector2D{x + subWidth, y}, {subWidth, subHeight} )));
+        _nodes.push_back(QuadTreeNode(BBox2D::fromMinSize( Vector2D{x, y + subHeight}, {subWidth, subHeight} )));
+        _nodes.push_back(QuadTreeNode(BBox2D::fromMinSize( Vector2D{x + subWidth, y + subHeight}, {subWidth, subHeight} )));
     
         _nodes[currentNode].children = {
             firstChild,
@@ -148,5 +150,6 @@ private:
     std::vector<QuadTreeNode> _nodes;
 };
 
+*/
 
 }

@@ -303,19 +303,21 @@ bool detail::intersectRayImpl(const Ray2D& ray, const Circle2D& circle, real_t t
     return true;
 }
 
-bool intersect(const Ray2D& ray, const FiniteShapeVariant2D& shape, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
+// Todo: These functions should not be able to recurse into themselves
+
+bool raycast(const Ray2D& ray, const FiniteShapeVariant2D& shape, real_t t_min, real_t t_max, HitInfo2D* hitInfo)
 {
     return std::visit([&](const auto& concreteShape)
     {
-        return intersect(ray, concreteShape, t_min, t_max, hitInfo);
+        return detail::intersectRayImpl(ray, concreteShape, t_min, t_max, hitInfo);
     }, shape);
 }
 
-bool intersect(const Segment2D& segment, const FiniteShapeVariant2D& shape, HitInfo2D* hitInfo)
+bool raycast(const Segment2D& segment, const FiniteShapeVariant2D& shape, HitInfo2D* hitInfo)
 {
     return std::visit([&](const auto& concreteShape)
     {
-        return intersect(segment, concreteShape, hitInfo);
+        return raycast(segment, concreteShape, hitInfo);
     }, shape);
 }
 

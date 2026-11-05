@@ -33,7 +33,7 @@ void checkHit(const RayOrSegment& r, const Shape& s, const ExpectedHit& expected
     real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max())
 {
     HitInfo2D info;
-    bool result = intersect(r, s, t_min, t_max, &info);
+    bool result = raycast(r, s, t_min, t_max, &info);
 
     CHECK(result == expected.hit);
 
@@ -92,7 +92,7 @@ TEST_CASE("ray misses all primitives")
         for(const auto& p : primitives)
         {
             CAPTURE(std::visit([](const auto& shape) { return shape.type(); }, p));
-            CHECK_FALSE(intersect(ray, p));
+            CHECK_FALSE(raycast(ray, p));
         }
     }
 
@@ -102,7 +102,7 @@ TEST_CASE("ray misses all primitives")
         for(const auto& p : primitives)
         {
             CAPTURE(std::visit([](const auto& shape) { return shape.type(); }, p));
-            CHECK_FALSE(intersect(ray, p));
+            CHECK_FALSE(raycast(ray, p));
         }
     }
 }
@@ -379,10 +379,10 @@ TEST_CASE("Ray2D and Segment2D intersection with FiniteShapeVariant2D")
     const Ray2D ray(Vector2D(-1, 1), Vector2D(1, 0));
     const Segment2D segment(Vector2D(-1, 1), Vector2D(3, 1));
 
-    CHECK(intersect(ray, triangleShape));
-    CHECK(intersect(ray, circleShape));
-    CHECK_FALSE(intersect(ray, distantCircleShape));
-    CHECK(intersect(segment, triangleShape));
-    CHECK(intersect(segment, circleShape));
-    CHECK_FALSE(intersect(segment, distantCircleShape));
+    CHECK(raycast(ray, triangleShape));
+    CHECK(raycast(ray, circleShape));
+    CHECK_FALSE(raycast(ray, distantCircleShape));
+    CHECK(raycast(segment, triangleShape));
+    CHECK(raycast(segment, circleShape));
+    CHECK_FALSE(raycast(segment, distantCircleShape));
 }
