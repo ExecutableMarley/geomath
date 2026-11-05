@@ -37,4 +37,5 @@
 #include "Shapes/2D/Structures/Spatial/RTree.cpp"
 
 //3D
-#include "Shapes/3D/Algorithms3D/Algorithms3D.cpp"
+#include "Shapes/3D/Algorithms3D/Distance3D.cpp"
+#include "Shapes/3D/Algorithms3D/Intersection3D.cpp"

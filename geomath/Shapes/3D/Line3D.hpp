@@ -15,17 +15,17 @@ namespace Arns
 namespace geomath
 {
 
-class Line3D
+class Segment3D
 {
 public:
     Vector3D m_start;
     Vector3D m_end;
 
-    Line3D() : m_start(), m_end() {}
+    Segment3D() : m_start(), m_end() {}
 
-    Line3D(const Vector3D &start, const Vector3D &end) : m_start(start), m_end(end) {}
+    Segment3D(const Vector3D &start, const Vector3D &end) : m_start(start), m_end(end) {}
 
-    Line3D(const Vector3D &start, const Vector3D &direction, real_t length) : m_start(start), m_end(start + direction.copy().normalize() * length) {}
+    Segment3D(const Vector3D &start, const Vector3D &direction, real_t length) : m_start(start), m_end(start + direction.copy().normalize() * length) {}
 
     real_t length() const
     {

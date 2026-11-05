@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <math.h>
-
 #include "CommonMath.hpp"
 #include "Geometry/Vector3D.hpp"
 
@@ -16,17 +14,17 @@ namespace Arns
 namespace geomath
 {
 
-class Plane
+class Plane3D
 {
 public:
     Vector3D m_planePoint;
     Vector3D m_normal;
 
-    Plane() : m_planePoint(), m_normal() {}
+    Plane3D() : m_planePoint(), m_normal() {}
 
-    Plane(const Vector3D &planePoint, const Vector3D &normal) : m_planePoint(planePoint), m_normal(normal) {}
+    Plane3D(const Vector3D &planePoint, const Vector3D &normal) : m_planePoint(planePoint), m_normal(normal) {}
 
-    Plane(const Vector3D &point1, const Vector3D &point2, const Vector3D &point3)
+    Plane3D(const Vector3D &point1, const Vector3D &point2, const Vector3D &point3)
     {
         Vector3D v1 = point2 - point1;
         Vector3D v2 = point3 - point1;
@@ -44,12 +42,12 @@ public:
         return point - m_normal * distance(point);
     }
 
-    bool isParallel(const Plane &plane) const
+    bool isParallel(const Plane3D &plane) const
     {
         return m_normal.isParallel(plane.m_normal);
     }
 
-    bool isOrthogonal(const Plane &plane) const
+    bool isOrthogonal(const Plane3D &plane) const
     {
         return m_normal.isOrthogonal(plane.m_normal);
     }
@@ -64,16 +62,16 @@ public:
         return isOnPlane(point);
     }
 
-    bool intersects(const Plane &plane) const
+    bool intersects(const Plane3D &plane) const
     {
         return !isParallel(plane);
     }
 
-    static Plane fromAxisNormal(const Vector3D &point, int axis)
+    static Plane3D fromAxisNormal(const Vector3D &point, int axis)
     {
         Vector3D normal(0,0,0);
         normal[axis] = 1.f;
-        return Plane(point, normal);
+        return Plane3D(point, normal);
     }
 };
 

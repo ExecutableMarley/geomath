@@ -48,7 +48,7 @@ namespace detail
     bool intersectRayImpl(const Ray2D &ray, const Circle2D &circle, real_t t_min = 0, real_t t_max = std::numeric_limits<real_t>::max(), HitInfo2D *hitInfo = nullptr);
 
     template <typename Object>
-    concept HasRayIntersectionImpl =
+    concept HasRayIntersectionImpl2D =
         requires(
             const Ray2D &ray,
             const Object &object,
@@ -94,13 +94,11 @@ namespace detail
 // Public Intersection dispatch functions
 //=======================================
 
-//Todo: Consider renaming ray,object and segment,object overloads due to different calling conventions
-
 //    --- Ray intersection function ---
 
-template <typename B> requires (detail::HasRayIntersectionImpl<B>)
+template <typename Object> requires (detail::HasRayIntersectionImpl2D<Object>)
 bool raycast(
-    const Ray2D& first, const B& second, real_t tMin = real_t{0},
+    const Ray2D& first, const Object& second, real_t tMin = real_t{0},
         real_t tMax = std::numeric_limits<real_t>::max(),
         HitInfo2D* hitInfo = nullptr)
 {
@@ -109,7 +107,7 @@ bool raycast(
 
 //    --- Segment intersection function ---
 
-template <typename Object> requires detail::HasRayIntersectionImpl<Object>
+template <typename Object> requires detail::HasRayIntersectionImpl2D<Object>
 bool raycast(const Segment2D& segment, const Object& object, HitInfo2D* hitInfo = nullptr)
 {
     const Ray2D ray(segment.m_start, segment.deltaVector());
@@ -118,10 +116,10 @@ bool raycast(const Segment2D& segment, const Object& object, HitInfo2D* hitInfo 
 
 //    --- Shape-Shape intersection function ---
 
-template <typename A, typename B>
-    requires (requires(const A& a, const B& b) { detail::intersectImpl(a, b); } ||
-              requires(const A& a, const B& b) { detail::intersectImpl(b, a); })
-bool intersect(const A& a, const B& b)
+template <typename A, typename Object>
+    requires (requires(const A& a, const Object& b) { detail::intersectImpl(a, b); } ||
+              requires(const A& a, const Object& b) { detail::intersectImpl(b, a); })
+bool intersect(const A& a, const Object& b)
 {
     if constexpr (requires { detail::intersectImpl(a, b); })
         return detail::intersectImpl(a, b);

@@ -7,7 +7,8 @@ target_sources(Geomath INTERFACE
     Shapes/2D/Algorithms2D/CCD2D.cpp
     Shapes/2D/Structures/Spatial/RTree.cpp
     Shapes/2D/Algorithms2D/Triangulation/Detail/DelaunayTriangulation.cpp
-    Shapes/3D/Algorithms3D/Algorithms3D.cpp
+    Shapes/3D/Algorithms3D/Distance3D.cpp
+    Shapes/3D/Algorithms3D/Intersection3D.cpp
 )
 
 target_include_directories(Geomath INTERFACE

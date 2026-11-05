@@ -5,10 +5,9 @@
 
 #pragma once
 
-#include <algorithm>
-#include <math.h>
-
+#include "CommonMath.hpp"
 #include "Geometry/Vector3D.hpp"
+#include <algorithm>
 
 namespace Arns
 {

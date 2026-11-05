@@ -110,13 +110,13 @@ namespace detail
         return distancePolygonToCircle(polygon.vertices(), polygon.isConvex(), circle, closestPoint1, closestPoint2);
     }
 
-    template <typename A, typename B>
-    concept HasDistanceOrder = requires(const A &a, const B &b, Vector2D *pointA, Vector2D *pointB) {
+    template <typename A, typename Object>
+    concept HasDistanceOrder = requires(const A &a, const Object &b, Vector2D *pointA, Vector2D *pointB) {
         { distanceImpl(a, b, pointA, pointB) } -> std::convertible_to<real_t>;
     };
 
-    template <typename A, typename B>
-    concept HasDistance = HasDistanceOrder<A, B> || HasDistanceOrder<B, A>;
+    template <typename A, typename Object>
+    concept HasDistance = HasDistanceOrder<A, Object> || HasDistanceOrder<Object, A>;
 
 } // namespace detail
 
@@ -124,13 +124,13 @@ namespace detail
 // Public Distance dispatch function 
 //==================================
 
-template <typename A, typename B>
-    requires (requires(const A& a, const B& b, Vector2D* p1, Vector2D* p2) {
+template <typename A, typename Object>
+    requires (requires(const A& a, const Object& b, Vector2D* p1, Vector2D* p2) {
                   detail::distanceImpl(a, b, p1, p2);
-              } || requires(const A& a, const B& b, Vector2D* p1, Vector2D* p2) {
+              } || requires(const A& a, const Object& b, Vector2D* p1, Vector2D* p2) {
                   detail::distanceImpl(b, a, p2, p1);
               })
-real_t distance(const A& a, const B& b, Vector2D* p1 = nullptr, Vector2D* p2 = nullptr)
+real_t distance(const A& a, const Object& b, Vector2D* p1 = nullptr, Vector2D* p2 = nullptr)
 {
     if constexpr (requires { detail::distanceImpl(a, b, p1, p2); })
     {

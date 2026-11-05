@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <math.h>
-
 #include "CommonMath.hpp"
 #include "Geometry/Vector3D.hpp"
 #include "BBox3D.hpp"
@@ -19,16 +17,16 @@ namespace Arns
 namespace geomath
 {
 
-class Capsule : public IFiniteShape3D
+class Capsule3D : public IFiniteShape3D
 {
 public:
     Vector3D m_startPoint;
     Vector3D m_endPoint;
     real_t m_radius;
 
-    Capsule() : m_startPoint(), m_endPoint(), m_radius(0) {}
+    Capsule3D() : m_startPoint(), m_endPoint(), m_radius(0) {}
     
-    Capsule(const Vector3D &startPoint, const Vector3D &endPoint, real_t radius) : m_startPoint(startPoint), m_endPoint(endPoint), m_radius(radius) {}
+    Capsule3D(const Vector3D &startPoint, const Vector3D &endPoint, real_t radius) : m_startPoint(startPoint), m_endPoint(endPoint), m_radius(radius) {}
 
     ShapeType3D type() const override
     {
@@ -50,14 +48,14 @@ public:
         return (m_startPoint + m_endPoint) * 0.5f;
     }
 
-    Capsule& translate(const Vector3D &translation) override
+    Capsule3D& translate(const Vector3D &translation) override
     {
         m_startPoint += translation;
         m_endPoint += translation;
         return *this;
     }
 
-    Capsule& scale(real_t scaleFactor)
+    Capsule3D& scale(real_t scaleFactor)
     {
         Vector3D centroid = this->centroid();
         m_startPoint = centroid + scaleFactor * (m_startPoint - centroid);
@@ -66,7 +64,7 @@ public:
         return *this;
     }
 
-    Capsule& rotate(real_t xAngle, real_t yAngle, real_t zAngle)
+    Capsule3D& rotate(real_t xAngle, real_t yAngle, real_t zAngle)
     {
         Vector3D centroid = this->centroid();
         m_startPoint = m_startPoint.rotateAround(xAngle, yAngle, zAngle, centroid);
@@ -82,10 +80,18 @@ public:
         return *this;
     }*/
 
+    /*
     bool contains(const Vector3D &point) const override
     {
-        return distancePointToLine(m_startPoint, m_endPoint, point) < m_radius;
+        return false;
+    }*/
+
+    
+    bool contains(const Vector3D &point) const override
+    {
+        return detail::distancePointToSegment(m_startPoint, m_endPoint, point) < m_radius;
     }
+    
 
     BBox3D boundingBox() const override
     {

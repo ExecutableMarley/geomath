@@ -28,10 +28,10 @@ namespace detail
         const BBox2D& b, const Vector2D& velB, real_t maxTime);
 }
 
-template <typename A, typename B>
+template <typename A, typename Object>
 SweepResult2D sweepConservativeAdvancementGeneric(
     const A& a, Vector2D velocityA,
-    const B& b, Vector2D velocityB,
+    const Object& b, Vector2D velocityB,
     real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4))
 {
     const Vector2D relativeVelocity = velocityB - velocityA;
@@ -84,7 +84,7 @@ SweepResult2D sweepConservativeAdvancementGeneric(
         Vector2D cloA, cloB;
         real_t d;
 
-        B currentB = b;
+        Object currentB = b;
         currentB.translate(relativeVelocity * t);
         d = distance(a, currentB, &cloA, &cloB);
 
@@ -117,12 +117,12 @@ SweepResult2D sweepConservativeAdvancementGeneric(
 }
 
 
-template <typename A, typename B, typename Enable = void>
-    requires detail::HasDistance<A, B>
+template <typename A, typename Object, typename Enable = void>
+    requires detail::HasDistance<A, Object>
 struct SweepTraits {
     static SweepResult2D sweep(
         const A& a, Vector2D va,
-        const B& b, Vector2D vb,
+        const Object& b, Vector2D vb,
         real_t maxTime, int maxIterations, real_t epsilon) 
     {
         return sweepConservativeAdvancementGeneric(a, va, b, vb, maxTime, maxIterations, epsilon);
@@ -145,14 +145,14 @@ struct SweepTraits<Circle2D, Circle2D> {
 //================================
 
 // Helper function
-template <typename A, typename B>
-    requires detail::HasDistance<A, B>
+template <typename A, typename Object>
+    requires detail::HasDistance<A, Object>
 SweepResult2D sweep(
     const A& a, Vector2D va,
-    const B& b, Vector2D vb,
+    const Object& b, Vector2D vb,
     real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4))
 {
-    return SweepTraits<A, B>::sweep(a, va, b, vb, maxTime, maxIterations, epsilon);
+    return SweepTraits<A, Object>::sweep(a, va, b, vb, maxTime, maxIterations, epsilon);
 }
 
 

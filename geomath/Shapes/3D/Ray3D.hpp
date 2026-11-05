@@ -5,8 +5,7 @@
 
 #pragma once
 
-#include <math.h>
-
+#include "CommonMath.hpp"
 #include "Geometry/Vector3D.hpp"
 
 namespace Arns
