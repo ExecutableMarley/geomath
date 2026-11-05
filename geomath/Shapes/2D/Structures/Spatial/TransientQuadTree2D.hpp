@@ -26,14 +26,6 @@ using NodeIndex = uint32_t;
 
 static constexpr NodeIndex INVALID_NODE = std::numeric_limits<NodeIndex>::max();
 
-/*
-struct QuadTreeEntry
-{
-    ShapeID shape;
-    BBox2D bounds;
-};
-*/
-
 struct FastQuadTreeNode
 {
     NodeIndex firstChild = INVALID_NODE; // Index of Top-Left child; next 3 are +1, +2, +3
@@ -51,10 +43,7 @@ public:
         : _rootBounds(bounds),
           _maxEntries(maxObjects),
           _maxDepth(maxDepth),
-          _rootIndex(0)
-    {
-        //_nodes.emplace_back(QuadTreeNode(bounds));
-    }
+          _rootIndex(0) {}
 
     // Dynamic insertion
     //void insert(ShapeID shapeIndex, const BBox2D& bounds) override {}
@@ -163,7 +152,6 @@ public:
             BBox2D childBounds = getChildBounds(bounds, i);
             buildNodeTopDown(firstChildIdx + i, childBounds, quadrants[i], depth + 1);
         }
-
     }
 
     // Reset method
@@ -230,7 +218,7 @@ public:
             const Candidate candidate = queue.top();
             queue.pop();
 
-            if (candidate.isEntry)
+            if (candidate.type == CandidateType::Entry)
                 return _entries[candidate.index].shape;
 
             const FastQuadTreeNode& node = _nodes[candidate.index];
@@ -266,7 +254,7 @@ public:
             const Candidate candidate = queue.top();
             queue.pop();
 
-            if (candidate.isEntry)
+            if (candidate.type == CandidateType::Entry)
             {
                 if (!callback(_entries[candidate.index].shape))
                     return;
@@ -333,7 +321,7 @@ public:
             const Candidate candidate = queue.top();
             queue.pop();
 
-            if (candidate.isEntry)
+            if (candidate.type == CandidateType::BoundsEntry)
             {
                 if (!callback(_entries[candidate.index].shape, candidate.priority))
                 {
@@ -363,10 +351,65 @@ public:
         }
     }
 
-    void query_ray(const Ray2D& ray, real_t t_min, real_t t_max, const IShapeResolver2D& resolver,
-        const RayHitCallback& callback, const ShapeFilter& filter = {}) const 
-    {
+    // --- Experimental precise ray query method ---
 
+    template <typename ShapeHitTest, typename Callback>
+    void query_ray(const Ray2D& ray, real_t t_min, real_t t_max,
+        ShapeHitTest&& hitTest, Callback&& callback,
+        const ShapeFilter& filter = {}) const
+    {
+        CandidateQueue queue;
+
+        for (uint32_t i = 0; i < entryCount; ++i)
+            pushRayEntry(queue, firstEntry + i, ray, t_min, t_max, filter);
+
+        if (!_nodes.empty() && _rootIndex != INVALID_NODE)
+            pushRayNode(queue, _rootIndex, _rootBounds, ray, t_min, t_max);
+
+        while (!queue.empty())
+        {
+            Candidate candidate = queue.top();
+            queue.pop();
+
+            if (candidate.type == CandidateType::ShapeHit)
+            {
+                if (!callback(_entries[candidate.index].shape, candidate.priority))
+                    return;
+
+                continue;
+            }
+
+            if (candidate.type == CandidateType::Node)
+            {
+                const FastQuadTreeNode& node = _nodes[candidate.index];
+
+                for (uint32_t i = 0; i < node.entryCount; ++i)
+                    pushRayEntry(queue, node.firstEntry + i, ray, t_min, t_max, filter);
+
+                if (node.firstChild == INVALID_NODE)
+                    continue;
+
+                for (uint32_t i = 0; i < 4; ++i)
+                {
+                    const BBox2D childBounds =
+                        getChildBounds(candidate.bounds, static_cast<int>(i));
+                    pushRayNode(queue, node.firstChild + i, childBounds, ray, t_min, t_max);
+                }
+
+                continue;
+            }
+
+            if (candidate.type == CandidateType::BoundsEntry)
+            {
+                const SpatialEntry& entry = _entries[candidate.index];
+                HitInfo2D hitInfo{};
+                if (hitTest(ray, entry.shape, t_min, t_max, &hitInfo) &&
+                    hitInfo.t >= t_min && hitInfo.t <= t_max)
+                {
+                    queue.push({hitInfo.t, CandidateType::ShapeHit, candidate.index, {} });
+                }
+            }
+        }
     }
 
     void query_intersecting_pairs(const PairCallback &callback) const
@@ -439,17 +482,30 @@ public:
 private:
     struct Candidate
     {
+        enum class Type : uint8_t
+        {
+            Node,
+            Entry,
+            BoundsEntry,
+            ShapeHit
+        };
+
         real_t priority;
-        bool isEntry;
+        Type type;
         NodeIndex index;
-        BBox2D bounds{}; // Used only for node candidates
+        BBox2D bounds{}; // Only used for nodes
     };
+
+    using CandidateType = Candidate::Type;
 
     struct CandidateCompare
     {
         bool operator()(const Candidate& left, const Candidate& right) const noexcept
         {
-            return left.priority > right.priority;
+            if (left.priority != right.priority)
+                return left.priority > right.priority;
+
+            return left.type > right.type;
         }
     };
 
@@ -471,7 +527,7 @@ private:
     {
         const SpatialEntry& entry = _entries[entryIndex];
         if (!filter || filter(entry.shape))
-            queue.push({entry.bounds.minDistanceSquared(point), true, entryIndex, {}});
+            queue.push({entry.bounds.minDistanceSquared(point), CandidateType::Entry, entryIndex, {}});
     }
 
     void pushNode(CandidateQueue& queue, NodeIndex nodeIndex, const BBox2D& bounds, const Vector2D& point) const
@@ -479,7 +535,7 @@ private:
         if (nodeIndex == INVALID_NODE)
             return;
 
-        queue.push({bounds.minDistanceSquared(point), false, nodeIndex, bounds});
+        queue.push({bounds.minDistanceSquared(point), CandidateType::Node, nodeIndex, bounds });
     }
 
     void pushRayEntry(CandidateQueue& queue, NodeIndex entryIndex, const Ray2D& ray,
@@ -491,9 +547,9 @@ private:
             return;
 
         HitInfo2D hitInfo;
-        if (intersect(ray, entry.bounds, tMin, tMax, &hitInfo))
+        if (raycast(ray, entry.bounds, tMin, tMax, &hitInfo))
         {
-            queue.push({hitInfo.t, true, entryIndex, {}});
+            queue.push({hitInfo.t, CandidateType::BoundsEntry, entryIndex, {} });
         }
     }
 
@@ -505,7 +561,7 @@ private:
         real_t enter;
         real_t exit;
         if (detail::rayBoundsInterval(ray, bounds, tMin, tMax, enter, exit))
-            queue.push({enter, false, nodeIndex, bounds});
+            queue.push({enter, CandidateType::Node, nodeIndex, bounds });
     }
 
     void pushChildren(CandidateQueue& queue, const FastQuadTreeNode& node, const BBox2D& bounds,
@@ -745,14 +801,8 @@ private:
     std::vector<SpatialEntry> _entries;
 };
 
-
-
-
-
-
-
-
-
+// Good thread about QuadTree's
+// https://stackoverflow.com/questions/41946007/efficient-and-well-explained-implementation-of-a-quadtree-for-2d-collision-det
 
 
 }

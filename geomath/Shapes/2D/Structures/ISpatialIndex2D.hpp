@@ -78,9 +78,6 @@ public:
         const ShapeFilter& filter = {}) const = 0;
 
 
-    //Ray trace query
-
-
     //virtual size_t size() const = 0;
     //Depth?
 
