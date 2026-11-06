@@ -44,8 +44,16 @@ struct Radians
     constexpr bool operator>(Radians other) const { return value > other.value; }
     constexpr bool operator>=(Radians other) const { return value >= other.value; }
 
+    constexpr Radians operator-() const { return Radians(-value); }
+    constexpr Radians abs() const { return Radians(std::abs(value)); }
+
     // Explicit! Degree -> Radian
     explicit operator Degrees() const;
+
+    static constexpr Radians zero()   { return Radians(real_t(0)); }
+    static constexpr Radians halfPi() { return Radians(PI * real_t(0.5)); }
+    static constexpr Radians pi()     { return Radians(PI); }
+    static constexpr Radians twoPi()  { return Radians(PI * real_t(2)); }
 };
 
 constexpr Radians operator*(real_t scalar, Radians angle) { return angle * scalar; }
@@ -55,6 +63,14 @@ inline Radians angleDifference(Radians from, Radians to)
     const real_t fullTurn = real_t(2) * PI;
     return Radians(std::remainder(to.value - from.value, fullTurn));
 }
+
+/*
+inline real_t sin(Radians rad) { return std::sin(rad.value); }
+inline real_t cos(Radians rad) { return std::cos(rad.value); }
+inline real_t tan(Radians rad) { return std::tan(rad.value); }
+*/
+
+// lerp, inverseLerp, remap defined in CommonMath.hpp
 
 namespace literals
 {
