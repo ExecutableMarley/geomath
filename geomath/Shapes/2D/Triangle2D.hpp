@@ -99,7 +99,7 @@ public:
         return *this;
     }
 
-    Triangle2D& rotate(real_t angle)
+    Triangle2D& rotate(Radians angle)
     {
         const Vector2D c = centroid();
         for (auto& v : m_vertices)
@@ -107,7 +107,7 @@ public:
         return *this;
     }
 
-    Triangle2D& rotate(real_t angle, const Vector2D& point)
+    Triangle2D& rotate(Radians angle, const Vector2D& point)
     {
         for (auto& v : m_vertices)
             v.rotateAround(angle, point);

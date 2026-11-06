@@ -8,12 +8,9 @@
 #include "CommonMath.hpp"
 #include "IMatrix.hpp"
 
-#include <math.h>
 #include <vector>
 #include <stdexcept>
 #include <initializer_list>
-#include <ostream>
-#include <iomanip>
 
 namespace Arns
 {

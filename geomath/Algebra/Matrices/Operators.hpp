@@ -9,8 +9,8 @@
 #include "IMatrix.hpp"
 #include "Matrix.hpp"
 
-#include <math.h>
 #include <format>
+#include <iomanip>
 #include <stdexcept>
 
 

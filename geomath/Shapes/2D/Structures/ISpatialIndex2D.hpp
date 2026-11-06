@@ -84,13 +84,6 @@ public:
     virtual ~ISpatialIndex2D() = default;
 };
 
-//Todo: More filter options
-//Convenient intersection checks and ray traces
-
-//Todo: Updating/Rebalancing/Optimizing functions
-
-
-
 
 } // namespace Math
 

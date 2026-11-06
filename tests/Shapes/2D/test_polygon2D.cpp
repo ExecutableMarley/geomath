@@ -167,14 +167,14 @@ TEST_CASE("Polygon2D transformations")
     SUBCASE("Rotate around centroid preserves area")
     {
         real_t originalArea = poly.area();
-        poly.rotate(real_t{45});
+        poly.rotate(Degrees(45));
         CHECK(poly.area() == doctest::Approx(originalArea));
     }
 
     SUBCASE("Rotate around arbitrary point")
     {
         real_t originalArea = poly.area();
-        poly.rotate(real_t{90}, Vector2D{0, 0});
+        poly.rotate(Degrees(90), Vector2D{0, 0});
         CHECK(poly.area() == doctest::Approx(originalArea));
     }
 

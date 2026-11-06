@@ -5,13 +5,11 @@
 
 #pragma once
 
-#include <math.h>
-#include <stdexcept>
-
 #include "CommonMath.hpp"
 #include "IMatrix.hpp"
 #include "Geometry/Vector3D.hpp"
 #include "Geometry/Vector4D.hpp"
+#include <stdexcept>
 
 namespace Arns
 {
@@ -367,100 +365,85 @@ public:
     static Matrix4x4 createTranslation3D(real_t tx, real_t ty, real_t tz)
     {
         return Matrix4x4(
-            1.f, 0.f, 0.f, tx,
-            0.f, 1.f, 0.f, ty,
-            0.f, 0.f, 1.f, tz,
-            0.f, 0.f, 0.f, 1.f);
+            1.0, 0.0, 0.0, tx,
+            0.0, 1.0, 0.0, ty,
+            0.0, 0.0, 1.0, tz,
+            0.0, 0.0, 0.0, 1.0);
     }
 
     static Matrix4x4 createScale3D(real_t sx, real_t sy, real_t sz)
     {
         return Matrix4x4(
-            sx,   0.0f, 0.0f, 0.0f,
-            0.0f, sy,   0.0f, 0.0f,
-            0.0f, 0.0f, sz,   0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
+            sx , 0.0, 0.0, 0.0,
+            0.0, sy , 0.0, 0.0,
+            0.0, 0.0, sz , 0.0,
+            0.0, 0.0, 0.0, 1.0
         );
     }
 
-    static Matrix4x4 createRotation3DRads(real_t angle, const Vector3D& axis)
+    static Matrix4x4 createRotation3D(Radians angle, const Vector3D& axis)
     {
         real_t sin, cos;
-        sinCos(angle, sin, cos);
-        real_t oneMinusCos = 1.0f - cos;
+        sinCos(angle.value, sin, cos);
+        real_t oneMinusCos = 1.0 - cos;
 
         return Matrix4x4(
             cos + axis.x * axis.x * oneMinusCos,
             axis.x * axis.y * oneMinusCos - axis.z * sin,
             axis.x * axis.z * oneMinusCos + axis.y * sin,
-            0.f,
+            0.0,
 
             axis.y * axis.x * oneMinusCos + axis.z * sin,
             cos + axis.y * axis.y * oneMinusCos,
             axis.y * axis.z * oneMinusCos - axis.x * sin,
-            0.f,
+            0.0,
 
             axis.z * axis.x * oneMinusCos - axis.y * sin,
             axis.z * axis.y * oneMinusCos + axis.x * sin,
             cos + axis.z * axis.z * oneMinusCos,
-            0.f,
+            0.0,
 
-            0.f, 0.f, 0.f, 1.f
+            0.0, 0.0, 0.0, 1.0
         );
     }
 
-    static Matrix4x4 createRotationXRads(real_t angle)
+    static Matrix4x4 createRotationX(Radians angle)
     {
         real_t sin, cos;
-        sinCos(angle, sin, cos);
+        sinCos(angle.value, sin, cos);
 
         return Matrix4x4(
-            1.f, 0.f,  0.f, 0.f,
-            0.f, cos, -sin, 0.f,
-            0.f, sin,  cos, 0.f,
-            0.f, 0.f,  0.f, 1.f
+            1.0, 0.0,  0.0, 0.0,
+            0.0, cos, -sin, 0.0,
+            0.0, sin,  cos, 0.0,
+            0.0, 0.0,  0.0, 1.0
         );
     }
 
-    static Matrix4x4 createRotationXDegs(real_t angle)
-    {
-        return createRotationXRads(degToRad(angle));
-    }
-
-    static Matrix4x4 createRotationYRads(real_t angle)
+    static Matrix4x4 createRotationY(Radians angle)
     {
         real_t sin, cos;
-        sinCos(angle, sin, cos);
+        sinCos(angle.value, sin, cos);
 
         return Matrix4x4(
-            cos, 0.f, sin, 0.f,
-            0.f, 1.f, 0.f, 0.f,
-            -sin, 0.f, cos, 0.f,
-            0.f, 0.f, 0.f, 1.f
+            cos , 0.0, sin, 0.0,
+            0.0 , 1.0, 0.0, 0.0,
+            -sin, 0.0, cos, 0.0,
+            0.0 , 0.0, 0.0, 1.0
         );
     }
 
-    static Matrix4x4 createRotationYDegs(real_t angle)
-    {
-        return createRotationYRads(degToRad(angle));
-    }
-
-    static Matrix4x4 createRotationZRads(real_t angle)
+    static Matrix4x4 createRotationZ(Radians angle)
     {
         real_t sin, cos;
-        sinCos(angle, sin, cos);
+        sinCos(angle.value, sin, cos);
 
         return Matrix4x4(
-            cos, -sin, 0.f, 0.f,
-            sin,  cos, 0.f, 0.f,
-            0.f,  0.f, 1.f, 0.f,
-            0.f,  0.f, 0.f, 1.f
+            cos, -sin, 0.0, 0.0,
+            sin,  cos, 0.0, 0.0,
+            0.0,  0.0, 1.0, 0.0,
+            0.0,  0.0, 0.0, 1.0
         );
-    }
-
-    static Matrix4x4 createRotationZDegs(real_t angle)
-    {
-        return createRotationZRads(degToRad(angle));
     }
 };
 

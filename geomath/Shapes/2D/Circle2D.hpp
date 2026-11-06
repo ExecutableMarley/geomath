@@ -88,12 +88,12 @@ public:
         return *this;
     }
 
-    Circle2D& rotate(real_t)
+    Circle2D& rotate(Radians)
     {
         return *this;
     }
 
-    Circle2D& rotate(real_t angle, const Vector2D& point)
+    Circle2D& rotate(Radians angle, const Vector2D& point)
     {
         this->m_center.rotateAround(angle, point);
         return *this;

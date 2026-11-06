@@ -5,13 +5,12 @@
 
 #pragma once
 
-#include <math.h>
-#include <stdexcept>
-
 #include "CommonMath.hpp"
 #include "IMatrix.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "Geometry/Vector3D.hpp"
+
+#include <stdexcept>
 
 namespace Arns
 {
@@ -307,10 +306,10 @@ public:
         );
     }
 
-    static Matrix3x3 createRotationRads2D(real_t angle)
+    static Matrix3x3 createRotation2D(Radians angle)
     {
         real_t sin, cos;
-        sinCos(angle, sin, cos);
+        sinCos(angle.value, sin, cos);
         
         return Matrix3x3(
             cos, -sin, 0.f,
@@ -318,10 +317,11 @@ public:
             0.f,  0.f, 1.f);
     }
 
+    /*
     static Matrix3x3 createRotationDegs2D(real_t angle)
     {
         return createRotationRads2D(degToRad(angle));
-    }
+    }*/
 
     // 3D linear transforms
 
@@ -334,10 +334,10 @@ public:
         );
     }
 
-    static Matrix3x3 createRotation3DRads(real_t angle, const Vector3D& axis)
+    static Matrix3x3 createRotation3D(Radians angle, const Vector3D& axis)
     {
         real_t sin, cos;
-        sinCos(angle, sin, cos);
+        sinCos(angle.value, sin, cos);
 
         real_t x = axis.x;
         real_t y = axis.y;
@@ -350,10 +350,10 @@ public:
         );
     }
 
-    static Matrix3x3 createRotationXRads(real_t angle)
+    static Matrix3x3 createRotationX(Radians angle)
     {
         real_t sin, cos;
-        sinCos(angle, sin, cos);
+        sinCos(angle.value, sin, cos);
 
         return Matrix3x3(
             1.f, 0.f,  0.f,
@@ -362,15 +362,16 @@ public:
         );
     }
 
+    /*
     static Matrix3x3 createRotationXDegs(real_t angle)
     {
         return createRotationXRads(degToRad(angle));
-    }
+    }*/
 
-    static Matrix3x3 createRotationYRads(real_t angle)
+    static Matrix3x3 createRotationY(Radians angle)
     {
         real_t sin, cos;
-        sinCos(angle, sin, cos);
+        sinCos(angle.value, sin, cos);
 
         return Matrix3x3(
             cos, 0.f, sin,
@@ -379,27 +380,30 @@ public:
         );
     }
 
+    /*
     static Matrix3x3 createRotationYDegs(real_t angle)
     {
         return createRotationYRads(degToRad(angle));
-    }
+    }*/
 
-    static Matrix3x3 createRotationZRads(real_t angle)
+    static Matrix3x3 createRotationZ(Radians angle)
     {
         real_t sin, cos;
-        sinCos(angle, sin, cos);
+        sinCos(angle.value, sin, cos);
 
         return Matrix3x3(
-            cos, -sin, 0.f,
-            sin,  cos, 0.f,
-            0.f,  0.f, 1.f
+            cos, -sin, 0.0,
+            sin,  cos, 0.0,
+            0.0,  0.0, 1.0
         );
     }
 
+    /*
     static Matrix3x3 createRotationZDegs(real_t angle)
     {
         return createRotationZRads(degToRad(angle));
     }
+    */
 };
 
 } // namespace Math

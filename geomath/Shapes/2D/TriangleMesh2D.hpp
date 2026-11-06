@@ -259,7 +259,7 @@ public:
         return *this;
     }
 
-    TriangleMesh2D& rotate(real_t rotate)
+    TriangleMesh2D& rotate(Radians rotate)
     {
         this->m_transform.rotate(rotate);
         _invalidate();

@@ -5,6 +5,7 @@
 #include "Algebra/Matrices/Operators.hpp"
 
 using namespace Arns::geomath;
+using namespace Arns::geomath::literals;
 
 TEST_SUITE("Matrix4x4")
 {
@@ -260,7 +261,7 @@ TEST_SUITE("Matrix4x4")
 
         SUBCASE("Rotation around X-axis")
         {
-            Matrix4x4 rotationMatrix = Matrix4x4::createRotationXDegs(90);
+            Matrix4x4 rotationMatrix = Matrix4x4::createRotationX(90_deg);
             Vector3D point(0, 1, 0);
             Vector3D transformedPoint = rotationMatrix * point;
             CHECK(transformedPoint == Vector3D(0, 0, 1));
@@ -268,7 +269,7 @@ TEST_SUITE("Matrix4x4")
 
         SUBCASE("Rotation around Y-axis")
         {
-            Matrix4x4 rotationMatrix = Matrix4x4::createRotationYDegs(90);
+            Matrix4x4 rotationMatrix = Matrix4x4::createRotationY(90_deg);
             Vector3D point(1, 0, 0);
             Vector3D transformedPoint = rotationMatrix * point;
             CHECK(transformedPoint == Vector3D(0, 0, -1));
@@ -276,7 +277,7 @@ TEST_SUITE("Matrix4x4")
 
         SUBCASE("Rotation around Z-axis")
         {
-            Matrix4x4 rotationMatrix = Matrix4x4::createRotationZDegs(90);
+            Matrix4x4 rotationMatrix = Matrix4x4::createRotationZ(90_deg);
             Vector3D point(1, 0, 0);
             Vector3D transformedPoint = rotationMatrix * point;
             CHECK(transformedPoint == Vector3D(0, 1, 0));
@@ -284,7 +285,7 @@ TEST_SUITE("Matrix4x4")
 
         SUBCASE("Rotation around an arbitrary axis")
         {
-            const Matrix4x4 rotationMatrix = Matrix4x4::createRotation3DRads(PI / real_t{2}, Vector3D(0, 0, 1));
+            const Matrix4x4 rotationMatrix = Matrix4x4::createRotation3D(Radians(PI / real_t{2}), Vector3D(0, 0, 1));
             CHECK(rotationMatrix * Vector3D(1, 0, 0) == Vector3D(0, 1, 0));
         }
 
@@ -292,7 +293,7 @@ TEST_SUITE("Matrix4x4")
         {
             const Matrix4x4 combinedTransform =
                 Matrix4x4::createTranslation3D(5, 10, 15) *
-                Matrix4x4::createRotationZDegs(90) *
+                Matrix4x4::createRotationZ(90_deg) *
                 Matrix4x4::createScale3D(2, 3, 4);
 
             CHECK(combinedTransform.transformPoint(Vector3D(1, 1, 1)) == Vector3D(2, 12, 19));

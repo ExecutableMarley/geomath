@@ -60,7 +60,7 @@ TEST_CASE("Circle2D transformations")
     {
         Circle2D original = circle;
 
-        circle.rotate(real_t{123});
+        circle.rotate(Degrees(123));
 
         CHECK(original == circle);
     }
@@ -68,7 +68,7 @@ TEST_CASE("Circle2D transformations")
     SUBCASE("Rotate around another point moves the center")
     {
         Circle2D rotatedCircle(circle);
-        rotatedCircle.rotate(real_t{90}, Vector2D{0, 2});
+        rotatedCircle.rotate(Degrees(90), Vector2D{0, 2});
 
         CHECK(rotatedCircle.centroid().x == doctest::Approx(real_t{0}));
         CHECK(rotatedCircle.centroid().y == doctest::Approx(real_t{3}));
@@ -79,7 +79,7 @@ TEST_CASE("Circle2D transformations")
     {
         Circle2D rotated = circle;
 
-        rotated.rotate(real_t{123}, rotated.centroid());
+        rotated.rotate(Degrees(123), rotated.centroid());
 
         CHECK(rotated.centroid() == circle.centroid());
         CHECK(rotated.m_radius == doctest::Approx(circle.m_radius));

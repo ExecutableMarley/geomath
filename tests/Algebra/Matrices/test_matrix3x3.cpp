@@ -5,6 +5,7 @@
 #include "Algebra/Matrices/Operators.hpp"
 
 using namespace Arns::geomath;
+using namespace Arns::geomath::literals;
 
 static_assert(!VectorLike<real_t>);
 
@@ -243,7 +244,7 @@ TEST_SUITE("Matrix3x3")
 
         SUBCASE("Rotation")
         {
-            Matrix3x3 rotationMatrix = Matrix3x3::createRotationDegs2D(90); // 90 degrees
+            Matrix3x3 rotationMatrix = Matrix3x3::createRotation2D(90_deg); // 90 degrees
             Vector2D point(1, 0);
             Vector2D transformedPoint = rotationMatrix * point;
             CHECK(transformedPoint == Vector2D(0, 1));
@@ -253,7 +254,7 @@ TEST_SUITE("Matrix3x3")
         {
             Matrix3x3 translationMatrix = Matrix3x3::createTranslation2D(Vector2D(5, 10));
             Matrix3x3 scalingMatrix = Matrix3x3::createScale2D(2, 3);
-            Matrix3x3 rotationMatrix = Matrix3x3::createRotationDegs2D(90); // 90 degrees
+            Matrix3x3 rotationMatrix = Matrix3x3::createRotation2D(90_deg); // 90 degrees
 
             // Combined transformation: first scale, then rotate, then translate
             Matrix3x3 combinedTransform = translationMatrix * rotationMatrix * scalingMatrix;
@@ -278,7 +279,7 @@ TEST_SUITE("Matrix3x3")
 
         SUBCASE("Rotation around X-axis")
         {
-            Matrix3x3 rotationMatrix = Matrix3x3::createRotationXDegs(90); // 90 degrees around X-axis
+            Matrix3x3 rotationMatrix = Matrix3x3::createRotationX(90_deg); // 90 degrees around X-axis
             Vector3D point(0, 1, 0);
             Vector3D transformedPoint = rotationMatrix * point;
             CHECK(transformedPoint == Vector3D(0, 0, 1));
@@ -286,7 +287,7 @@ TEST_SUITE("Matrix3x3")
 
         SUBCASE("Rotation around Y-axis")
         {
-            Matrix3x3 rotationMatrix = Matrix3x3::createRotationYDegs(90); // 90 degrees around Y-axis
+            Matrix3x3 rotationMatrix = Matrix3x3::createRotationY(90_deg); // 90 degrees around Y-axis
             Vector3D point(1, 0, 0);
             Vector3D transformedPoint = rotationMatrix * point;
             CHECK(transformedPoint == Vector3D(0, 0, -1));
@@ -294,7 +295,7 @@ TEST_SUITE("Matrix3x3")
 
         SUBCASE("Rotation around Z-axis")
         {
-            Matrix3x3 rotationMatrix = Matrix3x3::createRotationZDegs(90); // 90 degrees around Z-axis
+            Matrix3x3 rotationMatrix = Matrix3x3::createRotationZ(90_deg); // 90 degrees around Z-axis
             Vector3D point(1, 0, 0);
             Vector3D transformedPoint = rotationMatrix * point;
             CHECK(transformedPoint == Vector3D(0, 1, 0));
@@ -302,7 +303,7 @@ TEST_SUITE("Matrix3x3")
 
         SUBCASE("Rotation around an arbitrary axis")
         {
-            const Matrix3x3 rotationMatrix = Matrix3x3::createRotation3DRads(PI / real_t{2}, Vector3D(0, 0, 1));
+            const Matrix3x3 rotationMatrix = Matrix3x3::createRotation3D(Radians(PI / real_t{2}), Vector3D(0, 0, 1));
             CHECK(rotationMatrix * Vector3D(1, 0, 0) == Vector3D(0, 1, 0));
         }
     }

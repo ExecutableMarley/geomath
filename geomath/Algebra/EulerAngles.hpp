@@ -163,16 +163,16 @@ public:
 
     Matrix3x3 toMatrix3x3() const
     {
-        return Matrix3x3::createRotationXRads(m_pitch.value) * 
-            Matrix3x3::createRotationYRads(m_yaw.value) * 
-            Matrix3x3::createRotationZRads(m_roll.value);
+        return Matrix3x3::createRotationX(m_pitch) * 
+            Matrix3x3::createRotationY(m_yaw) * 
+            Matrix3x3::createRotationZ(m_roll);
     }
 
     Matrix4x4 toMatrix4x4() const
     {
-        return Matrix4x4::createRotationXRads(m_pitch.value) * 
-            Matrix4x4::createRotationYRads(m_yaw.value) * 
-            Matrix4x4::createRotationZRads(m_roll.value);
+        return Matrix4x4::createRotationX(m_pitch) * 
+            Matrix4x4::createRotationY(m_yaw) * 
+            Matrix4x4::createRotationZ(m_roll);
     }
 
     // --- Stream Output ---

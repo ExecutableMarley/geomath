@@ -104,7 +104,7 @@ TEST_CASE("Triangle2D transformations")
     SUBCASE("Rotate around centroid")
     {
         Vector2D originalCentroid = tri.centroid();
-        tri.rotate(real_t{90});
+        tri.rotate(Degrees(90));
 
         CHECK(tri.centroid() == originalCentroid);
         CHECK(tri.area() == doctest::Approx(real_t{6}));
@@ -113,7 +113,7 @@ TEST_CASE("Triangle2D transformations")
     SUBCASE("Rotate around arbitrary point")
     {
         Vector2D pivot{0, 0};
-        tri.rotate(real_t{90}, pivot);
+        tri.rotate(Degrees(90), pivot);
 
         CHECK(tri.a().x == doctest::Approx(real_t{0}));
         CHECK(tri.a().y == doctest::Approx(real_t{0}));

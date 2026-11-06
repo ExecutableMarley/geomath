@@ -106,7 +106,7 @@ public:
         return *this;
     }
 
-    ConvexPolygon2D& rotate(real_t angle)
+    ConvexPolygon2D& rotate(Radians angle)
     {
         const Vector2D centroid = this->centroid();
         for (int i = 0; i < m_vertices.size(); i++)
@@ -114,7 +114,7 @@ public:
         return *this;
     }
 
-    ConvexPolygon2D& rotate(real_t angle, const Vector2D& point)
+    ConvexPolygon2D& rotate(Radians angle, const Vector2D& point)
     {
         for (int i = 0; i < m_vertices.size(); i++)
             m_vertices[i].rotateAround(angle, point);

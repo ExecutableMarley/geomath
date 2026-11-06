@@ -17,21 +17,21 @@ class Transform2D
 {
 public:
     Transform2D()
-        : m_position(0, 0), m_rotationRads(0), m_scale(1), m_dirty(true) {}
+        : m_position(0, 0), m_rotation(0), m_scale(1), m_dirty(true) {}
 
-    Transform2D(const Vector2D& position, real_t rotationRads = 0, real_t scale = 1)
-        : m_position(position), m_rotationRads(rotationRads), m_scale(scale), m_dirty(true) {}
+    Transform2D(const Vector2D& position, Radians rotationRads = Radians(0), real_t scale = 1)
+        : m_position(position), m_rotation(rotationRads), m_scale(scale), m_dirty(true) {}
 
     // --- Setters (Mark cached matrices dirty) ---
 
     void setPosition(const Vector2D& position) { m_position = position; m_dirty = true; }
-    void setRotation(real_t radians) { m_rotationRads = radians; m_dirty = true; }
+    void setRotation(Radians radians) { m_rotation = radians; m_dirty = true; }
     void setScale(real_t scale) { m_scale = scale; m_dirty = true; }
 
     // --- Getters ---
 
     const Vector2D& getPosition() const { return m_position; }
-    real_t getRotation() const { return m_rotationRads; }
+    Radians getRotation() const { return m_rotation; }
     real_t getScale() const { return m_scale; }
 
     // --- Point and Vector Transformations ---
@@ -68,9 +68,9 @@ public:
 
     Transform2D& reset()
     {
-        this->m_position     = Vector2D::zero();
-        this->m_rotationRads = real_t{0};
-        this->m_scale        = real_t{1};
+        this->m_position = Vector2D::zero();
+        this->m_rotation = Radians(0);
+        this->m_scale    = real_t{1};
         m_dirty = true;
         return *this;
     }
@@ -82,9 +82,9 @@ public:
         return *this; 
     }
 
-    Transform2D& rotate(real_t angle) 
+    Transform2D& rotate(Radians angle) 
     {
-        m_rotationRads += angle; 
+        m_rotation += angle; 
         m_dirty = true; 
         return *this; 
     }
@@ -100,7 +100,7 @@ public:
     {
         return Transform2D(
             transformPoint(rhs.m_position),
-            m_rotationRads + rhs.m_rotationRads,
+            m_rotation + rhs.m_rotation,
             m_scale * rhs.m_scale);
     }
 
@@ -124,7 +124,7 @@ private:
         if (!m_dirty) return;
 
         real_t sinAngle, cosAngle;
-        sinCos(m_rotationRads, sinAngle, cosAngle);
+        sinCos(m_rotation.value, sinAngle, cosAngle);
 
         // Pre-calculate rotation * scale terms
         real_t m00 = cosAngle * m_scale;
@@ -161,8 +161,8 @@ private:
     }
 
     Vector2D m_position;
-    real_t m_rotationRads;
-    real_t m_scale;
+    Radians  m_rotation;
+    real_t   m_scale;
 
     mutable Matrix3x3 m_matrix;
     mutable Matrix3x3 m_invMatrix;

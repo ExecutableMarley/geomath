@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include "../CommonMath.hpp"
+#include "CommonMath.hpp"
 #include "VectorConcepts.hpp"
+#include "Algebra/Angle.hpp"
 #include "Formatting/Formatting.hpp"
-#include <math.h>
 #include <ostream>
 #include <format>
 
@@ -135,10 +135,10 @@ struct Vector2D
         return *this;
     }
 
-    Vector2D& rotate(real_t degree)
+    Vector2D& rotate(Radians radians)
     {
         real_t cosAngle, sinAngle;
-        sinCosDeg(degree, sinAngle, cosAngle);
+        sinCos(radians.value, sinAngle, cosAngle);
 
         const real_t tempX = x;
         x = x * cosAngle - y * sinAngle;
@@ -147,9 +147,9 @@ struct Vector2D
         return *this;
     }
 
-    Vector2D& rotateAround(real_t degree, const Vector2D& point)
+    Vector2D& rotateAround(Radians radians, const Vector2D& point)
     {
-        return (*this -= point).rotate(degree) += point;
+        return (*this -= point).rotate(radians) += point;
     }
 
     Vector2D& perpendicular()

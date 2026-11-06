@@ -64,7 +64,7 @@ public:
         return *this;
     }
 
-    Capsule3D& rotate(real_t xAngle, real_t yAngle, real_t zAngle)
+    Capsule3D& rotate(Radians xAngle, Radians yAngle, Radians zAngle)
     {
         Vector3D centroid = this->centroid();
         m_startPoint = m_startPoint.rotateAround(xAngle, yAngle, zAngle, centroid);

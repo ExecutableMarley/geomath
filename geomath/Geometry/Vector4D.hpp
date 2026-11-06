@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include "../CommonMath.hpp"
+#include "CommonMath.hpp"
 #include "VectorConcepts.hpp"
+#include "Algebra/Angle.hpp"
 #include "Formatting/Formatting.hpp"
-#include <math.h>
 #include <ostream>
 #include <format>
 

@@ -97,15 +97,15 @@ TEST_SUITE("Vector3D")
     TEST_CASE("Transform / Modification (rotation)")
     {
         Vector3D value(0, 1, 0);
-        value.rotateAroundX(PI / real_t{2});
+        value.rotateAroundX(Radians(PI / real_t{2}));
         CHECK(value == Vector3D(0, 0, 1));
 
         value = Vector3D(0, 0, 1);
-        value.rotateAroundY(PI / real_t{2});
+        value.rotateAroundY(Radians(PI / real_t{2}));
         CHECK(value == Vector3D(1, 0, 0));
 
         value = Vector3D(1, 0, 0);
-        value.rotateAroundZ(PI / real_t{2});
+        value.rotateAroundZ(Radians(PI / real_t{2}));
         CHECK(value == Vector3D(0, 1, 0));
     }
 

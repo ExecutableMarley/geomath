@@ -112,11 +112,11 @@ TEST_SUITE("Vector2D")
     TEST_CASE("Transform / Modification (rotation)")
     {
         Vector2D value(1, 0);
-        value.rotate(real_t{90});
+        value.rotate(Degrees(90));
         CHECK(value == Vector2D(0, 1));
 
         Vector2D point(2, 0);
-        point.rotateAround(real_t{90}, Vector2D(1, 0));
+        point.rotateAround(Degrees(90), Vector2D(1, 0));
         CHECK(point == Vector2D(1, 1));
     }
 

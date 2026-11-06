@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include "../CommonMath.hpp"
+#include "CommonMath.hpp"
 #include "VectorConcepts.hpp"
+#include "Algebra/Angle.hpp"
 #include "Formatting/Formatting.hpp"
-#include <math.h>
 #include <ostream>
 #include <format>
 
@@ -137,48 +137,48 @@ struct Vector3D
         return *this;
     }
 
-    Vector3D& rotateAroundX(real_t angle)
+    Vector3D& rotateAroundX(Radians angle)
     {
-        const real_t cosAngle = cos(angle);
-        const real_t sinAngle = sin(angle);
+        const real_t cosAngle = cos(angle.value);
+        const real_t sinAngle = sin(angle.value);
         const real_t newY = y * cosAngle - z * sinAngle;
         z = y * sinAngle + z * cosAngle;
         y = newY;
         return *this;
     }
 
-    Vector3D& rotateAroundY(real_t angle)
+    Vector3D& rotateAroundY(Radians angle)
     {
-        const real_t cosAngle = cos(angle);
-        const real_t sinAngle = sin(angle);
+        const real_t cosAngle = cos(angle.value);
+        const real_t sinAngle = sin(angle.value);
         const real_t newZ = z * cosAngle - x * sinAngle;
         x = z * sinAngle + x * cosAngle;
         z = newZ;
         return *this;
     }
 
-    Vector3D& rotateAroundZ(real_t angle)
+    Vector3D& rotateAroundZ(Radians angle)
     {
-        const real_t cosAngle = cos(angle);
-        const real_t sinAngle = sin(angle);
+        const real_t cosAngle = cos(angle.value);
+        const real_t sinAngle = sin(angle.value);
         const real_t newX = x * cosAngle - y * sinAngle;
         y = x * sinAngle + y * cosAngle;
         x = newX;
         return *this;
     }
 
-    Vector3D& rotate(real_t xAngle = 0.f, real_t yAngle = 0.f, real_t zAngle = 0.f)
+    Vector3D& rotate(Radians xAngle = Radians(0), Radians yAngle = Radians(0), Radians zAngle = Radians(0))
     {
-        if (xAngle != 0.f)
+        if (xAngle.value != 0.f)
             rotateAroundX(xAngle);
-        if (yAngle != 0.f)
+        if (yAngle.value != 0.f)
             rotateAroundY(yAngle);
-        if (zAngle != 0.f)
+        if (zAngle.value != 0.f)
             rotateAroundZ(zAngle);
         return *this;
     }
 
-    Vector3D& rotateAround(real_t xAngle, real_t yAngle, real_t zAngle, const Vector3D& point)
+    Vector3D& rotateAround(Radians xAngle, Radians yAngle, Radians zAngle, const Vector3D& point)
     {
         return (*this -= point).rotate(xAngle, yAngle, zAngle) += point;
     }

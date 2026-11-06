@@ -77,17 +77,17 @@ public:
         return *this;
     }
 
-    Segment2D& rotate(real_t angle, const Vector2D& point)
+    Segment2D& rotate(Radians angle)
+    {
+        const Vector2D c = (m_start + m_end) * real_t{0.5};
+        return rotate(angle, c);
+    }
+
+    Segment2D& rotate(Radians angle, const Vector2D& point)
     {
         m_start.rotateAround(angle, point);
         m_end.rotateAround(angle, point);
         return *this;
-    }
-
-    Segment2D& rotate(real_t angle)
-    {
-        const Vector2D c = (m_start + m_end) * real_t{0.5};
-        return rotate(angle, c);
     }
 
     Segment2D& scale(real_t factor, const Vector2D& point)

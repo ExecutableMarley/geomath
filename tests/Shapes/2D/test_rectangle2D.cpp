@@ -131,14 +131,14 @@ TEST_CASE("Rectangle2D transformations")
     SUBCASE("Rotate around centroid")
     {
         Vector2D originalCentroid = rect.centroid();
-        rect.rotate(real_t{90});
+        rect.rotate(Degrees(90));
         CHECK(rect.centroid() == originalCentroid);
         CHECK(rect.area() == doctest::Approx(real_t{12}));
     }
 
     SUBCASE("Rotate around arbitrary point")
     {
-        rect.rotate(real_t{90}, Vector2D{0, 0});
+        rect.rotate(Degrees(90), Vector2D{0, 0});
         CHECK(rect.area() == doctest::Approx(real_t{12}));
     }
 

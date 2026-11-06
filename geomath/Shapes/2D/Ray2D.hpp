@@ -58,14 +58,14 @@ public:
         return *this;
     }
 
-    Ray2D& rotate(real_t angle, const Vector2D& point)
+    Ray2D& rotate(Radians angle, const Vector2D& point)
     {
         m_origin.rotateAround(angle, point);
         m_direction.rotateAround(angle, point);
         return *this;
     }
 
-    Ray2D& rotate(real_t angle)
+    Ray2D& rotate(Radians angle)
     {
         const Vector2D c = pointAt(real_t{0.5});
         return rotate(angle, c);

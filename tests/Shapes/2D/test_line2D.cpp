@@ -63,7 +63,7 @@ TEST_CASE("Segment2D transformations and comparison")
 
 	SUBCASE("Rotate around a point")
 	{
-		segment.rotate(real_t{90}, Vector2D{0, 0});
+		segment.rotate(Degrees(90), Vector2D{0, 0});
 		CHECK(segment.m_start == Vector2D{0, 0});
 		CHECK(segment.m_end.x == doctest::Approx(real_t{-2}));
 		CHECK(segment.m_end.y == doctest::Approx(real_t{2}));

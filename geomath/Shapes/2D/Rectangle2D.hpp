@@ -113,7 +113,7 @@ public:
         return *this;
     }
 
-    Rectangle2D& rotate(real_t angle)
+    Rectangle2D& rotate(Radians angle)
     {
         const Vector2D c = centroid();
         for (auto& v : m_vertices)
@@ -121,7 +121,7 @@ public:
         return *this;
     }
 
-    Rectangle2D& rotate(real_t angle, const Vector2D& point)
+    Rectangle2D& rotate(Radians angle, const Vector2D& point)
     {
         for (auto& v : m_vertices)
             v.rotateAround(angle, point);
