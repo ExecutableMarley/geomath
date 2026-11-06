@@ -109,8 +109,7 @@ private:
             return;
         }
 
-        //Todo: 
-        //m_localBounds = BBox3D::fromPoint(m_data.m_vertices[m_data.m_triangles[0].v0]);
+        m_localBounds = BBox3D::fromPoint(m_data.m_vertices[m_data.m_triangles[0].v0]);
         real_t totalArea = real_t{0};
         Vector3D weightedCentroid = Vector3D::zero();
 

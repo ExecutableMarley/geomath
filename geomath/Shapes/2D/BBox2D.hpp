@@ -253,6 +253,11 @@ public:
         return BBox2D(min, min + size);
     }
 
+    static BBox2D fromPoint(const Vector2D &point)
+    {
+        return BBox2D(point, point);
+    }
+    
     static BBox2D fromTwoPoints(const Vector2D& a, const Vector2D& b)
     {
         return BBox2D(Vector2D::min(a, b), Vector2D::max(a, b));
@@ -284,11 +289,6 @@ public:
     static BBox2D merge(const BBox2D &box1, const BBox2D &box2)
     {
         return BBox2D(Vector2D::min(box1.m_min, box2.m_min), Vector2D::max(box1.m_max, box2.m_max));
-    }
-
-    static BBox2D fromPoint(const Vector2D &point)
-    {
-        return BBox2D(point, point);
     }
 
     static BBox2D FromPointAndRadius(const Vector2D& center, real_t radius)

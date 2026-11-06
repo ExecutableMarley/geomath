@@ -27,7 +27,7 @@ public:
 
     BBox3D(const Vector3D &min, const Vector3D &max) : m_min(min), m_max(max) {}
 
-    BBox3D(const Vector3D &center, real_t halfSize) : m_min(center - Vector3D(halfSize, halfSize, halfSize)), m_max(center + Vector3D(halfSize, halfSize, halfSize)) {}
+    BBox3D(const Vector3D& point) : m_min(point), m_max(point) {}
 
     // --- Derived geometry ---
 
@@ -144,9 +144,62 @@ public:
 
     // --- Static factory Functions ---
 
+    static BBox3D fromMinSize(const Vector3D &min, const Vector3D &size)
+    {
+        return BBox3D(min, min + size);
+    }
+
+    static BBox3D fromPoint(const Vector3D &point)
+    {
+        return BBox3D(point, point);
+    }
+
+    static BBox3D fromTwoPoints(const Vector3D& a, const Vector3D& b)
+    {
+        return BBox3D(Vector3D::min(a, b), Vector3D::max(a, b));
+    }
+
+    template <typename... Points> requires (std::same_as<std::remove_cvref_t<Points>, Vector3D> && ...)
+    static BBox3D fromPoints(const Vector3D& first, const Points&... points)
+    {
+        BBox3D result(first);
+        (result.encapsulate(points), ...);
+        return result;
+    }
+
+    template <typename Iter>
+    static BBox3D fromRange(Iter begin, Iter end)
+    {
+        if (begin == end) return {};
+
+        Vector3D min = *begin;
+        Vector3D max = *begin;
+        for (auto it = std::next(begin); it != end; it++)
+        {
+            min = Vector3D::min(min, *it);
+            max = Vector3D::max(max, *it);
+        }
+        return BBox3D(min, max);
+    }
+
     static BBox3D merge(const BBox3D &box1, const BBox3D &box2)
     {
         return BBox3D(Vector3D::min(box1.m_min, box2.m_min), Vector3D::max(box1.m_max, box2.m_max));
+    }
+
+    static BBox3D FromPointAndRadius(const Vector3D& center, real_t radius)
+    {
+        return BBox3D(
+            { center.x - radius, center.y - radius, center.z - radius },
+            { center.x + radius, center.y + radius, center.z + radius }
+        );
+    }
+
+    static BBox3D sweptBounds(const BBox3D &bounds, const Vector3D &displacement)
+    {
+        return {
+            Vector3D::min(bounds.m_min, bounds.m_min + displacement),
+            Vector3D::max(bounds.m_max, bounds.m_max + displacement)};
     }
 };
 
