@@ -12,10 +12,8 @@
 #include "Shapes/3D/BBox3D.hpp"
 #include "Shapes/3D/Triangle3D.hpp"
 
-#include <array>
 #include <cstdint>
 #include <initializer_list>
-#include <limits>
 #include <span>
 #include <stdexcept>
 #include <utility>
@@ -328,10 +326,97 @@ public:
         return *this;
     }
 
+    TriangleMeshBuilder3D& addVertices(const std::vector<Vector3D>& vertices) {
+        m_data.m_vertices.insert(m_data.m_vertices.end(), vertices.begin(), vertices.end());
+        return *this;
+    }
+
+    TriangleMeshBuilder3D& addTriangles(const std::vector<TriangleIndices>& triangles) {
+        m_data.m_triangles.insert(m_data.m_triangles.end(), triangles.begin(), triangles.end());
+        return *this;
+    }
+
+    TriangleMeshBuilder3D& merge(const TriangleMeshData3D& other) {
+        uint32_t vertexOffset = static_cast<uint32_t>(m_data.m_vertices.size());
+        
+        // Reserve space to avoid reallocations
+        m_data.m_vertices.reserve(m_data.m_vertices.size() + other.m_vertices.size());
+        m_data.m_triangles.reserve(m_data.m_triangles.size() + other.m_triangles.size());
+
+        // Append vertices
+        m_data.m_vertices.insert(m_data.m_vertices.end(), other.m_vertices.begin(), other.m_vertices.end());
+
+        // Append triangles with shifted indices
+        for (const auto& t : other.m_triangles) {
+            m_data.m_triangles.push_back({
+                t.v0 + vertexOffset,
+                t.v1 + vertexOffset,
+                t.v2 + vertexOffset
+            });
+        }
+        return *this;
+    }
+
     TriangleMeshBuilder3D& reserve(size_t numVertices, size_t numTriangles) {
         m_data.reserve(numVertices, numTriangles);
         return *this;
     }
+
+    // Removes triangles where the predicate returns true
+    template <typename Predicate>
+    TriangleMeshBuilder3D& filterTriangles(Predicate&& pred) {
+        auto& tris = m_data.m_triangles;
+        tris.erase(
+            std::remove_if(tris.begin(), tris.end(), [&](const TriangleIndices& t) {
+                return pred(m_data.m_vertices[t.v0], 
+                            m_data.m_vertices[t.v1], 
+                            m_data.m_vertices[t.v2]);
+            }),
+            tris.end()
+        );
+        return *this;
+    }
+
+    template <typename Func>
+    TriangleMeshBuilder3D& transformVertices(Func&& func) {
+        for (auto& v : m_data.m_vertices) {
+            func(v);
+        }
+        return *this;
+    }
+
+    // Removes orphan vertices that are no longer referenced by any triangle
+    TriangleMeshBuilder3D& removeUnusedVertices() {
+        std::vector<bool> usedVertex(m_data.m_vertices.size(), false);
+        for (const auto& t : m_data.m_triangles) {
+            usedVertex[t.v0] = true;
+            usedVertex[t.v1] = true;
+            usedVertex[t.v2] = true;
+        }
+
+        std::vector<uint32_t> oldToNewIndex(m_data.m_vertices.size());
+        std::vector<Vector3D> compactedVertices;
+        compactedVertices.reserve(m_data.m_vertices.size());
+
+        for (size_t i = 0; i < m_data.m_vertices.size(); ++i) {
+            if (usedVertex[i]) {
+                oldToNewIndex[i] = static_cast<uint32_t>(compactedVertices.size());
+                compactedVertices.push_back(m_data.m_vertices[i]);
+            }
+        }
+
+        // Remap triangle indices
+        for (auto& t : m_data.m_triangles) {
+            t.v0 = oldToNewIndex[t.v0];
+            t.v1 = oldToNewIndex[t.v1];
+            t.v2 = oldToNewIndex[t.v2];
+        }
+
+        m_data.m_vertices = std::move(compactedVertices);
+        return *this;
+    }
+
+    //Optimize Method?
 
     // Move out (consuming/invalidating m_data)
     TriangleMeshData3D build() && { return std::move(m_data); }
