@@ -5,17 +5,16 @@
 
 #pragma once
 
-#include <cmath>
-#include <math.h>
-#include <vector>
-#include <memory>
-
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "Variants/ShapeConcepts.hpp"
 #include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
 #include "BBox2D.hpp"
 #include "Interfaces/IFiniteShape2D.hpp"
+
+#include <cmath>
+#include <vector>
+#include <memory>
 
 namespace Arns
 {
@@ -89,7 +88,7 @@ public:
         return *this;
     }
 
-    Circle2D& rotate(real_t angle)
+    Circle2D& rotate(real_t)
     {
         return *this;
     }

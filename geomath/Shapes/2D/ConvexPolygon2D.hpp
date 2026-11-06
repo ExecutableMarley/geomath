@@ -10,7 +10,6 @@
 #include "BBox2D.hpp"
 #include "Polygon2D.hpp"
 
-#include <math.h>
 #include <optional>
 
 namespace Arns

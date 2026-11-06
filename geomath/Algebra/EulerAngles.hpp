@@ -39,8 +39,6 @@ public:
             delta.m_roll.value * delta.m_roll.value);
     }
 
-    // proper min angle distance
-
     // --- State Queries ---
 
     bool isNormalized(Radians minVal = Radians(-PI), Radians maxVal = Radians(PI)) const

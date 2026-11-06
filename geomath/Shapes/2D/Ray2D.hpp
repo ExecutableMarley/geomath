@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <math.h>
-
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "Algebra/Matrices/Matrix3x3.hpp"

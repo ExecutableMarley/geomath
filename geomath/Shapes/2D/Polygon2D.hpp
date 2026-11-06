@@ -5,11 +5,6 @@
 
 #pragma once
 
-#include <math.h>
-#include <vector>
-#include <memory>
-#include <stdexcept>
-
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "Variants/ShapeConcepts.hpp"
@@ -17,6 +12,10 @@
 #include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
 #include "BBox2D.hpp"
 #include "Interfaces/IPolygonalShape2D.hpp"
+
+#include <vector>
+#include <memory>
+#include <stdexcept>
 
 namespace Arns
 {

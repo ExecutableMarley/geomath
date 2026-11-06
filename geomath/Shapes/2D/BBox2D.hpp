@@ -8,7 +8,6 @@
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
 
-#include <math.h>
 #include <algorithm>
 #include <concepts>
 #include <type_traits>
