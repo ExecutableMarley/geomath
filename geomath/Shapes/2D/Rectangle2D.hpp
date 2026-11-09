@@ -74,7 +74,7 @@ public:
 
     // --- Geometric Properties ---
 
-    bool isConvex() const noexcept
+    bool isConvex() const noexcept override
     {
         return true;
     }

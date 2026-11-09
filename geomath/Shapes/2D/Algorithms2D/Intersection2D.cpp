@@ -183,7 +183,7 @@ namespace detail
 
 bool intersectRayWithPolygonOptimized(const Ray2D& ray, std::span<const Vector2D> vertices, real_t t_min, real_t t_max)
 {
-    for (int i = 0; i < vertices.size(); i++)
+    for (size_t i = 0; i < vertices.size(); ++i)
     {
         const Vector2D& p1 = vertices[i];
         const Vector2D& p2 = vertices[(i + 1) % vertices.size()];
@@ -209,7 +209,7 @@ bool detail::intersectRayWithPolygon(const Ray2D& ray, std::span<const Vector2D>
     bool hit = false;
     real_t t = t_max;
 
-    for (int i = 0; i < vertices.size(); i++)
+    for (size_t i = 0; i < vertices.size(); ++i)
     {
         const Vector2D& p1 = vertices[i];
         const Vector2D& p2 = vertices[(i + 1) % vertices.size()];

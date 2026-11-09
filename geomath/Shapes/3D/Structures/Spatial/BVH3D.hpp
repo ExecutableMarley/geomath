@@ -221,7 +221,7 @@ private:
     }
 
     template <typename Queue>
-    void pushEntry(Queue& queue, size_t entryIndex, const Vector3D& point,
+    void pushEntry(Queue& queue, NodeIndex entryIndex, const Vector3D& point,
         const ShapeFilter& filter) const
     {
         const SpatialEntry3D& entry = _entries[entryIndex];

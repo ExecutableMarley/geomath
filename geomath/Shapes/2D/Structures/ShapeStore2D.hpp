@@ -198,6 +198,9 @@ private:
         case ShapeType2D::SHAPE2D_RECTANGLE: _rectangles.remove(h.index); break;
         case ShapeType2D::SHAPE2D_POLYGON:   _generalPoly.remove(h.index); break;
         case ShapeType2D::SHAPE2D_CONVEX_POLYGON: _convexPoly.remove(h.index); break;
+        case ShapeType2D::Count:
+        default:
+            break;
         }
     }
 

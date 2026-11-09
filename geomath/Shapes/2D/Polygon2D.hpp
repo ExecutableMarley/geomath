@@ -81,7 +81,7 @@ public:
 
     // --- Geometric Properties ---
 
-    bool isConvex() const
+    bool isConvex() const override
     {
         const size_t n = m_vertices.size();
         if (n < 3) 
@@ -126,7 +126,7 @@ public:
     real_t area() const override
     {
         double area = 0;
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
         {
             const Vector2D& a = m_vertices[i];
             const Vector2D& b = m_vertices[(i + 1 == m_vertices.size()) ? 0 : i + 1];
@@ -141,7 +141,7 @@ public:
     {
         real_t perimeter = 0;
 
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
         {
             perimeter += (m_vertices[i] - m_vertices[(i + 1) % m_vertices.size()]).length();
         }
@@ -153,19 +153,19 @@ public:
     {
         Vector2D centroid;
 
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
         {
             centroid += m_vertices[i];
         }
 
-        return centroid / m_vertices.size();
+        return centroid / static_cast<real_t>(m_vertices.size());
     }
 
     // --- Transform / modification ---
 
     Polygon2D& translate(const Vector2D &translation) override
     {
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
             m_vertices[i] += translation;
         return *this;
     }
@@ -173,21 +173,21 @@ public:
     Polygon2D& rotate(Radians angle)
     {
         const Vector2D centroid = this->centroid();
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
             m_vertices[i].rotateAround(angle, centroid);
         return *this;
     }
 
     Polygon2D& rotate(Radians angle, const Vector2D& point)
     {
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
             m_vertices[i].rotateAround(angle, point);
         return *this;
     }
 
     Polygon2D& scale(real_t factor, const Vector2D& point)
     {
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
             m_vertices[i] = point + (m_vertices[i] - point) * factor;
         return *this;
     }
@@ -199,7 +199,7 @@ public:
 
     Polygon2D& transform(const Matrix3x3& matrix)
     {
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
             m_vertices[i] = matrix.transformPoint(m_vertices[i]);
         return *this;
     }
@@ -227,7 +227,7 @@ public:
     bool strictlyContains(const Vector2D &point) const
     {
         bool contains = false;
-        for (int i = 0, j = m_vertices.size() - 1; i < m_vertices.size(); j = i++)
+        for (size_t i = 0, j = m_vertices.size() - 1; i < m_vertices.size(); j = i++)
         {
             if (((m_vertices[i].y > point.y) != (m_vertices[j].y > point.y)) &&
                 (point.x < (m_vertices[j].x - m_vertices[i].x) * (point.y - m_vertices[i].y) / (m_vertices[j].y - m_vertices[i].y) + m_vertices[i].x))
@@ -258,7 +258,7 @@ public:
         Vector2D min = m_vertices[0];
         Vector2D max = m_vertices[0];
 
-        for (int i = 1; i < m_vertices.size(); i++)
+        for (size_t i = 1; i < m_vertices.size(); ++i)
         {
             min = Vector2D::min(min, m_vertices[i]);
             max = Vector2D::max(max, m_vertices[i]);
@@ -286,7 +286,7 @@ public:
         if (this->vertexCount() != other.vertexCount())
             return false;
 
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
         {
             if (this->vertexAt(i) != other.vertexAt(i))
                 return false;

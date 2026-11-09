@@ -23,7 +23,7 @@ class ConvexPolygon2D : public IPolygonalShape2D //: public Polygon2D
 public:
     // --- Metadata & Interface Queries ---
 
-    ShapeType2D type() const { return SHAPE2D_CONVEX_POLYGON; }
+    ShapeType2D type() const override { return SHAPE2D_CONVEX_POLYGON; }
     static constexpr ShapeType2D shapeType = SHAPE2D_CONVEX_POLYGON;    
 
     // --- Data Accessors & Mutators ---
@@ -54,7 +54,7 @@ public:
 
     // --- Geometric Properties ---
 
-    bool isConvex() const noexcept
+    bool isConvex() const noexcept override
     {
         return true;
     }
@@ -62,7 +62,7 @@ public:
     real_t area() const override
     {
         double area = 0;
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
         {
             const Vector2D& a = m_vertices[i];
             const Vector2D& b = m_vertices[(i + 1 == m_vertices.size()) ? 0 : i + 1];
@@ -77,7 +77,7 @@ public:
     {
         real_t perimeter = 0;
 
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
         {
             perimeter += (m_vertices[i] - m_vertices[(i + 1) % m_vertices.size()]).length();
         }
@@ -89,19 +89,19 @@ public:
     {
         Vector2D centroid;
 
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
         {
             centroid += m_vertices[i];
         }
 
-        return centroid / m_vertices.size();
+        return centroid / static_cast<real_t>(m_vertices.size());
     }
 
     // --- Transform / modification ---
 
     ConvexPolygon2D& translate(const Vector2D &translation) override
     {
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
             m_vertices[i] += translation;
         return *this;
     }
@@ -109,21 +109,21 @@ public:
     ConvexPolygon2D& rotate(Radians angle)
     {
         const Vector2D centroid = this->centroid();
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
             m_vertices[i].rotateAround(angle, centroid);
         return *this;
     }
 
     ConvexPolygon2D& rotate(Radians angle, const Vector2D& point)
     {
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
             m_vertices[i].rotateAround(angle, point);
         return *this;
     }
 
     ConvexPolygon2D& scale(real_t factor, const Vector2D& point)
     {
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
             m_vertices[i] = point + (m_vertices[i] - point) * factor;
         return *this;
     }
@@ -135,7 +135,7 @@ public:
 
     ConvexPolygon2D& transform(const Matrix3x3& matrix)
     {
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
             m_vertices[i] = matrix.transformPoint(m_vertices[i]);
         return *this;
     }
@@ -178,7 +178,7 @@ public:
         Vector2D min = m_vertices[0];
         Vector2D max = m_vertices[0];
 
-        for (int i = 1; i < m_vertices.size(); i++)
+        for (size_t i = 1; i < m_vertices.size(); ++i)
         {
             min = Vector2D::min(min, m_vertices[i]);
             max = Vector2D::max(max, m_vertices[i]);
@@ -247,26 +247,28 @@ private:
         size_t n = points.size();
 
         if (n <= 1)
+        {
             return points;
-        
-	    std::vector<Vector2D> hull(n*2);
+        }
 
-	    for (size_t i = 0; i < n; ++i)
+        std::vector<Vector2D> hull(n * 2);
+
+        for (size_t i = 0; i < n; ++i)
         {
-	    	while (hullSize >= 2 && orient2D(hull[hullSize-2], hull[hullSize-1], points[i]) <= 0)
+            while (hullSize >= 2 && orient2D(hull[hullSize - 2], hull[hullSize - 1], points[i]) <= 0)
                 hullSize--;
-	    	hull[hullSize++] = points[i];
-	    }
+            hull[hullSize++] = points[i];
+        }
 
-	    for (size_t i = n-1, t = hullSize+1; i > 0; --i)
+        for (size_t i = n - 1, t = hullSize + 1; i > 0; --i)
         {
-	    	while (hullSize >= t && orient2D(hull[hullSize-2], hull[hullSize-1], points[i-1]) <= 0)
+            while (hullSize >= t && orient2D(hull[hullSize - 2], hull[hullSize - 1], points[i - 1]) <= 0)
                 hullSize--;
-	    	hull[hullSize++] = points[i-1];
-	    }
+            hull[hullSize++] = points[i - 1];
+        }
 
-	    hull.resize(hullSize-1);
-	    return hull;
+        hull.resize(hullSize - 1);
+        return hull;
     }
 
     static bool is_convex_sequence(std::span<const Vector2D> vertices)
@@ -318,7 +320,7 @@ private:
         if (this->vertexCount() != other.vertexCount())
             return false;
 
-        for (int i = 0; i < m_vertices.size(); i++)
+        for (size_t i = 0; i < m_vertices.size(); ++i)
         {
             if (this->vertexAt(i) != other.vertexAt(i))
                 return false;
