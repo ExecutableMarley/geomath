@@ -262,6 +262,8 @@ public:
         case ShapeType2D::SHAPE2D_CONVEX_POLYGON:
             if (auto* p = _convexPoly.get({h.index})) fn(*p);
             break;
+        case ShapeType2D::Count:
+            break;
         }
     }
 
@@ -290,6 +292,7 @@ public:
         case ShapeType2D::SHAPE2D_RECTANGLE: return _rectangles.get({h.index});
         case ShapeType2D::SHAPE2D_POLYGON:   return _generalPoly.get({h.index});
         case ShapeType2D::SHAPE2D_CONVEX_POLYGON: return _convexPoly.get({h.index});
+        case ShapeType2D::Count: return nullptr;
         }
         return nullptr;
     }
@@ -306,6 +309,7 @@ public:
         case ShapeType2D::SHAPE2D_RECTANGLE: return _rectangles.get({h.index});
         case ShapeType2D::SHAPE2D_POLYGON:   return _generalPoly.get({h.index});
         case ShapeType2D::SHAPE2D_CONVEX_POLYGON: return _convexPoly.get({h.index});
+        case ShapeType2D::Count: return std::monostate{};
         }
         return std::monostate{};
     }

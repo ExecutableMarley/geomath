@@ -21,6 +21,8 @@ namespace Arns::geomath
 class IBaseShape2D
 {
 public:
+    virtual ~IBaseShape2D() = default;
+
     virtual ShapeType2D type() const = 0;
 
     virtual IBaseShape2D& translate(const Vector2D &translation) = 0;

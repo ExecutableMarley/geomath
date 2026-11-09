@@ -51,7 +51,7 @@ public:
     using ISpatialIndex2D::build;
 
     // Bulk-loading method
-    void build(const std::span<SpatialEntry2D> entries)
+    void build(const std::span<SpatialEntry2D> entries) override
     {
         this->clear();
 
@@ -155,7 +155,7 @@ public:
     }
 
     // Reset method
-    void clear()
+    void clear() override
     {
         _nodes.clear();
         _entries.clear();
@@ -452,8 +452,7 @@ public:
                     const auto p1 = reverse ? idB : idA;
                     const auto p2 = reverse ? idA : idB;
 
-                    if (!callback(p1, p2))
-                        return true;
+                    return callback(p1, p2);
                 });
             }
 

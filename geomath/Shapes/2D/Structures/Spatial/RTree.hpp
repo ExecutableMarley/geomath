@@ -68,13 +68,13 @@ public:
     using ISpatialIndex2D::build;
 
     // Bulk-loading method
-    void build(const std::span<SpatialEntry2D> elementBoundsWithIndices);
+    void build(const std::span<SpatialEntry2D> elementBoundsWithIndices) override;
 
     // Dynamic insertion
     // void insert(ShapeID shapeIndex, const BBox2D& bounds) override {}
 
     // Reset method
-    void clear()
+    void clear() override
     {
         this->_rootIndex = InvalidNode;
         this->_nodes.clear();
