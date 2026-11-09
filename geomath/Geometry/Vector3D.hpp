@@ -197,6 +197,7 @@ struct Vector3D
 
     // --- Conversion ---
 
+    /*
     operator real_t*()
     {
         return &x;
@@ -205,7 +206,7 @@ struct Vector3D
     operator const real_t*() const
     {
         return &x;
-    }
+    }*/
 
     // --- Arithmetic Operators ---
 

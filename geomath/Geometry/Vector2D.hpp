@@ -190,6 +190,7 @@ struct Vector2D
 
     // --- Conversion ---
 
+    /*
     operator real_t*()
     {
         return &x;
@@ -198,7 +199,7 @@ struct Vector2D
     operator const real_t*() const
     {
         return &x;
-    }
+    }*/
 
     // --- Arithmetic Operators ---
 
