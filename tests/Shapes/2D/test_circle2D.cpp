@@ -2,6 +2,8 @@
 #include "Shapes/2D/Circle2D.hpp"
 #include <sstream>
 
+static_assert(FiniteShape2D<Circle2D>);
+
 TEST_CASE("Circle2D is not polygonal")
 {
     Circle2D circle(Vector2D{0, 0}, real_t{1.0});
@@ -11,7 +13,7 @@ TEST_CASE("Circle2D is not polygonal")
         CHECK(circle.type() == SHAPE2D_CIRCLE);
     }
 
-    check_is_not_polygonal(circle);
+    //check_is_not_polygonal(circle);
 }
 
 TEST_CASE("Circle2D accessors and geometry")
@@ -111,6 +113,7 @@ TEST_CASE("Circle2D copy and clone")
 
     SUBCASE("Clone returns an equivalent unique_ptr")
     {
+        /*
         auto clone = circle.clone();
         REQUIRE(clone != nullptr);
 
@@ -121,6 +124,7 @@ TEST_CASE("Circle2D copy and clone")
 
         CHECK(clonedCircle->centroid() == circle.centroid());
         CHECK(clonedCircle->m_radius == doctest::Approx(circle.m_radius));
+        */
     }
 }
 

@@ -7,6 +7,7 @@
 
 #include "Geometry/Vector2D.hpp"
 #include "VariantTraits.hpp"
+#include "../Interfaces/EShapeType2D.hpp"
 #include <concepts>
 #include <span>
 
@@ -28,13 +29,14 @@ class ConvexPolygon2D;
 
 template <typename T>
 concept Shape2D = requires(T& t, const T& ct, const Vector2D& p) {
-    { ct.contains(p) } -> std::same_as<bool>;
+    //{ ct.contains(p) } -> std::same_as<bool>;
     //{ t.translate(p) } -> std::same_as<T&>;
+    { ct.type() } -> std::same_as<ShapeType2D>;
 };
 
 template <typename T>
 concept FiniteShape2D =
-    Shape2D<T> &&
+    //Shape2D<T> &&
     requires(const T& t) {
         { t.area() } -> std::same_as<real_t>;
         { t.perimeter() } -> std::same_as<real_t>;

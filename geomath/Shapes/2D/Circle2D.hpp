@@ -8,9 +8,9 @@
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "Variants/ShapeConcepts.hpp"
-#include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
+#include "Shapes/2D/Algorithms2D/Containment2D.hpp"
 #include "BBox2D.hpp"
-#include "Interfaces/IFiniteShape2D.hpp"
+//#include "Interfaces/IFiniteShape2D.hpp"
 
 #include <cmath>
 #include <vector>
@@ -22,7 +22,7 @@ namespace Arns
 namespace geomath
 {
 
-class Circle2D : public IFiniteShape2D
+class Circle2D //: public IFiniteShape2D
 {
 public:
     Vector2D m_center;
@@ -36,7 +36,7 @@ public:
 
     // --- Metadata & Interface Queries ---
 
-    ShapeType2D type() const override { return SHAPE2D_CIRCLE; }
+    ShapeType2D type() const { return SHAPE2D_CIRCLE; }
     static constexpr ShapeType2D shapeType = SHAPE2D_CIRCLE;
 
     // --- Data Accessors & Mutators ---
@@ -60,7 +60,7 @@ public:
 
     // --- Geometric Properties ---
 
-    real_t area() const override
+    real_t area() const
     {
         return PI * m_radius * m_radius;
     }
@@ -70,19 +70,19 @@ public:
         return real_t{2} * PI * m_radius;
     }
 
-    real_t perimeter() const override
+    real_t perimeter() const
     {
         return circumference();
     }
 
-    Vector2D centroid() const override
+    Vector2D centroid() const
     {
         return m_center;
     }
 
     // --- Transform / modification ---
 
-    Circle2D& translate(const Vector2D &translation) override
+    Circle2D& translate(const Vector2D &translation)
     {
         m_center += translation;
         return *this;
@@ -112,14 +112,16 @@ public:
         return *this;
     }
 
-    std::unique_ptr<IFiniteShape2D> clone() const override
+    /*
+    std::unique_ptr<IFiniteShape2D> clone() const
     {
         return std::make_unique<Circle2D>(*this);        
     }
+    */
 
     // --- Spatial Queries ---
 
-    bool contains(const Vector2D &point) const override
+    bool contains(const Vector2D &point) const
     {
         return isPointInsideCircle(point, *this);
     }
@@ -145,7 +147,7 @@ public:
         return (m_center - circle.m_center).lengthSquared() <= (m_radius + circle.m_radius) * (m_radius + circle.m_radius);
     }
 
-    BBox2D boundingBox() const override
+    BBox2D boundingBox() const
     {
         return BBox2D(m_center - Vector2D(m_radius, m_radius), m_center + Vector2D(m_radius, m_radius));
     }
@@ -161,16 +163,17 @@ public:
     {
         return !(*this == other);
     }
-
-    // --- Stream Output ---
-
-    friend std::ostream& operator<<(std::ostream& stream, const Circle2D& circle)
-    {
-        return stream << "Circle2D(center: [" << circle.m_center.x << ", " << circle.m_center.y << "], radius: " << circle.m_radius << ")";
-    }
 };
 
-static_assert(FiniteShape2D<Circle2D>);
+//static_assert(FiniteShape2D<Circle2D>); Why is Circle2D incomplete after the closing bracket?
+//GCC sees no issues. Clang however is deadset on Circle2D beeing incomplete. Moving assert to test file for now
+
+// --- Stream Output ---
+
+inline std::ostream& operator<<(std::ostream &os, const Circle2D& circle)
+{
+    return os << "Circle2D(center: [" << circle.m_center.x << ", " << circle.m_center.y << "], radius: " << circle.m_radius << ")";
+}
 
 } // namespace Math
 

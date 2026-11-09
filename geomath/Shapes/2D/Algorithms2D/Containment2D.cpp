@@ -5,6 +5,7 @@
 
 #include "Algorithms2D.hpp"
 #include "CommonMath.hpp"
+#include "../Variants/ShapeConcepts.hpp"
 #include "../Ray2D.hpp"
 #include "../Segment2D.hpp"
 #include "../BBox2D.hpp"
@@ -13,7 +14,6 @@
 #include "../Rectangle2D.hpp"
 #include "../Polygon2D.hpp"
 #include "../ConvexPolygon2D.hpp"
-#include "../Variants/ShapeConcepts.hpp"
 #include "ShapeVariantAlgorithms.hpp"
 
 #include <algorithm>
