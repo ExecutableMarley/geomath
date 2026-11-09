@@ -450,23 +450,19 @@ namespace detail
 
 bool isShapeInsideShape(const FiniteShapeVariant2D& inner, const FiniteShapeVariant2D& shell)
 {
-#if 0
-    // Todo: Don't rely on the function we want to remove in the future
-    return std::visit([](const auto& innerShape, const auto& shellShape)
-    {
-        return isShapeInsideShape(
-            static_cast<const IFiniteShape2D&>(innerShape),
-            static_cast<const IFiniteShape2D&>(shellShape));
-    }, inner, shell);
-#else
     return std::visit(
-        []<FiniteShape2D Inner, FiniteShape2D Shell>(
-            const Inner& inner,
-            const Shell& shell)
+        [](const auto& innerShape, const auto& shellShape) -> bool
         {
-            return detail::isShapeInsideShape(inner, shell);
+            using InnerType = std::decay_t<decltype(innerShape)>;
+            using ShellType = std::decay_t<decltype(shellShape)>;
+
+            if constexpr (FiniteShape2D<InnerType> && FiniteShape2D<ShellType>)
+            {
+                return detail::isShapeInsideShape(innerShape, shellShape);
+            }
+
+            return false;
         }, inner, shell);
-#endif
 }
 
 /*
