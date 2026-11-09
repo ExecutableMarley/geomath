@@ -7,7 +7,19 @@
 
 namespace Arns::geomath
 {
-    
+
+// Forward declarations
+class Ray2D;
+class Segment2D;
+class BBox2D;
+class IBaseShape2D;
+class IFiniteShape2D;
+class IPolygonalShape2D;
+class Circle2D;
+class Triangle2D;
+class Rectangle2D;
+class Polygon2D;
+class ConvexPolygon2D;
 
 namespace detail
 {

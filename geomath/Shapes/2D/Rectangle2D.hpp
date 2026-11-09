@@ -6,12 +6,13 @@
 #pragma once
 
 #include "CommonMath.hpp"
+#include "Algebra/Angle.hpp"
 #include "Geometry/Vector2D.hpp"
 #include "Variants/ShapeConcepts.hpp"
 #include "Algebra/Matrices/Matrix3x3.hpp"
-#include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
+#include "Shapes/2D/Algorithms2D/Containment2D.hpp"
 #include "BBox2D.hpp"
-#include "Interfaces/IPolygonalShape2D.hpp"
+//#include "Interfaces/IPolygonalShape2D.hpp"
 
 #include <array>
 #include <memory>
@@ -22,7 +23,7 @@ namespace Arns
 namespace geomath
 {
 
-class Rectangle2D : public IPolygonalShape2D
+class Rectangle2D //: public IPolygonalShape2D
 {
 public:
     std::array<Vector2D, 4> m_vertices;
@@ -37,7 +38,7 @@ public:
 
     // --- Metadata & Interface Queries ---
 
-    ShapeType2D type() const override { return SHAPE2D_RECTANGLE; }
+    ShapeType2D type() const { return SHAPE2D_RECTANGLE; }
     static constexpr ShapeType2D shapeType = SHAPE2D_RECTANGLE;
 
     // --- Data Accessors & Mutators ---
@@ -52,7 +53,7 @@ public:
     const Vector2D& c() const { return m_vertices[2]; }
     const Vector2D& d() const { return m_vertices[3]; }
 
-    size_t vertexCount() const override
+    size_t vertexCount() const
     {
         return 4;
     }
@@ -67,14 +68,14 @@ public:
         return m_vertices[index];
     }
 
-    const std::span<const Vector2D> vertices() const override
+    const std::span<const Vector2D> vertices() const 
     {
         return m_vertices;
     }
 
     // --- Geometric Properties ---
 
-    bool isConvex() const noexcept override
+    bool isConvex() const noexcept 
     {
         return true;
     }
@@ -89,24 +90,24 @@ public:
         return (d() - a()).length();
     }
 
-    real_t area() const override
+    real_t area() const 
     {
         return width() * height();
     }
 
-    real_t perimeter() const override
+    real_t perimeter() const 
     {
         return real_t{2} * (width() + height());
     }
 
-    Vector2D centroid() const override
+    Vector2D centroid() const 
     {
         return (a() + b() + c() + d()) / real_t{4};
     }
 
     // --- Transform / modification ---
 
-    Rectangle2D& translate(const Vector2D &translation) override
+    Rectangle2D& translate(const Vector2D &translation) 
     {
         for (auto& v : m_vertices)
             v += translation;
@@ -154,14 +155,15 @@ public:
         return *this;
     }
 
-    std::unique_ptr<IFiniteShape2D> clone() const override
+    /*
+    std::unique_ptr<IFiniteShape2D> clone() const 
     {
         return std::make_unique<Rectangle2D>(*this);        
-    }
+    }*/
 
     // --- Spatial Queries ---
 
-    bool contains(const Vector2D &point) const override
+    bool contains(const Vector2D &point) const 
     {
         return isPointInsideRectangle(point, *this);
     }
@@ -182,7 +184,7 @@ public:
         return isShapeInsideShape(innerShape, *this);
     }
 
-    BBox2D boundingBox() const override
+    BBox2D boundingBox() const 
     {
         return BBox2D(Vector2D::min(a(), b(), c(), d()), Vector2D::max(a(), b(), c(), d()));
     }
@@ -194,7 +196,7 @@ public:
         return vertexAt(index);
     }
 
-    const Vector2D& operator[](size_t index) const override
+    const Vector2D& operator[](size_t index) const 
     {
         return vertexAt(index);
     }
@@ -224,6 +226,19 @@ public:
 };
 
 static_assert(PolygonalShape<Rectangle2D>);
+
+inline std::ostream& operator<<(std::ostream &os, const Rectangle2D &polygon)
+{
+    os << "PolygonalShape2D(type: " << polygon.type() << ", vertices: [";
+    for (size_t i = 0; i < polygon.vertexCount(); ++i)
+    {
+        os << polygon[i];
+        if (i < polygon.vertexCount() - 1)
+            os << ", ";
+    }
+    os << "])";
+    return os;
+}
 
 } // namespace geomath
 

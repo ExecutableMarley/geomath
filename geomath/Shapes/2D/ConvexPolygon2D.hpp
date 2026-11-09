@@ -7,8 +7,10 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
+#include "Variants/ShapeConcepts.hpp"
+#include "Algebra/Matrices/Matrix3x3.hpp"
+#include "Shapes/2D/Algorithms2D/Containment2D.hpp"
 #include "BBox2D.hpp"
-#include "Polygon2D.hpp"
 
 #include <optional>
 
@@ -18,17 +20,17 @@ namespace Arns
 namespace geomath
 {
 
-class ConvexPolygon2D : public IPolygonalShape2D //: public Polygon2D
+class ConvexPolygon2D //: public IPolygonalShape2D //: public Polygon2D
 {
 public:
     // --- Metadata & Interface Queries ---
 
-    ShapeType2D type() const override { return SHAPE2D_CONVEX_POLYGON; }
+    ShapeType2D type() const  { return SHAPE2D_CONVEX_POLYGON; }
     static constexpr ShapeType2D shapeType = SHAPE2D_CONVEX_POLYGON;    
 
     // --- Data Accessors & Mutators ---
 
-    size_t vertexCount() const override
+    size_t vertexCount() const 
     {
         return m_vertices.size();
     }
@@ -38,7 +40,7 @@ public:
         return m_vertices[index];
     }
 
-    const std::span<const Vector2D> vertices() const override
+    const std::span<const Vector2D> vertices() const 
     {
         return m_vertices;
     }
@@ -54,12 +56,12 @@ public:
 
     // --- Geometric Properties ---
 
-    bool isConvex() const noexcept override
+    bool isConvex() const noexcept 
     {
         return true;
     }
 
-    real_t area() const override
+    real_t area() const 
     {
         double area = 0;
         for (size_t i = 0; i < m_vertices.size(); ++i)
@@ -73,7 +75,7 @@ public:
         return (real_t)area / real_t{2};
     }
 
-    real_t perimeter() const override
+    real_t perimeter() const 
     {
         real_t perimeter = 0;
 
@@ -85,7 +87,7 @@ public:
         return perimeter;
     }
 
-    Vector2D centroid() const override
+    Vector2D centroid() const 
     {
         Vector2D centroid;
 
@@ -99,7 +101,7 @@ public:
 
     // --- Transform / modification ---
 
-    ConvexPolygon2D& translate(const Vector2D &translation) override
+    ConvexPolygon2D& translate(const Vector2D &translation) 
     {
         for (size_t i = 0; i < m_vertices.size(); ++i)
             m_vertices[i] += translation;
@@ -147,14 +149,15 @@ public:
         return *this;
     }
 
-    std::unique_ptr<IFiniteShape2D> clone() const override
+    /*
+    std::unique_ptr<IFiniteShape2D> clone() const 
     {
         return std::make_unique<ConvexPolygon2D>(*this);
-    }
+    }*/
 
     // --- Spatial Queries ---
 
-    bool contains(const Vector2D &point) const override
+    bool contains(const Vector2D &point) const 
     {
         return detail::isPointInsideConvexPolygon(point, std::span<const Vector2D>(m_vertices));
     }
@@ -170,7 +173,7 @@ public:
         return isShapeInsideShape(innerShape, *this);
     }
 
-    BBox2D boundingBox() const override
+    BBox2D boundingBox() const 
     {
         if (m_vertices.empty())
             return BBox2D();
@@ -196,7 +199,7 @@ public:
     }
     */
 
-    const Vector2D& operator[](size_t index) const override
+    const Vector2D& operator[](size_t index) const 
     {
         return m_vertices[index];
     }
@@ -336,6 +339,19 @@ private:
 };
 
 static_assert(FiniteShape2D<ConvexPolygon2D>);
+
+inline std::ostream& operator<<(std::ostream &os, const ConvexPolygon2D &polygon)
+{
+    os << "PolygonalShape2D(type: " << polygon.type() << ", vertices: [";
+    for (size_t i = 0; i < polygon.vertexCount(); ++i)
+    {
+        os << polygon[i];
+        if (i < polygon.vertexCount() - 1)
+            os << ", ";
+    }
+    os << "])";
+    return os;
+}
 
 } // namespace Math
 

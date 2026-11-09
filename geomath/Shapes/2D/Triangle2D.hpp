@@ -9,9 +9,9 @@
 #include "Geometry/Vector2D.hpp"
 #include "Variants/ShapeConcepts.hpp"
 #include "Algebra/Matrices/Matrix3x3.hpp"
-#include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
+#include "Shapes/2D/Algorithms2D/Containment2D.hpp"
 #include "BBox2D.hpp"
-#include "Interfaces/IPolygonalShape2D.hpp"
+//#include "Interfaces/IPolygonalShape2D.hpp"
 
 #include <array>
 #include <memory>
@@ -22,7 +22,7 @@ namespace Arns
 namespace geomath
 {
 
-class Triangle2D : public IPolygonalShape2D
+class Triangle2D //: public IPolygonalShape2D
 {
 public:
     std::array<Vector2D, 3> m_vertices;
@@ -35,7 +35,7 @@ public:
 
     // --- Metadata & Interface Queries ---
 
-    ShapeType2D type() const override { return SHAPE2D_TRIANGLE; }
+    ShapeType2D type() const { return SHAPE2D_TRIANGLE; }
     static constexpr ShapeType2D shapeType = SHAPE2D_TRIANGLE;
 
     // --- Data Accessors & Mutators ---
@@ -48,7 +48,7 @@ public:
     const Vector2D& b() const { return m_vertices[1]; }
     const Vector2D& c() const { return m_vertices[2]; }
 
-    size_t vertexCount() const override
+    size_t vertexCount() const
     {
         return 3;
     }
@@ -63,36 +63,36 @@ public:
         return m_vertices[index];
     }
 
-    const std::span<const Vector2D> vertices() const override
+    const std::span<const Vector2D> vertices() const
     {
         return m_vertices;
     }
 
     // --- Geometric Properties ---
 
-    bool isConvex() const noexcept override
+    bool isConvex() const noexcept
     {
         return true;
     }
 
-    real_t area() const override
+    real_t area() const
     {
-        return 0.5f * fabs((a().x - c().x) * (b().y - c().y) - (b().x - c().x) * (a().y - c().y));
+        return 0.5 * fabs((a().x - c().x) * (b().y - c().y) - (b().x - c().x) * (a().y - c().y));
     }
 
-    real_t perimeter() const override
+    real_t perimeter() const
     {
         return (a() - b()).length() + (b() - c()).length() + (c() - a()).length();
     }
 
-    Vector2D centroid() const override
+    Vector2D centroid() const
     {
         return (a() + b() + c()) / real_t{3};
     }
 
     // --- Transform / modification ---
 
-    Triangle2D& translate(const Vector2D &translation) override
+    Triangle2D& translate(const Vector2D &translation)
     {
         for (auto& v : m_vertices)
             v += translation;
@@ -140,14 +140,16 @@ public:
         return *this;
     }
 
-    std::unique_ptr<IFiniteShape2D> clone() const override
+    /*
+    std::unique_ptr<IFiniteShape2D> clone() const
     {
         return std::make_unique<Triangle2D>(*this);        
     }
+    */
 
     // --- Spatial Queries ---
 
-    bool contains(const Vector2D &point) const override
+    bool contains(const Vector2D &point) const
     {
         return isPointInsideTriangle(point, *this);
     }
@@ -168,7 +170,7 @@ public:
         return isShapeInsideShape(innerShape, *this);
     }
 
-    BBox2D boundingBox() const override
+    BBox2D boundingBox() const
     {
         return BBox2D(Vector2D::min(a(), b(), c()), Vector2D::max(a(), b(), c()));
     }
@@ -180,7 +182,7 @@ public:
         return vertexAt(index);
     }
 
-    const Vector2D& operator[](size_t index) const override
+    const Vector2D& operator[](size_t index) const
     {
         return vertexAt(index);
     }
@@ -201,6 +203,19 @@ public:
 };
 
 static_assert(PolygonalShape<Triangle2D>);
+
+inline std::ostream& operator<<(std::ostream &os, const Triangle2D &polygon)
+{
+    os << "PolygonalShape2D(type: " << polygon.type() << ", vertices: [";
+    for (size_t i = 0; i < polygon.vertexCount(); ++i)
+    {
+        os << polygon[i];
+        if (i < polygon.vertexCount() - 1)
+            os << ", ";
+    }
+    os << "])";
+    return os;
+}
 
 } // namespace geomath
 

@@ -22,7 +22,7 @@ namespace Arns
 namespace geomath
 {
 
-class Circle2D //: public IFiniteShape2D
+class Circle2D
 {
 public:
     Vector2D m_center;
@@ -136,11 +136,12 @@ public:
         return isCircleInsideCircle(circle, *this);
     }
 
+    /*
     template <typename T> requires FiniteShape2D<T>
     bool contains(const T& innerShape) const
     {
         return isShapeInsideShape(innerShape, *this);
-    }
+    }*/
 
     bool intersects(const Circle2D &circle) const
     {

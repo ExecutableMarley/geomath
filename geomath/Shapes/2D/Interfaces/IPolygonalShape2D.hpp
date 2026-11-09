@@ -38,47 +38,7 @@ inline const IPolygonalShape2D *IFiniteShape2D::polygonal() const
     return dynamic_cast<const IPolygonalShape2D *>(this);
 }
 
-template <typename T>
-struct PolygonalShapeFormatter
-{
-    int precision = 6;
-    bool hasPrecision = false;
 
-    constexpr auto parse(std::format_parse_context& ctx)
-    {
-        return parse_optional_float_format(ctx, precision, hasPrecision);
-    }
-
-    template <typename FormatContext>
-    auto format(const T& shape, FormatContext& ctx) const
-    {
-        std::string verticesStr;
-
-        for (size_t i = 0; i < shape.vertexCount(); ++i)
-        {
-            if (hasPrecision)
-                verticesStr += std::format(
-                    "[{:.{}f}, {:.{}f}]",
-                    shape[i].x,
-                    precision,
-                    shape[i].y,
-                    precision
-                );
-            else
-                verticesStr += std::format("{}", shape[i]);
-
-            if (i + 1 < shape.vertexCount())
-                verticesStr += ", ";
-        }
-
-        return std::format_to(
-            ctx.out(),
-            "PolygonalShape2D(type: {}, vertices: [{}])",
-            shape.type(),
-            verticesStr
-        );
-    }
-};
 
 
 } // namespace Arns::geomath
