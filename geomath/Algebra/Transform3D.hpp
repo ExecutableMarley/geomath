@@ -134,8 +134,7 @@ private:
 		const Matrix4x4 scaleMatrix = Matrix4x4::createScale3D(m_scale, m_scale, m_scale);
 		m_matrix = translation * rotation * scaleMatrix;
 
-		Matrix4x4 inverseRotation;
-		rotation.inverse(inverseRotation);
+		const Matrix4x4 inverseRotation = rotation.transpose();
 		const Matrix4x4 inverseScaleMatrix = Matrix4x4::createScale3D(
 			inverseScale(m_scale), inverseScale(m_scale), inverseScale(m_scale));
 		const Matrix4x4 inverseTranslation = Matrix4x4::createTranslation3D(-m_position.x, -m_position.y, -m_position.z);
