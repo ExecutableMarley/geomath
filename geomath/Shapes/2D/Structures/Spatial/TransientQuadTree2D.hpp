@@ -51,7 +51,7 @@ public:
     using ISpatialIndex2D::build;
 
     // Bulk-loading method
-    void build(const std::span<SpatialEntry> entries)
+    void build(const std::span<SpatialEntry2D> entries)
     {
         this->clear();
 
@@ -63,13 +63,13 @@ public:
 
         // 2. Partition out-of-bounds objects upfront
         const BBox2D& rootBBox = _rootBounds;
-        auto oobStart = std::partition(entries.begin(), entries.end(), [&rootBBox](const SpatialEntry& e) {
+        auto oobStart = std::partition(entries.begin(), entries.end(), [&rootBBox](const SpatialEntry2D& e) {
         return e.bounds.m_min.x >= rootBBox.m_min.x && e.bounds.m_max.x <= rootBBox.m_max.x &&
                e.bounds.m_min.y >= rootBBox.m_min.y && e.bounds.m_max.y <= rootBBox.m_max.y;
         });
 
-        std::span<SpatialEntry> validEntries(entries.begin(), oobStart);
-        std::span<SpatialEntry> oobEntries(oobStart, entries.end());
+        std::span<SpatialEntry2D> validEntries(entries.begin(), oobStart);
+        std::span<SpatialEntry2D> oobEntries(oobStart, entries.end());
 
         //Store out of bounds entries separately
         this->firstEntry = static_cast<uint32_t>(_entries.size());
@@ -86,7 +86,7 @@ public:
     }
 
     void buildNodeTopDown(NodeIndex nodeIdx, const BBox2D& bounds, 
-                         std::span<SpatialEntry> entries, size_t depth)
+                         std::span<SpatialEntry2D> entries, size_t depth)
     {
         if (entries.size() <= _maxEntries || depth >= _maxDepth)
         {
@@ -99,7 +99,7 @@ public:
         // 1. Partition entries into 5 buckets: Stays in Parent, NW, NE, SW, SE
         Vector2D c = bounds.centroid();
 
-        auto parentEnd = std::partition(entries.begin(), entries.end(), [c](const SpatialEntry& e) {
+        auto parentEnd = std::partition(entries.begin(), entries.end(), [c](const SpatialEntry2D& e) {
             bool straddlesX = (e.bounds.m_min.x < c.x) && (e.bounds.m_max.x > c.x);
             bool straddlesY = (e.bounds.m_min.y < c.y) && (e.bounds.m_max.y > c.y);
             return straddlesX || straddlesY;
@@ -110,31 +110,31 @@ public:
         _nodes[nodeIdx].entryCount = static_cast<uint32_t>(std::distance(entries.begin(), parentEnd));
         _entries.insert(_entries.end(), entries.begin(), parentEnd);
 
-        std::span<SpatialEntry> childEntries(parentEnd, entries.end());
+        std::span<SpatialEntry2D> childEntries(parentEnd, entries.end());
         if (childEntries.empty()) {
             return; // Nothing in the childs -> Early return
         }
 
-        auto southStart = std::partition(childEntries.begin(), childEntries.end(), [c](const SpatialEntry& e) {
+        auto southStart = std::partition(childEntries.begin(), childEntries.end(), [c](const SpatialEntry2D& e) {
             return e.bounds.m_min.y >= c.y; // Top / North halves
         });
 
-        std::span<SpatialEntry> northEntries(childEntries.begin(), southStart);
-        std::span<SpatialEntry> southEntries(southStart, childEntries.end());
+        std::span<SpatialEntry2D> northEntries(childEntries.begin(), southStart);
+        std::span<SpatialEntry2D> southEntries(southStart, childEntries.end());
 
-        auto neStart = std::partition(northEntries.begin(), northEntries.end(), [c](const SpatialEntry& e) {
+        auto neStart = std::partition(northEntries.begin(), northEntries.end(), [c](const SpatialEntry2D& e) {
             return e.bounds.m_max.x <= c.x; // NW: completely left of center
         });
 
-        auto seStart = std::partition(southEntries.begin(), southEntries.end(), [c](const SpatialEntry& e) {
+        auto seStart = std::partition(southEntries.begin(), southEntries.end(), [c](const SpatialEntry2D& e) {
             return e.bounds.m_max.x <= c.x; // SW: completely left of center
         });
 
-        std::array<std::span<SpatialEntry>, 4> quadrants = {
-            std::span<SpatialEntry>(northEntries.begin(), neStart), // 0: NW
-            std::span<SpatialEntry>(neStart, northEntries.end()),   // 1: NE
-            std::span<SpatialEntry>(southEntries.begin(), seStart), // 2: SW
-            std::span<SpatialEntry>(seStart, southEntries.end())    // 3: SE
+        std::array<std::span<SpatialEntry2D>, 4> quadrants = {
+            std::span<SpatialEntry2D>(northEntries.begin(), neStart), // 0: NW
+            std::span<SpatialEntry2D>(neStart, northEntries.end()),   // 1: NE
+            std::span<SpatialEntry2D>(southEntries.begin(), seStart), // 2: SW
+            std::span<SpatialEntry2D>(seStart, southEntries.end())    // 3: SE
         };
 
         // 2. Allocate 4 children contiguously in the arena vector
@@ -186,7 +186,7 @@ public:
         //Check out of bounds overflow objects
         for (uint32_t i = 0; i < entryCount; i++)
         {
-            const SpatialEntry& entry = _entries[firstEntry + i];
+            const SpatialEntry2D& entry = _entries[firstEntry + i];
             if (filter && !filter(entry.shape))
                     continue;
 
@@ -284,7 +284,7 @@ public:
         //Check out of bounds overflow objects
         for (uint32_t i = 0; i < entryCount; i++)
         {
-            const SpatialEntry& entry = _entries[firstEntry + i];
+            const SpatialEntry2D& entry = _entries[firstEntry + i];
             if (filter && !filter(entry.shape))
                 continue;
 
@@ -401,7 +401,7 @@ public:
 
             if (candidate.type == CandidateType::BoundsEntry)
             {
-                const SpatialEntry& entry = _entries[candidate.index];
+                const SpatialEntry2D& entry = _entries[candidate.index];
                 HitInfo2D hitInfo{};
                 if (hitTest(ray, entry.shape, t_min, t_max, &hitInfo) &&
                     hitInfo.t >= t_min && hitInfo.t <= t_max)
@@ -525,7 +525,7 @@ private:
 
     void pushEntry(CandidateQueue& queue, NodeIndex entryIndex, const Vector2D& point, const ShapeFilter& filter) const
     {
-        const SpatialEntry& entry = _entries[entryIndex];
+        const SpatialEntry2D& entry = _entries[entryIndex];
         if (!filter || filter(entry.shape))
             queue.push({entry.bounds.minDistanceSquared(point), CandidateType::Entry, entryIndex, {}});
     }
@@ -541,7 +541,7 @@ private:
     void pushRayEntry(CandidateQueue& queue, NodeIndex entryIndex, const Ray2D& ray,
         real_t tMin, real_t tMax, const ShapeFilter& filter) const
     {
-        const SpatialEntry& entry = _entries[entryIndex];
+        const SpatialEntry2D& entry = _entries[entryIndex];
 
         if (filter && !filter(entry.shape))
             return;
@@ -584,7 +584,7 @@ private:
         //Check this nodes entries
         for (NodeIndex i = 0; i < _nodes[nodeIdx].entryCount; i++)
         {
-            const SpatialEntry& entry = _entries[_nodes[nodeIdx].firstEntry + i];
+            const SpatialEntry2D& entry = _entries[_nodes[nodeIdx].firstEntry + i];
             if (filter && !filter(entry.shape))
                     continue;
 
@@ -615,7 +615,7 @@ private:
         //Check this nodes entries
         for (NodeIndex i = 0; i < _nodes[nodeIdx].entryCount; i++)
         {
-            const SpatialEntry& entry = _entries[_nodes[nodeIdx].firstEntry + i];
+            const SpatialEntry2D& entry = _entries[_nodes[nodeIdx].firstEntry + i];
             if (filter && !filter(entry.shape))
                 continue;
 
@@ -798,7 +798,7 @@ private:
     NodeIndex firstEntry = 0;
     NodeIndex entryCount = 0;
     std::vector<FastQuadTreeNode> _nodes;
-    std::vector<SpatialEntry> _entries;
+    std::vector<SpatialEntry2D> _entries;
 };
 
 // Good thread about QuadTree's

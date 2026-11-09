@@ -5,6 +5,7 @@
 
 #include "RTree.hpp"
 
+#include "../../Algorithms2D/Algorithms2D.hpp"
 #include <queue>
 
 
@@ -43,7 +44,7 @@ using RTreeRayQueue = std::priority_queue<
 
 }
 
-void RTree2D::build(const std::span<SpatialEntry> elementBoundsWithIndices)
+void RTree2D::build(const std::span<SpatialEntry2D> elementBoundsWithIndices)
 {
     this->clear();
 
@@ -55,12 +56,12 @@ void RTree2D::build(const std::span<SpatialEntry> elementBoundsWithIndices)
     }
 
     // mutable workspace
-    std::vector<SpatialEntry> buildWorkspace(elementBoundsWithIndices.begin(), elementBoundsWithIndices.end());
-    _rootIndex = buildRecursive(std::span<SpatialEntry>(buildWorkspace), 0);
+    std::vector<SpatialEntry2D> buildWorkspace(elementBoundsWithIndices.begin(), elementBoundsWithIndices.end());
+    _rootIndex = buildRecursive(std::span<SpatialEntry2D>(buildWorkspace), 0);
     _rootBounds = calculateNodeMBR(_rootIndex);
 }
 
-size_t RTree2D::buildRecursive(const std::span<SpatialEntry> currentElements, int axis)
+size_t RTree2D::buildRecursive(const std::span<SpatialEntry2D> currentElements, int axis)
 {
     // Base Case
     if (currentElements.size() <= _maxEntries)
@@ -81,7 +82,7 @@ size_t RTree2D::buildRecursive(const std::span<SpatialEntry> currentElements, in
     {
         // Sort by X-coordinate
         std::sort(currentElements.begin(), currentElements.end(),
-            [](const SpatialEntry& a, const SpatialEntry& b)
+            [](const SpatialEntry2D& a, const SpatialEntry2D& b)
             {
                 return a.bounds.m_min.x < b.bounds.m_min.x;
             });
@@ -90,7 +91,7 @@ size_t RTree2D::buildRecursive(const std::span<SpatialEntry> currentElements, in
     {
         // Sort by Y-coordinate
         std::sort(currentElements.begin(), currentElements.end(),
-            [](const SpatialEntry& a, const SpatialEntry& b)
+            [](const SpatialEntry2D& a, const SpatialEntry2D& b)
             {
                 return a.bounds.m_min.y < b.bounds.m_min.y;
             });
@@ -105,7 +106,7 @@ size_t RTree2D::buildRecursive(const std::span<SpatialEntry> currentElements, in
 
         if (sliceStart >= sliceEnd) continue; // Should not happen
 
-        std::span<SpatialEntry> slice = currentElements.subspan(sliceStart, sliceEnd - sliceStart);
+        std::span<SpatialEntry2D> slice = currentElements.subspan(sliceStart, sliceEnd - sliceStart);
         size_t childNodeIndex = buildRecursive(slice, 1 - axis);
 
         _nodes[newNodeIdx].childEntries.push_back({ calculateNodeMBR(childNodeIndex), childNodeIndex });

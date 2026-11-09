@@ -28,7 +28,7 @@ public:
 
 	using ISpatialIndex2D::build;
 
-	void build(const std::span<SpatialEntry> entries) override
+	void build(const std::span<SpatialEntry2D> entries) override
 	{
 		clear();
 		_entries.assign(entries.begin(), entries.end());
@@ -140,7 +140,7 @@ public:
 			const Node& node = _nodes[candidate.index];
 			for (uint32_t i = 0; i < node.count; ++i)
 			{
-				const SpatialEntry& entry = _entries[node.firstEntry + i];
+				const SpatialEntry2D& entry = _entries[node.firstEntry + i];
 				if (filter && !filter(entry.shape))
 					continue;
 				HitInfo2D hitInfo;
@@ -209,7 +209,7 @@ private:
 		const bool splitX = centroidBounds.width() >= centroidBounds.height();
 		const size_t middle = first + node.count / 2;
 		std::nth_element(_entries.begin() + first, _entries.begin() + middle, _entries.begin() + last,
-			[splitX](const SpatialEntry& left, const SpatialEntry& right) {
+			[splitX](const SpatialEntry2D& left, const SpatialEntry2D& right) {
 				const Vector2D leftCenter = left.bounds.centroid();
 				const Vector2D rightCenter = right.bounds.centroid();
 				return splitX ? leftCenter.x < rightCenter.x : leftCenter.y < rightCenter.y;
@@ -224,7 +224,7 @@ private:
 	template <typename Queue>
 	void pushEntry(Queue& queue, NodeIndex entryIndex, const Vector2D& point, const ShapeFilter& filter) const
 	{
-		const SpatialEntry& entry = _entries[entryIndex];
+		const SpatialEntry2D& entry = _entries[entryIndex];
 		if (!filter || filter(entry.shape))
 			queue.push({ entry.bounds.minDistanceSquared(point), true, static_cast<NodeIndex>(entryIndex) });
 	}
@@ -255,7 +255,7 @@ private:
 			return true;
 		for (size_t i = 0; i < node.count; ++i)
 		{
-			const SpatialEntry& entry = _entries[node.firstEntry + i];
+			const SpatialEntry2D& entry = _entries[node.firstEntry + i];
 			if ((!filter || filter(entry.shape)) && query.intersects(entry.bounds) && !callback(entry.shape))
 				return false;
 		}
@@ -271,7 +271,7 @@ private:
 			return true;
 		for (size_t i = 0; i < node.count; ++i)
 		{
-			const SpatialEntry& entry = _entries[node.firstEntry + i];
+			const SpatialEntry2D& entry = _entries[node.firstEntry + i];
 			if ((!filter || filter(entry.shape)) && entry.bounds.contains(point) && !callback(entry.shape))
 				return false;
 		}
@@ -283,7 +283,7 @@ private:
 	size_t _maxLeafEntries;
 	NodeIndex _rootIndex = InvalidNode;
 	std::vector<Node> _nodes;
-	std::vector<SpatialEntry> _entries;
+	std::vector<SpatialEntry2D> _entries;
 };
 
 

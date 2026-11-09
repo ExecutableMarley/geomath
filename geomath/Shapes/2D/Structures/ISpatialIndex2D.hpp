@@ -1,16 +1,18 @@
+/*
+ * Copyright (c) Marley Arns
+ * Licensed under the MIT License.
+*/
+
 #pragma once
 
 #include "Containers/SlotID.hpp"
-#include "../Interfaces/IFiniteShape2D.hpp"
 #include "../BBox2D.hpp"
 #include "../Ray2D.hpp"
-#include "ShapeStore2D.hpp"
 
-#include <initializer_list>
-#include <memory>
-#include <vector>
-#include <span>
 #include <functional>
+#include <initializer_list>
+#include <span>
+#include <vector>
 
 namespace Arns
 {
@@ -19,7 +21,7 @@ namespace geomath
 {
 
 
-struct SpatialEntry
+struct SpatialEntry2D
 {
     BBox2D bounds;
     ShapeID shape;
@@ -33,12 +35,12 @@ public:
 
     //virtual void build(const std::vector<SpatialEntry>& shapeBounds) = 0;
 
-    virtual void build(const std::span<SpatialEntry> entries) = 0;
+    virtual void build(const std::span<SpatialEntry2D> entries) = 0;
 
-    void build(std::initializer_list<SpatialEntry> entries)
+    void build(std::initializer_list<SpatialEntry2D> entries)
     {
-        std::vector<SpatialEntry> _entries(entries);
-        build(std::span<SpatialEntry>(_entries));
+        std::vector<SpatialEntry2D> _entries(entries);
+        build(std::span<SpatialEntry2D>(_entries));
     }
 
     /*

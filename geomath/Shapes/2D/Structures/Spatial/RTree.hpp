@@ -46,7 +46,7 @@ using RTreeDistanceQueue = std::priority_queue<
 struct RTreeNode
 {
     bool isLeaf = false;
-    std::vector<SpatialEntry> leafEntries;
+    std::vector<SpatialEntry2D> leafEntries;
     std::vector<RTreeChildEntry> childEntries;
 };
 
@@ -68,7 +68,7 @@ public:
     using ISpatialIndex2D::build;
 
     // Bulk-loading method
-    void build(const std::span<SpatialEntry> elementBoundsWithIndices);
+    void build(const std::span<SpatialEntry2D> elementBoundsWithIndices);
 
     // Dynamic insertion
     // void insert(ShapeID shapeIndex, const BBox2D& bounds) override {}
@@ -127,8 +127,9 @@ public:
     void query_ray(const Ray2D& ray, real_t t_min, real_t t_max, const RayHitCallback& callback,
         const ShapeFilter& filter = {}) const override;
 
+    /*
     void query_ray(const Ray2D& ray, real_t t_min, real_t t_max, const IShapeResolver2D& resolver,
-        const RayHitCallback& callback, const ShapeFilter& filter = {}) const;
+        const RayHitCallback& callback, const ShapeFilter& filter = {}) const;*/
 
     RTreeFilter createFilter(const BBox2D& region, size_t maxDepth) const;
 
@@ -149,7 +150,7 @@ private:
     }
 
     // Returns the index of subtree root
-    size_t buildRecursive(std::span<SpatialEntry> currentElements, int axis);
+    size_t buildRecursive(std::span<SpatialEntry2D> currentElements, int axis);
 
     template <typename Entry>
     static BBox2D calculateMBR(const std::vector<Entry>& entries)
