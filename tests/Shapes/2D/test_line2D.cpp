@@ -1,5 +1,5 @@
 #include "test_shape2D_utility.hpp"
-#include "Shapes/2D/Line2D.hpp"
+#include "Shapes/2D/Segment2D.hpp"
 #include <sstream>
 
 TEST_CASE("Segment2D constructors and geometry")

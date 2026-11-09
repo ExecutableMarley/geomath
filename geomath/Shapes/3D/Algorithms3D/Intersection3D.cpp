@@ -6,11 +6,11 @@
 #include "Intersection3D.hpp"
 #include "../Ray3D.hpp"
 #include "../BBox3D.hpp"
-#include "../Plane.hpp"
+#include "../Plane3D.hpp"
 #include "../Triangle3D.hpp"
-#include "../Sphere.hpp"
-#include "../Cylinder.hpp"
-#include "../Capsule.hpp"
+#include "../Sphere3D.hpp"
+#include "../Cylinder3D.hpp"
+#include "../Capsule3D.hpp"
 
 #include <algorithm>
 

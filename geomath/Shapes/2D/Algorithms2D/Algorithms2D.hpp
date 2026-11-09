@@ -7,7 +7,7 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
-#include "../Line2D.hpp"
+#include "../Segment2D.hpp"
 #include "../Ray2D.hpp"
 #include "../Variants/ShapeConcepts.hpp"
 #include "Containment2D.hpp"

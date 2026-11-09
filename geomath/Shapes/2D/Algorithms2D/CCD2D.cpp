@@ -6,7 +6,7 @@
 #include "Algorithms2D.hpp"
 #include "CommonMath.hpp"
 #include "../Ray2D.hpp"
-#include "../Line2D.hpp"
+#include "../Segment2D.hpp"
 #include "../BBox2D.hpp"
 #include "../Circle2D.hpp"
 #include "../Triangle2D.hpp"

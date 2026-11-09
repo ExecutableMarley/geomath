@@ -28,6 +28,8 @@ public:
 
 	using ISpatialIndex2D::build;
 
+	//--- [Building/Clearing] ---
+
 	void build(const std::span<SpatialEntry2D> entries) override
 	{
 		clear();

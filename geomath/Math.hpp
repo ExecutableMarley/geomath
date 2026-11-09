@@ -48,7 +48,7 @@
 #include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
 
 #include "Shapes/2D/Ray2D.hpp"
-#include "Shapes/2D/Line2D.hpp"
+#include "Shapes/2D/Segment2D.hpp"
 #include "Shapes/2D/BBox2D.hpp"
 #include "Shapes/2D/Interfaces/IFiniteShape2D.hpp"
 #include "Shapes/2D/Interfaces/IPolygonalShape2D.hpp"
@@ -64,6 +64,8 @@
 #include "Shapes/2D/Structures/ShapeStore2D.hpp"
 #include "Shapes/2D/Structures/ISpatialIndex2D.hpp"
 #include "Shapes/2D/Structures/Spatial/BVH2D.hpp"
+#include "Shapes/3D/Structures/ISpatialIndex3D.hpp"
+#include "Shapes/3D/Structures/Spatial/BVH3D.hpp"
 #include "Shapes/2D/Structures/Spatial/RTree.hpp"
 #include "Shapes/2D/Structures/Spatial/TransientQuadTree2D.hpp"
 
@@ -74,7 +76,7 @@
 #include "Shapes/3D/Line3D.hpp"
 #include "Shapes/3D/BBox3D.hpp"
 #include "Shapes/3D/IShape3D.hpp"
-#include "Shapes/3D/Sphere.hpp"
-#include "Shapes/3D/Cylinder.hpp"
-#include "Shapes/3D/Capsule.hpp"
+#include "Shapes/3D/Sphere3D.hpp"
+#include "Shapes/3D/Cylinder3D.hpp"
+#include "Shapes/3D/Capsule3D.hpp"
 #include "Shapes/3D/Triangle3D.hpp"

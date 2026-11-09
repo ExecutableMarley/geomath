@@ -5,7 +5,7 @@
 #include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
 #include "Shapes/2D/BBox2D.hpp"
 #include "Shapes/2D/Ray2D.hpp"
-#include "Shapes/2D/Line2D.hpp"
+#include "Shapes/2D/Segment2D.hpp"
 #include "Shapes/2D/Triangle2D.hpp"
 #include "Shapes/2D/Rectangle2D.hpp"
 #include "Shapes/2D/Polygon2D.hpp"
@@ -14,6 +14,15 @@
 #include "Shapes/2D/Algorithms2D/ShapeVariantAlgorithms.hpp"
 
 using namespace Arns::geomath;
+
+struct UnsupportedSweepShape {};
+
+template <typename A, typename Object>
+concept SweepCallable = requires(const A& a, const Object& b, Vector2D velocity) {
+    sweep(a, velocity, b, velocity);
+};
+
+static_assert(!SweepCallable<UnsupportedSweepShape, UnsupportedSweepShape>);
 
 TEST_SUITE("sweep")
 {

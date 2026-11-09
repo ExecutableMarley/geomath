@@ -4,7 +4,7 @@
 #include "Geometry/Vector2D.hpp"
 #include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
 #include "Shapes/2D/Ray2D.hpp"
-#include "Shapes/2D/Line2D.hpp"
+#include "Shapes/2D/Segment2D.hpp"
 #include "Shapes/2D/Triangle2D.hpp"
 #include "Shapes/2D/Rectangle2D.hpp"
 #include "Shapes/2D/Polygon2D.hpp"
