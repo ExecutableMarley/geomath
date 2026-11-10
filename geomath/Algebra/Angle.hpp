@@ -75,11 +75,11 @@ inline real_t tan(Radians rad) { return std::tan(rad.value); }
 namespace literals
 {
     // --- QOL Literals for convenience ---
-    constexpr Degrees operator"" _deg(long double v)        { return Degrees(static_cast<real_t>(v)); }
-    constexpr Degrees operator"" _deg(unsigned long long v) { return Degrees(static_cast<real_t>(v)); }
+    constexpr Degrees operator""_deg(long double v)        { return Degrees(static_cast<real_t>(v)); }
+    constexpr Degrees operator""_deg(unsigned long long v) { return Degrees(static_cast<real_t>(v)); }
 
-    constexpr Radians operator"" _rad(long double v)        { return Radians(static_cast<real_t>(v)); }
-    constexpr Radians operator"" _rad(unsigned long long v) { return Radians(static_cast<real_t>(v)); }
+    constexpr Radians operator""_rad(long double v)        { return Radians(static_cast<real_t>(v)); }
+    constexpr Radians operator""_rad(unsigned long long v) { return Radians(static_cast<real_t>(v)); }
 }
 
 inline Degrees::operator Radians() const { return Radians(degToRad(value)); }
