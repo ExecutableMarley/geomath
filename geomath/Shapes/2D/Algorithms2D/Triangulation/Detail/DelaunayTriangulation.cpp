@@ -198,7 +198,10 @@ public:
         triangleTriplets.reserve(triangles.size() / 3);
         for (size_t i = 0; i < triangles.size(); i += 3)
         {
-            triangleTriplets.emplace_back(triangles[i + 0], triangles[i + 1], triangles[i + 2]);
+            triangleTriplets.emplace_back(
+                static_cast<std::uint32_t>(triangles[i]),
+                static_cast<std::uint32_t>(triangles[i + 1]),
+                static_cast<std::uint32_t>(triangles[i + 2]));
         }
         return triangleTriplets;
     }
