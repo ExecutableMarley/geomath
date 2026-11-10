@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include "Geometry/Vector2D.hpp"
+#include <span>
+
 namespace Arns::geomath
 {
 
@@ -12,9 +15,6 @@ namespace Arns::geomath
 class Ray2D;
 class Segment2D;
 class BBox2D;
-class IBaseShape2D;
-class IFiniteShape2D;
-class IPolygonalShape2D;
 class Circle2D;
 class Triangle2D;
 class Rectangle2D;

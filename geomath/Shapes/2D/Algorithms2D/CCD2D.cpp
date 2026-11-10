@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
 */
 
-#include "Algorithms2D.hpp"
+#include "CCD2D.hpp"
 #include "CommonMath.hpp"
 #include "../Ray2D.hpp"
 #include "../Segment2D.hpp"

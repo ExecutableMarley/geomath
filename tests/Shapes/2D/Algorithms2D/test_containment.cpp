@@ -2,7 +2,7 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
-#include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
+#include "Shapes/2D/Algorithms2D/Containment2D.hpp"
 #include "Shapes/2D/Ray2D.hpp"
 #include "Shapes/2D/Segment2D.hpp"
 #include "Shapes/2D/Triangle2D.hpp"
@@ -13,9 +13,6 @@
 #include "Shapes/2D/Algorithms2D/ShapeVariantAlgorithms.hpp"
 
 using namespace Arns::geomath;
-
-//static_assert(FiniteShape2D<Circle2D>); //Fails when Algorithms2D.hpp is included before Circle2D.
-//Must be some caching issue then?
 
 // ============================================================================
 // TRIANGLE2D CONTAINMENT TESTS

@@ -1,6 +1,9 @@
 #include "test_shape2D_utility.hpp"
+#include "Shapes/2D/Algorithms2D/Containment2D.hpp"
 #include "Shapes/2D/Circle2D.hpp"
 #include <sstream>
+
+
 
 static_assert(FiniteShape2D<Circle2D>);
 

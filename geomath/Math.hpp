@@ -45,13 +45,16 @@
 #include "Containers/SparseSlotVector.hpp"
 
 // 2D
+
+//Lightweight algorithms & queries
 #include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
+#include "Shapes/2D/Algorithms2D/Containment2D.hpp"
+#include "Shapes/2D/Algorithms2D/Intersection2D.hpp"
+#include "Shapes/2D/Algorithms2D/Distance2D.hpp"
 
 #include "Shapes/2D/Ray2D.hpp"
 #include "Shapes/2D/Segment2D.hpp"
 #include "Shapes/2D/BBox2D.hpp"
-#include "Shapes/2D/Interfaces/IFiniteShape2D.hpp"
-#include "Shapes/2D/Interfaces/IPolygonalShape2D.hpp"
 #include "Shapes/2D/Circle2D.hpp"
 #include "Shapes/2D/Triangle2D.hpp"
 #include "Shapes/2D/Rectangle2D.hpp"
@@ -59,6 +62,8 @@
 #include "Shapes/2D/ConvexPolygon2D.hpp"
 #include "Shapes/2D/TriangleMesh2D.hpp"
 
+// These Must come AFTER shape definitions
+#include "Shapes/2D/Algorithms2D/CCD2D.hpp"
 #include "Shapes/2D/Algorithms2D/ShapeVariantAlgorithms.hpp"
 #include "Shapes/2D/Algorithms2D/Triangulation/Triangulation.hpp"
 #include "Shapes/2D/Structures/ShapeStore2D.hpp"

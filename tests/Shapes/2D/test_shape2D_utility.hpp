@@ -2,10 +2,11 @@
 
 #include "../../third_party/doctest.h"
 #include "CommonMath.hpp"
-#include "Shapes/2D/Interfaces/IPolygonalShape2D.hpp"
+//#include "Shapes/2D/Interfaces/IPolygonalShape2D.hpp"
 
 using namespace Arns::geomath;
 
+/*
 template <typename ShapeT>
 void check_is_polygonal(const IFiniteShape2D& shape, size_t expectedVertexCount)
 {
@@ -34,4 +35,4 @@ inline void check_is_not_polygonal(const IFiniteShape2D& shape)
     {
         CHECK(shape.polygonal() == nullptr);
     }
-}
+}*/

@@ -7,7 +7,7 @@
 
 #include "CommonMath.hpp"
 #include "../../BBox2D.hpp"
-#include "../../Algorithms2D/Algorithms2D.hpp"
+#include "../../Algorithms2D/Intersection2D.hpp"
 #include "../ISpatialIndex2D.hpp"
 
 #include <algorithm>

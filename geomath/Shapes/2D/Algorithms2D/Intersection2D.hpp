@@ -5,9 +5,24 @@
 
 #pragma once
 
+#include "Shapes/2D/Variants/ShapeConcepts.hpp"
+#include "Shapes/2D/Ray2D.hpp"
+#include "Shapes/2D/Segment2D.hpp"
+#include "Shapes/2D/BBox2D.hpp"
+
 namespace Arns::geomath
 {
     
+// Forward declarations
+class Ray2D;
+class Segment2D;
+class BBox2D;
+class Circle2D;
+class Triangle2D;
+class Rectangle2D;
+class Polygon2D;
+class ConvexPolygon2D;
+
 struct HitInfo2D
 {
     real_t t;

@@ -8,6 +8,15 @@
 #include "Geometry/Vector2D.hpp"
 #include "Distance2D.hpp"
 
+#include "../Ray2D.hpp"
+#include "../Segment2D.hpp"
+#include "../BBox2D.hpp"
+#include "../Circle2D.hpp"
+#include "../Triangle2D.hpp"
+#include "../Rectangle2D.hpp"
+#include "../Polygon2D.hpp"
+#include "../ConvexPolygon2D.hpp"
+
 namespace Arns::geomath
 {
     

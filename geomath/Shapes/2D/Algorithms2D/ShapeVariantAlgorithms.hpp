@@ -5,7 +5,10 @@
 
 #pragma once
 
-#include "Algorithms2D.hpp"
+#include "Containment2D.hpp"
+#include "Distance2D.hpp"
+#include "Intersection2D.hpp"
+#include "CCD2D.hpp"
 #include "../Variants/ShapeVariants.hpp"
 
 namespace Arns::geomath
@@ -20,8 +23,6 @@ namespace Arns::geomath
 //bool isSegmentInsideShape(const Segment2D& segment, const FiniteShapeVariant2D& shell);
 
 bool isShapeInsideShape(const FiniteShapeVariant2D& inner, const FiniteShapeVariant2D& shell);
-
-
 
 
 //
@@ -47,7 +48,6 @@ SweepResult2D sweep(
     const FiniteShapeVariant2D& shapeA, Vector2D va, 
     const FiniteShapeVariant2D& shapeB, Vector2D vb,
     real_t maxTime = real_t(1), int maxIterations = 15, real_t epsilon = real_t(1e-4));
-
 
 
 }

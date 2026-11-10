@@ -2,7 +2,7 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
-#include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
+#include "Shapes/2D/Algorithms2D/CCD2D.hpp"
 #include "Shapes/2D/BBox2D.hpp"
 #include "Shapes/2D/Ray2D.hpp"
 #include "Shapes/2D/Segment2D.hpp"

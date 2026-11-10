@@ -5,7 +5,7 @@
 
 #include "RTree.hpp"
 
-#include "../../Algorithms2D/Algorithms2D.hpp"
+#include "../../Algorithms2D/Intersection2D.hpp"
 #include <queue>
 
 
