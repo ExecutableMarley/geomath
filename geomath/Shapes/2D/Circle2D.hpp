@@ -10,11 +10,9 @@
 #include "Variants/ShapeConcepts.hpp"
 #include "Shapes/2D/Algorithms2D/Containment2D.hpp"
 #include "BBox2D.hpp"
-//#include "Interfaces/IFiniteShape2D.hpp"
 
 #include <cmath>
 #include <vector>
-#include <memory>
 
 namespace Arns
 {
@@ -112,13 +110,6 @@ public:
         return *this;
     }
 
-    /*
-    std::unique_ptr<IFiniteShape2D> clone() const
-    {
-        return std::make_unique<Circle2D>(*this);        
-    }
-    */
-
     // --- Spatial Queries ---
 
     bool contains(const Vector2D &point) const
@@ -136,12 +127,11 @@ public:
         return isCircleInsideCircle(circle, *this);
     }
 
-    /*
     template <typename T> requires FiniteShape2D<T>
     bool contains(const T& innerShape) const
     {
         return isShapeInsideShape(innerShape, *this);
-    }*/
+    }
 
     bool intersects(const Circle2D &circle) const
     {
@@ -166,8 +156,7 @@ public:
     }
 };
 
-//static_assert(FiniteShape2D<Circle2D>); Why is Circle2D incomplete after the closing bracket?
-//GCC sees no issues. Clang however is deadset on Circle2D beeing incomplete. Moving assert to test file for now
+static_assert(FiniteShape2D<Circle2D>);
 
 // --- Stream Output ---
 

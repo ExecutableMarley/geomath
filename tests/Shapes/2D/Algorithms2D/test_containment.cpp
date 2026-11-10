@@ -245,7 +245,7 @@ TEST_CASE("Rectangle2D shape containment")
     SUBCASE("Circle inside rectangle should be contained")
     {
         Circle2D circle(Vector2D{3, 2}, real_t{1});
-        //CHECK(rect.contains(circle)); //Todo:
+        CHECK(rect.contains(circle));
     }
 }
 
@@ -351,7 +351,7 @@ TEST_CASE("Circle2D shape containment")
     SUBCASE("Triangle inside circle should be contained")
     {
         Triangle2D triangle(Vector2D{-1, -1}, Vector2D{1, -1}, Vector2D{0, 1});
-        //CHECK(circle.contains(triangle)); //Todo: Fails on clang/msvc
+        CHECK(circle.contains(triangle));
     }
 
     SUBCASE("Rectangle inside circle should be contained")
@@ -362,7 +362,7 @@ TEST_CASE("Circle2D shape containment")
             Vector2D{2, 2},
             Vector2D{-2, 2}
         );
-        //CHECK(circle.contains(rect));
+        CHECK(circle.contains(rect));
     }
 }
 
@@ -563,7 +563,7 @@ TEST_CASE("ConvexPolygon2D shape containment")
     SUBCASE("Circle inside should be contained")
     {
         Circle2D circle(Vector2D{4, 3}, real_t{1.5});
-        //CHECK(convex.contains(circle)); // Todo: 
+        CHECK(convex.contains(circle));
     }
 
     SUBCASE("Shape extending outside should not be contained")

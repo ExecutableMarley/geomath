@@ -155,12 +155,6 @@ public:
         return *this;
     }
 
-    /*
-    std::unique_ptr<IFiniteShape2D> clone() const 
-    {
-        return std::make_unique<Rectangle2D>(*this);        
-    }*/
-
     // --- Spatial Queries ---
 
     bool contains(const Vector2D &point) const 
