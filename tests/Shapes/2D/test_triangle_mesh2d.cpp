@@ -109,4 +109,91 @@ TEST_CASE("TriangleMeshBuilder2D builds mesh data")
     CHECK(mesh.localArea() == doctest::Approx(real_t{6}));
 }
 
+TEST_CASE("TriangleMeshBuilder2D appends and merges mesh data")
+{
+    TriangleMeshBuilder2D builder;
+    builder.addVertices({{0, 0}, {2, 0}, {0, 2}})
+        .addTriangles({{0, 1, 2}});
+
+    const TriangleMeshData2D other(
+        {{3, 0}, {5, 0}, {3, 2}},
+        {{0, 1, 2}});
+    builder.merge(other);
+
+    const TriangleMeshData2D& data = builder.data();
+    REQUIRE(data.m_vertices.size() == 6);
+    REQUIRE(data.m_triangles.size() == 2);
+    CHECK(data.m_triangles[0].v0 == 0);
+    CHECK(data.m_triangles[0].v1 == 1);
+    CHECK(data.m_triangles[0].v2 == 2);
+    CHECK(data.m_triangles[1].v0 == 3);
+    CHECK(data.m_triangles[1].v1 == 4);
+    CHECK(data.m_triangles[1].v2 == 5);
+    CHECK(data.isValid());
+}
+
+TEST_CASE("TriangleMeshBuilder2D filters triangles using their vertices")
+{
+    TriangleMeshBuilder2D builder(TriangleMeshData2D(
+        {{0, 0}, {1, 0}, {0, 1}, {3, 0}, {5, 0}, {3, 2}},
+        {{0, 1, 2}, {3, 4, 5}}));
+
+    builder.filterTriangles([](const Vector2D& a, const Vector2D& b, const Vector2D& c) {
+        return (a.x + b.x + c.x) / real_t{3} > real_t{2};
+    });
+
+    const TriangleMeshData2D& data = builder.data();
+    REQUIRE(data.m_triangles.size() == 1);
+    CHECK(data.m_triangles[0].v0 == 0);
+    CHECK(data.m_triangles[0].v1 == 1);
+    CHECK(data.m_triangles[0].v2 == 2);
+    CHECK(data.m_vertices.size() == 6);
+}
+
+TEST_CASE("TriangleMeshBuilder2D transforms every vertex")
+{
+    TriangleMeshBuilder2D builder(TriangleMeshData2D(
+        {{0, 0}, {2, 0}, {0, 2}},
+        {{0, 1, 2}}));
+
+    builder.transformVertices([](Vector2D& vertex) {
+        vertex += Vector2D{3, -1};
+    });
+
+    const TriangleMeshData2D& data = builder.data();
+    CHECK(data.m_vertices[0] == Vector2D{3, -1});
+    CHECK(data.m_vertices[1] == Vector2D{5, -1});
+    CHECK(data.m_vertices[2] == Vector2D{3, 1});
+    CHECK(data.isValid());
+}
+
+TEST_CASE("TriangleMeshBuilder2D removes orphan vertices and remaps indices")
+{
+    TriangleMeshBuilder2D builder(TriangleMeshData2D(
+        {{-10, -10}, {0, 0}, {2, 0}, {99, 99}, {0, 2}, {2, 2}},
+        {{1, 2, 4}, {2, 5, 4}}));
+
+    builder.removeUnusedVertices();
+
+    const TriangleMeshData2D& data = builder.data();
+    REQUIRE(data.m_vertices.size() == 4);
+    REQUIRE(data.m_triangles.size() == 2);
+    CHECK(data.m_vertices[0] == Vector2D{0, 0});
+    CHECK(data.m_vertices[1] == Vector2D{2, 0});
+    CHECK(data.m_vertices[2] == Vector2D{0, 2});
+    CHECK(data.m_vertices[3] == Vector2D{2, 2});
+    CHECK(data.m_triangles[0].v0 == 0);
+    CHECK(data.m_triangles[0].v1 == 1);
+    CHECK(data.m_triangles[0].v2 == 2);
+    CHECK(data.m_triangles[1].v0 == 1);
+    CHECK(data.m_triangles[1].v1 == 3);
+    CHECK(data.m_triangles[1].v2 == 2);
+    CHECK(data.isValid());
+
+    TriangleMeshBuilder2D emptyAfterRemoval(TriangleMeshData2D(
+        {{0, 0}, {1, 0}, {0, 1}}, {}));
+    emptyAfterRemoval.removeUnusedVertices();
+    CHECK(emptyAfterRemoval.data().m_vertices.empty());
+}
+
 }
