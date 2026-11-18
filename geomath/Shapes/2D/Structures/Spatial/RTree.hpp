@@ -10,7 +10,10 @@
 #include "../ISpatialIndex2D.hpp"
 
 #include <cassert>
+#include <limits>
 #include <queue>
+#include <span>
+#include <vector>
 
 
 namespace Arns
@@ -21,13 +24,7 @@ namespace geomath
 
 // Todo: Bring this up to the quality of BVH2D
 
-using RTreeNodeIndex = size_t;
-
-struct RTreeChildEntry
-{
-    BBox2D bounds;
-    RTreeNodeIndex idx;
-};
+//using RTreeNodeIndex = size_t;
 
 struct RTreeDistanceEntryCompare
 {
@@ -43,12 +40,7 @@ using RTreeDistanceQueue = std::priority_queue<
     std::vector<std::pair<real_t, ShapeID>>,
     RTreeDistanceEntryCompare>;
 
-struct RTreeNode
-{
-    bool isLeaf = false;
-    std::vector<SpatialEntry2D> leafEntries;
-    std::vector<RTreeChildEntry> childEntries;
-};
+
 
 struct RTreeFilter
 {
@@ -59,6 +51,10 @@ struct RTreeFilter
 
 class RTree2D : public ISpatialIndex2D
 {
+private:
+    using NodeIndex = size_t;
+	static constexpr NodeIndex InvalidNode = std::numeric_limits<NodeIndex>::max();
+
 public:
     RTree2D(size_t maxEntries = 8, size_t minEntries = 3)
         : _maxEntries(maxEntries), _minEntries(minEntries), _rootIndex(std::numeric_limits<size_t>::max()) {
@@ -78,6 +74,7 @@ public:
     {
         this->_rootIndex = InvalidNode;
         this->_nodes.clear();
+        this->_entries.clear();
     }
 
     //
@@ -87,19 +84,18 @@ public:
         return size(_rootIndex);
     }
 
-    size_t size(RTreeNodeIndex idx) const
+    size_t size(NodeIndex idx) const
     {
-        if (_nodes[idx].isLeaf)
+        const Node& node = _nodes[idx];
+        if (node.isLeaf)
         {
-            return _nodes[idx].leafEntries.size();
+            return node.entryCount;
         }
         else
         {
             size_t subTreeSize = 0;
-            for (RTreeChildEntry childEntry : _nodes[idx].childEntries)
-            {
-                subTreeSize += size(childEntry.idx);
-            }
+            for (size_t i = 0; i < node.childCount; ++i)
+                subTreeSize += size(node.firstChild + i);
             return subTreeSize;
         }
     }
@@ -133,27 +129,32 @@ public:
 
     RTreeFilter createFilter(const BBox2D& region, size_t maxDepth) const;
 
-    static constexpr size_t InvalidNode = std::numeric_limits<size_t>::max();
+    //static constexpr size_t InvalidNode = std::numeric_limits<size_t>::max();
 private:
-    size_t _minEntries;
-    size_t _maxEntries;
-    size_t _rootIndex;
-    BBox2D _rootBounds;
-    std::vector<RTreeNode> _nodes;
-    //Height
+    //using NodeIndex = size_t;
+	//static constexpr NodeIndex InvalidNode = std::numeric_limits<NodeIndex>::max();
 
-    size_t createNode(bool isLeaf)
+    struct Node
+    {
+        //Todo: We prob want to compress this down.
+        bool isLeaf = false;
+        BBox2D bounds;
+        size_t firstEntry = 0;
+        size_t entryCount = 0;
+        NodeIndex firstChild = 0;
+        size_t childCount = 0;
+    };
+
+    size_t createNode()
     {
         _nodes.emplace_back();
-        _nodes.back().isLeaf = isLeaf;
         return _nodes.size() - 1;
     }
 
     // Returns the index of subtree root
-    size_t buildRecursive(std::span<SpatialEntry2D> currentElements, int axis);
+    void buildRecursive(std::span<SpatialEntry2D> currentElements, int axis, size_t nodeIndex);
 
-    template <typename Entry>
-    static BBox2D calculateMBR(const std::vector<Entry>& entries)
+    static BBox2D calculateMBR(std::span<const SpatialEntry2D> entries)
     {
         if (entries.empty())
             return BBox2D();
@@ -166,8 +167,12 @@ private:
 
     BBox2D calculateNodeMBR(size_t nodeIndex) const
     {
-        const RTreeNode& node = _nodes[nodeIndex];
-        return node.isLeaf ? calculateMBR(node.leafEntries) : calculateMBR(node.childEntries);
+        return _nodes[nodeIndex].bounds;
+    }
+
+    std::span<const SpatialEntry2D> leafEntries(const Node& node) const
+    {
+        return std::span<const SpatialEntry2D>(_entries).subspan(node.firstEntry, node.entryCount);
     }
 
     // Recursive helper for range search
@@ -187,6 +192,14 @@ private:
         size_t maxDepth,
         std::vector<size_t>& outNodes,
         std::vector<BBox2D>& outBounds) const;
+
+private:
+    size_t _minEntries;
+    size_t _maxEntries;
+    size_t _rootIndex;
+    BBox2D _rootBounds;
+    std::vector<Node> _nodes;
+    std::vector<SpatialEntry2D> _entries;
 };
 
 } // namespace Math

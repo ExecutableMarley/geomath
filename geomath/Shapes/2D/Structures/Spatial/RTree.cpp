@@ -57,18 +57,23 @@ void RTree2D::build(const std::span<SpatialEntry2D> elementBoundsWithIndices)
 
     // mutable workspace
     std::vector<SpatialEntry2D> buildWorkspace(elementBoundsWithIndices.begin(), elementBoundsWithIndices.end());
-    _rootIndex = buildRecursive(std::span<SpatialEntry2D>(buildWorkspace), 0);
+    _rootIndex = createNode();
+    buildRecursive(std::span<SpatialEntry2D>(buildWorkspace), 0, _rootIndex);
     _rootBounds = calculateNodeMBR(_rootIndex);
 }
 
-size_t RTree2D::buildRecursive(const std::span<SpatialEntry2D> currentElements, int axis)
+void RTree2D::buildRecursive(const std::span<SpatialEntry2D> currentElements, int axis, size_t nodeIndex)
 {
     // Base Case
     if (currentElements.size() <= _maxEntries)
     {
-        size_t newNodeIdx = createNode(true);
-        _nodes[newNodeIdx].leafEntries.assign(currentElements.begin(), currentElements.end());
-        return newNodeIdx;
+        Node& node = _nodes[nodeIndex];
+        node.isLeaf = true;
+        node.bounds = calculateMBR(currentElements);
+        node.firstEntry = _entries.size();
+        node.entryCount = currentElements.size();
+        _entries.insert(_entries.end(), currentElements.begin(), currentElements.end());
+        return;
     }
 
     size_t numElements = currentElements.size();
@@ -97,7 +102,14 @@ size_t RTree2D::buildRecursive(const std::span<SpatialEntry2D> currentElements, 
             });
     }
 
-    size_t newNodeIdx = createNode(false);
+    const size_t firstChild = _nodes.size();
+    for (size_t i = 0; i < numSlices; ++i)
+        createNode();
+
+    Node& node = _nodes[nodeIndex];
+    node.isLeaf = false;
+    node.firstChild = firstChild;
+    node.childCount = numSlices;
 
     for (size_t i = 0; i < numSlices; ++i)
     {
@@ -107,12 +119,13 @@ size_t RTree2D::buildRecursive(const std::span<SpatialEntry2D> currentElements, 
         if (sliceStart >= sliceEnd) continue; // Should not happen
 
         std::span<SpatialEntry2D> slice = currentElements.subspan(sliceStart, sliceEnd - sliceStart);
-        size_t childNodeIndex = buildRecursive(slice, 1 - axis);
-
-        _nodes[newNodeIdx].childEntries.push_back({ calculateNodeMBR(childNodeIndex), childNodeIndex });
+        buildRecursive(slice, 1 - axis, firstChild + i);
     }
 
-    return newNodeIdx;
+    BBox2D bounds = _nodes[firstChild].bounds;
+    for (size_t i = 1; i < numSlices; ++i)
+        bounds.encapsulate(_nodes[firstChild + i].bounds);
+    _nodes[nodeIndex].bounds = bounds;
 }
 
 // --- Queries ---
@@ -136,12 +149,12 @@ void RTree2D::query_range(const BBox2D& query,
 bool RTree2D::rangeSearchRecursive(size_t nodeIndex, const BBox2D& query,
     const ShapeCallback& callback, const ShapeFilter& filter) const
 {
-    const RTreeNode& node = _nodes[nodeIndex];
+    const Node& node = _nodes[nodeIndex];
 
     if (node.isLeaf)
     {
         // Check elements directly
-        for (const auto &entry : node.leafEntries)
+        for (const auto& entry : leafEntries(node))
         {
             if (entry.bounds.intersects(query) && (!filter || filter(entry.shape)))
                 if (!callback(entry.shape))
@@ -151,11 +164,12 @@ bool RTree2D::rangeSearchRecursive(size_t nodeIndex, const BBox2D& query,
     else
     {
         // Recursive search children
-        for (const auto &entry : node.childEntries)
+        for (size_t i = 0; i < node.childCount; ++i)
         {
-            if (entry.bounds.intersects(query))
+            const size_t childIndex = node.firstChild + i;
+            if (_nodes[childIndex].bounds.intersects(query))
             {
-                if (!rangeSearchRecursive(entry.idx, query, callback, filter))
+                if (!rangeSearchRecursive(childIndex, query, callback, filter))
                     return false;
             }
         }
@@ -167,11 +181,11 @@ bool RTree2D::rangeSearchRecursive(size_t nodeIndex, const BBox2D& query,
 bool RTree2D::pointSearchRecursive(size_t nodeIndex, const Vector2D &point,
     const ShapeCallback &callback, const ShapeFilter &filter) const
 {
-    const RTreeNode &node = _nodes[nodeIndex];
+    const Node &node = _nodes[nodeIndex];
 
     if (node.isLeaf)
     {
-        for (const auto &entry : node.leafEntries)
+        for (const auto& entry : leafEntries(node))
         {
             if (entry.bounds.contains(point) && (!filter || filter(entry.shape)))
                 if (!callback(entry.shape))
@@ -180,10 +194,11 @@ bool RTree2D::pointSearchRecursive(size_t nodeIndex, const Vector2D &point,
         return true;
     }
 
-    for (const auto &entry : node.childEntries)
+    for (size_t i = 0; i < node.childCount; ++i)
     {
-        if (entry.bounds.contains(point))
-            if (!pointSearchRecursive(entry.idx, point, callback, filter))
+        const size_t childIndex = node.firstChild + i;
+        if (_nodes[childIndex].bounds.contains(point))
+            if (!pointSearchRecursive(childIndex, point, callback, filter))
                 return false;
     }
 
@@ -200,33 +215,28 @@ ShapeID RTree2D::query_nearest(const Vector2D& queryPoint, const ShapeFilter& fi
         std::vector<std::pair<real_t, size_t>>,
         std::greater<std::pair<real_t, size_t>>> nodesToVisitQueue;
 
-    BBox2D rootMbr = _rootBounds;
-    nodesToVisitQueue.push({ rootMbr.minDistanceSquared(queryPoint), _rootIndex });
+    nodesToVisitQueue.push({ _rootBounds.minDistanceSquared(queryPoint), _rootIndex });
 
     ShapeID nearestShape = ShapeID::invalid();
     real_t nearestDistanceSq = std::numeric_limits<real_t>::max();
 
     while (!nodesToVisitQueue.empty())
     {
-        auto current = nodesToVisitQueue.top();
+        const auto current = nodesToVisitQueue.top();
         nodesToVisitQueue.pop();
 
-        real_t currentMinDistSq = current.first;
-        size_t currentIndex = current.second;
-
-        // Pruning
+        const real_t currentMinDistSq = current.first;
+        const size_t currentIndex = current.second;
         if (currentMinDistSq >= nearestDistanceSq)
             break;
 
-        const RTreeNode& node = _nodes[currentIndex];
-
+        const Node& node = _nodes[currentIndex];
         if (node.isLeaf)
         {
-            for (const auto& entry : node.leafEntries)
+            for (const auto& entry : leafEntries(node))
             {
-                Vector2D elementPoint = { entry.bounds.m_min.x, entry.bounds.m_min.y }; // Assuming point data
-                real_t actualDistSq = elementPoint.distanceSquared(queryPoint);
-
+                const Vector2D elementPoint{ entry.bounds.m_min.x, entry.bounds.m_min.y };
+                const real_t actualDistSq = elementPoint.distanceSquared(queryPoint);
                 if ((!filter || filter(entry.shape)) && actualDistSq < nearestDistanceSq)
                 {
                     nearestDistanceSq = actualDistSq;
@@ -236,13 +246,12 @@ ShapeID RTree2D::query_nearest(const Vector2D& queryPoint, const ShapeFilter& fi
         }
         else
         {
-            for (const auto& entry : node.childEntries)
+            for (size_t i = 0; i < node.childCount; ++i)
             {
-                real_t childMinDistSq = entry.bounds.minDistanceSquared(queryPoint);
-
-                // Pruning check
+                const size_t childIndex = node.firstChild + i;
+                const real_t childMinDistSq = _nodes[childIndex].bounds.minDistanceSquared(queryPoint);
                 if (childMinDistSq < nearestDistanceSq)
-                    nodesToVisitQueue.push({ childMinDistSq, entry.idx });
+                    nodesToVisitQueue.push({ childMinDistSq, childIndex });
             }
         }
     }
@@ -284,11 +293,11 @@ void RTree2D::query_knn(const Vector2D& queryPoint, size_t k,
             break;
         }
 
-        const RTreeNode& node = _nodes[currentIndex];
+        const Node& node = _nodes[currentIndex];
 
         if (node.isLeaf)
         {
-            for (const auto& entry : node.leafEntries)
+            for (const auto& entry : leafEntries(node))
             {
                 Vector2D elementPoint = { entry.bounds.m_min.x, entry.bounds.m_min.y }; // Assuming point data
                 real_t actualDistSq = elementPoint.distanceSquared(queryPoint);
@@ -308,16 +317,17 @@ void RTree2D::query_knn(const Vector2D& queryPoint, size_t k,
         }
         else
         {
-            for (const auto& entry : node.childEntries)
+            for (size_t i = 0; i < node.childCount; ++i)
             {
-                real_t childMinDistSq = entry.bounds.minDistanceSquared(queryPoint);
+                const size_t childIndex = node.firstChild + i;
+                real_t childMinDistSq = _nodes[childIndex].bounds.minDistanceSquared(queryPoint);
 
                 //Pruning check
                 if (bestKResultsQueue.size() == k && childMinDistSq > bestKResultsQueue.top().first)
                 {
                     continue;
                 }
-                nodesToVisitQueue.push({ childMinDistSq, entry.idx });
+                nodesToVisitQueue.push({ childMinDistSq, childIndex });
             }
         }
     }
@@ -389,10 +399,10 @@ void RTree2D::query_ray(const Ray2D& ray, real_t t_min, real_t t_max,
             continue;
         }
 
-        const RTreeNode& node = _nodes[candidate.nodeIndex];
+        const Node& node = _nodes[candidate.nodeIndex];
         if (node.isLeaf)
         {
-            for (const auto& entry : node.leafEntries)
+            for (const auto& entry : leafEntries(node))
             {
                 if (filter && !filter(entry.shape))
                     continue;
@@ -404,12 +414,14 @@ void RTree2D::query_ray(const Ray2D& ray, real_t t_min, real_t t_max,
             continue;
         }
 
-        for (const auto& entry : node.childEntries)
+        for (size_t i = 0; i < node.childCount; ++i)
         {
+            const size_t childIndex = node.firstChild + i;
+            const Node& child = _nodes[childIndex];
             real_t childEnter;
             real_t childExit;
-            if (detail::rayBoundsInterval(ray, entry.bounds, t_min, t_max, childEnter, childExit))
-                candidates.push({ childEnter, entry.idx, ShapeID::invalid(), true, sequence++ });
+            if (detail::rayBoundsInterval(ray, child.bounds, t_min, t_max, childEnter, childExit))
+                candidates.push({ childEnter, childIndex, ShapeID::invalid(), true, sequence++ });
         }
     }
 }
@@ -435,7 +447,7 @@ void RTree2D::collectFilterNodes(size_t nodeIndex,
     std::vector<size_t>& outNodes,
     std::vector<BBox2D>& outBounds) const
 {
-    const RTreeNode& node = _nodes[nodeIndex];
+    const Node& node = _nodes[nodeIndex];
     BBox2D nodeMbr = calculateNodeMBR(nodeIndex);
 
     // Check if still relevant
@@ -451,11 +463,12 @@ void RTree2D::collectFilterNodes(size_t nodeIndex,
     }
 
     // Otherwise, go deeper
-    for (const auto& entry : node.childEntries)
+    for (size_t i = 0; i < node.childCount; ++i)
     {
-        if (entry.bounds.intersects(region))
+        const size_t childIndex = node.firstChild + i;
+        if (_nodes[childIndex].bounds.intersects(region))
         {
-            collectFilterNodes(entry.idx, region, depth + 1, maxDepth, outNodes, outBounds);
+            collectFilterNodes(childIndex, region, depth + 1, maxDepth, outNodes, outBounds);
         }
     }
 }
