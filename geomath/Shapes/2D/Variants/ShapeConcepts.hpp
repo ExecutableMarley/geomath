@@ -19,9 +19,6 @@ namespace Arns::geomath
 class Ray2D;
 class Segment2D;
 class BBox2D;
-class IBaseShape2D;
-class IFiniteShape2D;
-class IPolygonalShape2D;
 class Circle2D;
 class Triangle2D;
 class Rectangle2D;
@@ -29,15 +26,45 @@ class Polygon2D;
 class ConvexPolygon2D;
 
 template <typename T>
+concept Translatable2D = requires(T& t, const Vector2D& translation) {
+    { t.translate(translation) } -> std::same_as<T&>;
+};
+
+template <typename T>
+concept Rotatable2D = requires(T& t, Radians angle, const Vector2D& point) {
+    { t.rotate(angle) } -> std::same_as<T&>;
+    { t.rotate(angle, point) } -> std::same_as<T&>;
+};
+
+template <typename T>
+concept UniformlyScalable2D = requires(T& t, real_t scale) {
+    { t.scale(scale) } -> std::same_as<T&>;
+};
+
+template <typename T>
+concept Scalable2D = requires(T& t, real_t factor, const Vector2D& point) {
+    { t.scale(factor) } -> std::same_as<T&>;
+    { t.scale(factor, point) } -> std::same_as<T&>;
+};
+
+template <typename T>
+concept Transformable2D = Translatable2D<T> && Rotatable2D<T> && Scalable2D<T>;
+
+template <typename T>
+concept PointContainable2D = requires(const T& t, const Vector2D& point) {
+    { t.contains(point) } -> std::same_as<bool>;
+};
+
+template <typename T>
 concept Shape2D = requires(T& t, const T& ct, const Vector2D& p) {
-    //{ ct.contains(p) } -> std::same_as<bool>;
-    //{ t.translate(p) } -> std::same_as<T&>;
+    { ct.contains(p) } -> std::same_as<bool>;
+    { t.translate(p) } -> std::same_as<T&>;
     { ct.type() } -> std::same_as<ShapeType2D>;
 };
 
 template <typename T>
 concept FiniteShape2D =
-    //Shape2D<T> &&
+    Shape2D<T> &&
     requires(const T& t) {
         { t.area() } -> std::same_as<real_t>;
         { t.perimeter() } -> std::same_as<real_t>;

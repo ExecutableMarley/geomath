@@ -8,7 +8,8 @@
 #include "CommonMath.hpp"
 #include "Geometry/Vector3D.hpp"
 #include "BBox3D.hpp"
-#include "IShape3D.hpp"
+#include "Variants/EShapeType3D.hpp"
+#include "Variants/ShapeConcepts3D.hpp"
 #include "Algorithms3D/Algorithms3D.hpp"
 
 namespace Arns
@@ -17,7 +18,7 @@ namespace Arns
 namespace geomath
 {
 
-class Capsule3D : public IFiniteShape3D
+class Capsule3D
 {
 public:
     Vector3D m_startPoint;
@@ -28,27 +29,27 @@ public:
     
     Capsule3D(const Vector3D &startPoint, const Vector3D &endPoint, real_t radius) : m_startPoint(startPoint), m_endPoint(endPoint), m_radius(radius) {}
 
-    ShapeType3D type() const override
+    ShapeType3D type() const 
     {
-        return ShapeType3D::CAPSULE;
+        return ShapeType3D::SHAPE3D_CAPSULE;
     }
 
-    real_t volume() const override
+    real_t volume() const 
     {
         return PI * m_radius * m_radius * (4.0f / 3.0f * m_radius + (m_endPoint - m_startPoint).length());
     }
 
-    real_t surfaceArea() const override
+    real_t surfaceArea() const 
     {
         return 2.0f * PI * m_radius * (2.0f * m_radius + (m_endPoint - m_startPoint).length());
     }
 
-    Vector3D centroid() const override
+    Vector3D centroid() const 
     {
         return (m_startPoint + m_endPoint) * 0.5f;
     }
 
-    Capsule3D& translate(const Vector3D &translation) override
+    Capsule3D& translate(const Vector3D &translation) 
     {
         m_startPoint += translation;
         m_endPoint += translation;
@@ -81,19 +82,19 @@ public:
     }*/
 
     /*
-    bool contains(const Vector3D &point) const override
+    bool contains(const Vector3D &point) const 
     {
         return false;
     }*/
 
     
-    bool contains(const Vector3D &point) const override
+    bool contains(const Vector3D &point) const 
     {
         return detail::distancePointToSegment(m_startPoint, m_endPoint, point) < m_radius;
     }
     
 
-    BBox3D boundingBox() const override
+    BBox3D boundingBox() const 
     {
         const Vector3D min = Vector3D::min(m_startPoint, m_endPoint) - Vector3D(m_radius, m_radius, m_radius);
         const Vector3D max = Vector3D::max(m_startPoint, m_endPoint) + Vector3D(m_radius, m_radius, m_radius);
@@ -101,6 +102,11 @@ public:
     }
 };
 
+static_assert(Translatable3D<Capsule3D>);
+static_assert(UniformlyScalable3D<Capsule3D>);
+//static_assert(Rotatable3D<Capsule3D>);
+//static_assert(Transformable3D<Capsule3D>);
+static_assert(PointContainable3D<Capsule3D>);
 
 } // namespace Math
 

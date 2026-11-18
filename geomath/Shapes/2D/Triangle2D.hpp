@@ -11,7 +11,6 @@
 #include "Algebra/Matrices/Matrix3x3.hpp"
 #include "Shapes/2D/Algorithms2D/Containment2D.hpp"
 #include "BBox2D.hpp"
-//#include "Interfaces/IPolygonalShape2D.hpp"
 
 #include <array>
 #include <memory>
@@ -202,6 +201,9 @@ public:
     }
 };
 
+static_assert(Translatable2D<Triangle2D>);
+static_assert(Scalable2D<Triangle2D>);
+static_assert(PointContainable2D<Triangle2D>);
 static_assert(PolygonalShape<Triangle2D>);
 
 inline std::ostream& operator<<(std::ostream &os, const Triangle2D &polygon)

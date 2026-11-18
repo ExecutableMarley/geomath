@@ -17,15 +17,7 @@ namespace Arns
 namespace geomath
 {
 
-enum ShapeType3D
-{
-    SPHERE,
-    CYLINDER,
-    CAPSULE,
-    BOX,
-    TRIANGLE,
-    MESH
-};
+
 
 /*
 class IShape3D
@@ -50,6 +42,7 @@ public:
 };*/
 
 //Todo: Implement this
+/*
 class IBaseShape3D
 {
     virtual ShapeType3D type() const = 0;
@@ -68,7 +61,7 @@ class IFiniteShape3D : public IBaseShape3D
     virtual Vector3D centroid() const = 0;
 
     virtual BBox3D boundingBox() const = 0;
-};
+};*/
 //
 
 } // namespace Math

@@ -338,6 +338,9 @@ private:
     }
 };
 
+static_assert(Translatable2D<ConvexPolygon2D>);
+static_assert(UniformlyScalable2D<ConvexPolygon2D>);
+static_assert(PointContainable2D<ConvexPolygon2D>);
 static_assert(FiniteShape2D<ConvexPolygon2D>);
 
 inline std::ostream& operator<<(std::ostream &os, const ConvexPolygon2D &polygon)

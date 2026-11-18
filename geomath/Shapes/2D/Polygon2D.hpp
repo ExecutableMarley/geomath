@@ -302,9 +302,11 @@ public:
     }
 };
 
+static_assert(Translatable2D<Polygon2D>);
+static_assert(Scalable2D<Polygon2D>);
+static_assert(PointContainable2D<Polygon2D>);
 static_assert(FiniteShape2D<Polygon2D>);
 
-//Todo: Move IPolygonalShape2D 
 inline std::ostream& operator<<(std::ostream &os, const Polygon2D &polygon)
 {
     os << "PolygonalShape2D(type: " << polygon.type() << ", vertices: [";

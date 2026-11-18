@@ -7,7 +7,7 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector2D.hpp"
-
+#include "Variants/ShapeConcepts.hpp"
 #include <algorithm>
 #include <concepts>
 #include <type_traits>
@@ -306,6 +306,10 @@ public:
             Vector2D::max(bounds.m_max, bounds.m_max + displacement)};
     }
 };
+
+static_assert(Translatable2D<BBox2D>);
+static_assert(Scalable2D<BBox2D>);
+static_assert(PointContainable2D<BBox2D>);
 
 } // namespace geomath
 

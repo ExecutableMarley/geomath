@@ -219,6 +219,9 @@ public:
     }
 };
 
+static_assert(Translatable2D<Rectangle2D>);
+static_assert(Scalable2D<Rectangle2D>);
+static_assert(PointContainable2D<Rectangle2D>);
 static_assert(PolygonalShape<Rectangle2D>);
 
 inline std::ostream& operator<<(std::ostream &os, const Rectangle2D &polygon)

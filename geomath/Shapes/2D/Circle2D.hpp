@@ -156,6 +156,9 @@ public:
     }
 };
 
+static_assert(Translatable2D<Circle2D>);
+static_assert(UniformlyScalable2D<Circle2D>);
+static_assert(PointContainable2D<Circle2D>);
 static_assert(FiniteShape2D<Circle2D>);
 
 // --- Stream Output ---
