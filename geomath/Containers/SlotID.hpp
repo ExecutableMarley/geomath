@@ -7,6 +7,8 @@
 
 #include <cstdint>
 #include <limits>
+#include <ostream>
+#include <format>
 
 namespace Arns::geomath
 {
@@ -29,5 +31,22 @@ struct SlotID
 
 using ShapeID = SlotID;
 
-
+inline std::ostream& operator<<(std::ostream& os, const SlotID& slotID)
+{
+    return os << "SlotID(index=" << slotID.index << ", generation=" << slotID.generation << ")";
 }
+
+
+} // namespace Arns::geomath
+
+template <>
+struct std::formatter<Arns::geomath::SlotID>
+{
+    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const Arns::geomath::SlotID& slotID, FormatContext& ctx)
+    {
+        return std::format_to(ctx.out(), "SlotID(index={}, generation={})", slotID.index, slotID.generation);
+    }
+};
