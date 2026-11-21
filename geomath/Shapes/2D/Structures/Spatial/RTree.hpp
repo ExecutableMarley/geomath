@@ -7,6 +7,7 @@
 
 #include "CommonMath.hpp"
 #include "../../BBox2D.hpp"
+#include "../../Algorithms2D/Intersection2D.hpp"
 #include "../ISpatialIndex2D.hpp"
 
 #include <cassert>
@@ -24,24 +25,6 @@ namespace geomath
 
 // Todo: Bring this up to the quality of BVH2D
 
-//using RTreeNodeIndex = size_t;
-
-struct RTreeDistanceEntryCompare
-{
-    bool operator()(const std::pair<real_t, ShapeID>& left,
-        const std::pair<real_t, ShapeID>& right) const
-    {
-        return left.first < right.first;
-    }
-};
-
-using RTreeDistanceQueue = std::priority_queue<
-    std::pair<real_t, ShapeID>,
-    std::vector<std::pair<real_t, ShapeID>>,
-    RTreeDistanceEntryCompare>;
-
-
-
 struct RTreeFilter
 {
     BBox2D region;
@@ -51,7 +34,7 @@ struct RTreeFilter
 
 class RTree2D : public ISpatialIndex2D
 {
-private:
+public:
     using NodeIndex = size_t;
 	static constexpr NodeIndex InvalidNode = std::numeric_limits<NodeIndex>::max();
 
@@ -65,9 +48,6 @@ public:
 
     // Bulk-loading method
     void build(const std::span<SpatialEntry2D> elementBoundsWithIndices) override;
-
-    // Dynamic insertion
-    // void insert(ShapeID shapeIndex, const BBox2D& bounds) override {}
 
     // Reset method
     void clear() override
@@ -89,18 +69,16 @@ public:
         const Node& node = _nodes[idx];
         if (node.isLeaf)
         {
-            return node.entryCount;
+            return node.count;
         }
         else
         {
             size_t subTreeSize = 0;
-            for (size_t i = 0; i < node.childCount; ++i)
-                subTreeSize += size(node.firstChild + i);
+            for (size_t i = 0; i < node.count; ++i)
+                subTreeSize += size(node.firstIndex + i);
             return subTreeSize;
         }
     }
-
-
 
     //--- [Query] ---
 
@@ -123,27 +101,45 @@ public:
     void query_ray(const Ray2D& ray, real_t t_min, real_t t_max, const RayHitCallback& callback,
         const ShapeFilter& filter = {}) const override;
 
-    /*
-    void query_ray(const Ray2D& ray, real_t t_min, real_t t_max, const IShapeResolver2D& resolver,
-        const RayHitCallback& callback, const ShapeFilter& filter = {}) const;*/
-
     RTreeFilter createFilter(const BBox2D& region, size_t maxDepth) const;
 
-    //static constexpr size_t InvalidNode = std::numeric_limits<size_t>::max();
 private:
-    //using NodeIndex = size_t;
-	//static constexpr NodeIndex InvalidNode = std::numeric_limits<NodeIndex>::max();
 
     struct Node
     {
-        //Todo: We prob want to compress this down.
         bool isLeaf = false;
         BBox2D bounds;
-        size_t firstEntry = 0;
-        size_t entryCount = 0;
-        NodeIndex firstChild = 0;
-        size_t childCount = 0;
+        size_t firstIndex = 0;
+        size_t count = 0;
     };
+
+    struct Candidate
+	{
+		real_t priority;
+		bool isEntry;
+		NodeIndex index;
+	};
+
+    struct CandidateCompare
+	{
+		bool operator()(const Candidate& left, const Candidate& right) const noexcept
+		{
+			if (left.priority != right.priority)
+				return left.priority > right.priority;
+			return left.index < right.index; // tie-breaker
+		}
+	};
+
+    template <typename Queue>
+	void pushRayNode(Queue& queue, const Ray2D& ray, real_t t_min, real_t t_max, NodeIndex nodeIndex) const
+	{
+		if (nodeIndex == InvalidNode)
+			return;
+		real_t enter;
+		real_t exit;
+		if (detail::rayBoundsInterval(ray, _nodes[nodeIndex].bounds, t_min, t_max, enter, exit))
+			queue.push({ enter, false, nodeIndex });
+	}
 
     size_t createNode()
     {
@@ -172,7 +168,7 @@ private:
 
     std::span<const SpatialEntry2D> leafEntries(const Node& node) const
     {
-        return std::span<const SpatialEntry2D>(_entries).subspan(node.firstEntry, node.entryCount);
+        return std::span<const SpatialEntry2D>(_entries).subspan(node.firstIndex, node.count);
     }
 
     // Recursive helper for range search
@@ -181,10 +177,6 @@ private:
 
     bool pointSearchRecursive(size_t nodeIndex, const Vector2D& point,
         const ShapeCallback& callback, const ShapeFilter& filter) const;
-
-    // retrieve k final results from priority queue
-    void extractKNearestResults(size_t k, RTreeDistanceQueue& queue_to_explore,
-        const ShapeCallback& callback) const;
 
     void collectFilterNodes(size_t nodeIndex,
         const BBox2D& region,
@@ -197,7 +189,6 @@ private:
     size_t _minEntries;
     size_t _maxEntries;
     size_t _rootIndex;
-    BBox2D _rootBounds;
     std::vector<Node> _nodes;
     std::vector<SpatialEntry2D> _entries;
 };

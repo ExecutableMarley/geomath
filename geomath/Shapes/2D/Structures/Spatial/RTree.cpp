@@ -18,6 +18,7 @@ namespace geomath
 namespace
 {
 
+/*
 struct RTreeRayQueueEntry
 {
     real_t t;
@@ -41,8 +42,9 @@ using RTreeRayQueue = std::priority_queue<
     RTreeRayQueueEntry,
     std::vector<RTreeRayQueueEntry>,
     RTreeRayQueueCompare>;
-
+*/
 }
+
 
 void RTree2D::build(const std::span<SpatialEntry2D> elementBoundsWithIndices)
 {
@@ -59,7 +61,6 @@ void RTree2D::build(const std::span<SpatialEntry2D> elementBoundsWithIndices)
     std::vector<SpatialEntry2D> buildWorkspace(elementBoundsWithIndices.begin(), elementBoundsWithIndices.end());
     _rootIndex = createNode();
     buildRecursive(std::span<SpatialEntry2D>(buildWorkspace), 0, _rootIndex);
-    _rootBounds = calculateNodeMBR(_rootIndex);
 }
 
 void RTree2D::buildRecursive(const std::span<SpatialEntry2D> currentElements, int axis, size_t nodeIndex)
@@ -70,8 +71,8 @@ void RTree2D::buildRecursive(const std::span<SpatialEntry2D> currentElements, in
         Node& node = _nodes[nodeIndex];
         node.isLeaf = true;
         node.bounds = calculateMBR(currentElements);
-        node.firstEntry = _entries.size();
-        node.entryCount = currentElements.size();
+        node.firstIndex = _entries.size();
+        node.count = currentElements.size();
         _entries.insert(_entries.end(), currentElements.begin(), currentElements.end());
         return;
     }
@@ -108,8 +109,8 @@ void RTree2D::buildRecursive(const std::span<SpatialEntry2D> currentElements, in
 
     Node& node = _nodes[nodeIndex];
     node.isLeaf = false;
-    node.firstChild = firstChild;
-    node.childCount = numSlices;
+    node.firstIndex = firstChild;
+    node.count = numSlices;
 
     for (size_t i = 0; i < numSlices; ++i)
     {
@@ -140,7 +141,7 @@ void RTree2D::query_range(const BBox2D& query,
         // Tree is empty
         return;
     }
-    if (!_rootBounds.intersects(query))
+    if (!_nodes[_rootIndex].bounds.intersects(query))
         return;
 
     rangeSearchRecursive(_rootIndex, query, callback, filter);
@@ -164,9 +165,9 @@ bool RTree2D::rangeSearchRecursive(size_t nodeIndex, const BBox2D& query,
     else
     {
         // Recursive search children
-        for (size_t i = 0; i < node.childCount; ++i)
+        for (size_t i = 0; i < node.count; ++i)
         {
-            const size_t childIndex = node.firstChild + i;
+            const size_t childIndex = node.firstIndex + i;
             if (_nodes[childIndex].bounds.intersects(query))
             {
                 if (!rangeSearchRecursive(childIndex, query, callback, filter))
@@ -194,9 +195,9 @@ bool RTree2D::pointSearchRecursive(size_t nodeIndex, const Vector2D &point,
         return true;
     }
 
-    for (size_t i = 0; i < node.childCount; ++i)
+    for (size_t i = 0; i < node.count; ++i)
     {
-        const size_t childIndex = node.firstChild + i;
+        const size_t childIndex = node.firstIndex + i;
         if (_nodes[childIndex].bounds.contains(point))
             if (!pointSearchRecursive(childIndex, point, callback, filter))
                 return false;
@@ -215,7 +216,7 @@ ShapeID RTree2D::query_nearest(const Vector2D& queryPoint, const ShapeFilter& fi
         std::vector<std::pair<real_t, size_t>>,
         std::greater<std::pair<real_t, size_t>>> nodesToVisitQueue;
 
-    nodesToVisitQueue.push({ _rootBounds.minDistanceSquared(queryPoint), _rootIndex });
+    nodesToVisitQueue.push({ _nodes[_rootIndex].bounds.minDistanceSquared(queryPoint), _rootIndex });
 
     ShapeID nearestShape = ShapeID::invalid();
     real_t nearestDistanceSq = std::numeric_limits<real_t>::max();
@@ -246,9 +247,9 @@ ShapeID RTree2D::query_nearest(const Vector2D& queryPoint, const ShapeFilter& fi
         }
         else
         {
-            for (size_t i = 0; i < node.childCount; ++i)
+            for (size_t i = 0; i < node.count; ++i)
             {
-                const size_t childIndex = node.firstChild + i;
+                const size_t childIndex = node.firstIndex + i;
                 const real_t childMinDistSq = _nodes[childIndex].bounds.minDistanceSquared(queryPoint);
                 if (childMinDistSq < nearestDistanceSq)
                     nodesToVisitQueue.push({ childMinDistSq, childIndex });
@@ -263,99 +264,48 @@ void RTree2D::query_knn(const Vector2D& queryPoint, size_t k,
     const ShapeCallback& callback, const ShapeFilter& filter) const
 {
     if (!callback || k == 0 || _rootIndex == InvalidNode)
-    {
         return;
-    }
 
-    // Min-heap for nodes and elements to visit
-    std::priority_queue<std::pair<real_t, size_t>,
-        std::vector<std::pair<real_t, size_t>>,
-        std::greater<std::pair<real_t, size_t>>> nodesToVisitQueue;
+    std::priority_queue<Candidate, std::vector<Candidate>, CandidateCompare> queue;
+    queue.push({ _nodes[_rootIndex].bounds.minDistanceSquared(queryPoint), false, _rootIndex });
 
-    // Max-heap for 'k' best results found
-    RTreeDistanceQueue bestKResultsQueue;
-
-    BBox2D rootMbr = _rootBounds;
-    nodesToVisitQueue.push({ rootMbr.minDistanceSquared(queryPoint), _rootIndex });
-
-    while (!nodesToVisitQueue.empty())
+    size_t emitted = 0;
+    while (!queue.empty() && emitted < k)
     {
-        auto current = nodesToVisitQueue.top();
-        nodesToVisitQueue.pop();
+        const Candidate candidate = queue.top();
+        queue.pop();
 
-        real_t currentMinDistSq = current.first;
-        size_t currentIndex = current.second;
-
-        // Pruning
-        if (bestKResultsQueue.size() == k && currentMinDistSq > bestKResultsQueue.top().first)
+        if (candidate.isEntry)
         {
-            // All remaining will be further away than bestKResultsQueue.top().first
-            break;
+            if (!callback(_entries[candidate.index].shape))
+                return;
+            ++emitted;
+            continue;
         }
 
-        const Node& node = _nodes[currentIndex];
-
+        const Node& node = _nodes[candidate.index];
         if (node.isLeaf)
         {
-            for (const auto& entry : leafEntries(node))
+            for (size_t i = 0; i < node.count; ++i)
             {
-                Vector2D elementPoint = { entry.bounds.m_min.x, entry.bounds.m_min.y }; // Assuming point data
-                real_t actualDistSq = elementPoint.distanceSquared(queryPoint);
-
-                if ((!filter || filter(entry.shape)) && bestKResultsQueue.size() < k)
+                const size_t entryIndex = node.firstIndex + i;
+                const SpatialEntry2D& entry = _entries[entryIndex];
+                if (!filter || filter(entry.shape))
                 {
-                    //Append
-                    bestKResultsQueue.push({ actualDistSq, entry.shape });
-                }
-                else if ((!filter || filter(entry.shape)) && actualDistSq < bestKResultsQueue.top().first)
-                {
-                    //Replace with closer element
-                    bestKResultsQueue.pop();
-                    bestKResultsQueue.push({ actualDistSq, entry.shape });
+                    queue.push({ entry.bounds.minDistanceSquared(queryPoint), true,
+                        static_cast<NodeIndex>(entryIndex) });
                 }
             }
         }
         else
         {
-            for (size_t i = 0; i < node.childCount; ++i)
+            for (size_t i = 0; i < node.count; ++i)
             {
-                const size_t childIndex = node.firstChild + i;
-                real_t childMinDistSq = _nodes[childIndex].bounds.minDistanceSquared(queryPoint);
-
-                //Pruning check
-                if (bestKResultsQueue.size() == k && childMinDistSq > bestKResultsQueue.top().first)
-                {
-                    continue;
-                }
-                nodesToVisitQueue.push({ childMinDistSq, childIndex });
+                const size_t childIndex = node.firstIndex + i;
+                queue.push({ _nodes[childIndex].bounds.minDistanceSquared(queryPoint),
+                    false, static_cast<NodeIndex>(childIndex) });
             }
         }
-    }
-
-    // Extract and reverse results from bestKResultsQueue.
-    extractKNearestResults(k, bestKResultsQueue, callback);
-}
-
-void RTree2D::extractKNearestResults(size_t k,
-    RTreeDistanceQueue& bestKResultsQueue,
-    const ShapeCallback& callback) const
-{
-    // I wish we could iterate backwards through the priority queue
-    // Todo: Consider using a different data structure to avoid this extra step 
-    std::vector<std::pair<real_t, ShapeID>> tempResults;
-    while (!bestKResultsQueue.empty())
-    {
-        tempResults.push_back(bestKResultsQueue.top());
-        bestKResultsQueue.pop();
-    }
-    // Reverse
-    std::reverse(tempResults.begin(), tempResults.end());
-
-    // Take k results (min check not required atm)
-    for (size_t i = 0; i < std::min(k, tempResults.size()); ++i)
-    {
-        if (!callback(tempResults[i].second))
-            return;
     }
 }
 
@@ -365,7 +315,7 @@ void RTree2D::extractKNearestResults(size_t k,
 void RTree2D::query_point(const Vector2D& point, const ShapeCallback& callback,
     const ShapeFilter& filter) const
 {
-    if (!callback || _rootIndex == InvalidNode || !_rootBounds.contains(point))
+    if (!callback || _rootIndex == InvalidNode || !_nodes[_rootIndex].bounds.contains(point))
         return;
 
     pointSearchRecursive(_rootIndex, point, callback, filter);
@@ -380,49 +330,48 @@ void RTree2D::query_ray(const Ray2D& ray, real_t t_min, real_t t_max,
 
     real_t rootEnter;
     real_t rootExit;
-    if (!detail::rayBoundsInterval(ray, _rootBounds, t_min, t_max, rootEnter, rootExit))
+    if (!detail::rayBoundsInterval(ray, _nodes[_rootIndex].bounds, t_min, t_max, rootEnter, rootExit))
         return;
 
-    RTreeRayQueue candidates;
-    size_t sequence = 0;
-    candidates.push({ rootEnter, _rootIndex, ShapeID::invalid(), true, sequence++ });
+    std::priority_queue<Candidate, std::vector<Candidate>, CandidateCompare> queue;
+    pushRayNode(queue, ray, t_min, t_max, _rootIndex);
 
-    while (!candidates.empty())
+    while (!queue.empty())
     {
-        const RTreeRayQueueEntry candidate = candidates.top();
-        candidates.pop();
+        const Candidate candidate = queue.top();
+        queue.pop();
 
-        if (!candidate.isNode)
+        if (candidate.isEntry)
         {
-            if (!callback(candidate.shape, candidate.t))
+            if (!callback(_entries[candidate.index].shape, candidate.priority))
                 return;
             continue;
         }
 
-        const Node& node = _nodes[candidate.nodeIndex];
+        const Node& node = _nodes[candidate.index];
         if (node.isLeaf)
         {
-            for (const auto& entry : leafEntries(node))
+            for (NodeIndex i = 0; i < node.count; ++i)
             {
+                const NodeIndex entryIndex = node.firstIndex + i;
+                const SpatialEntry2D& entry = _entries[entryIndex];
+
                 if (filter && !filter(entry.shape))
                     continue;
 
                 HitInfo2D hitInfo;
                 if (raycast(ray, entry.bounds, t_min, t_max, &hitInfo))
-                    candidates.push({ hitInfo.t, InvalidNode, entry.shape, false, sequence++ });
+                    queue.push({ hitInfo.t, true, entryIndex });
             }
-            continue;
         }
-
-        for (size_t i = 0; i < node.childCount; ++i)
+        else
         {
-            const size_t childIndex = node.firstChild + i;
-            const Node& child = _nodes[childIndex];
-            real_t childEnter;
-            real_t childExit;
-            if (detail::rayBoundsInterval(ray, child.bounds, t_min, t_max, childEnter, childExit))
-                candidates.push({ childEnter, childIndex, ShapeID::invalid(), true, sequence++ });
+            for (size_t i = 0; i < node.count; ++i)
+            {
+                pushRayNode(queue, ray, t_min, t_max, node.firstIndex + i);
+            }
         }
+        
     }
 }
 
@@ -463,9 +412,9 @@ void RTree2D::collectFilterNodes(size_t nodeIndex,
     }
 
     // Otherwise, go deeper
-    for (size_t i = 0; i < node.childCount; ++i)
+    for (size_t i = 0; i < node.count; ++i)
     {
-        const size_t childIndex = node.firstChild + i;
+        const size_t childIndex = node.firstIndex + i;
         if (_nodes[childIndex].bounds.intersects(region))
         {
             collectFilterNodes(childIndex, region, depth + 1, maxDepth, outNodes, outBounds);

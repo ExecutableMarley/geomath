@@ -23,6 +23,10 @@ namespace Arns::geomath
 class BVH3D : public ISpatialIndex3D
 {
 public:
+    using NodeIndex = uint32_t;
+    static constexpr NodeIndex InvalidNode = std::numeric_limits<NodeIndex>::max();
+
+public:
     explicit BVH3D(size_t maxLeafEntries = 4)
         : _maxLeafEntries(std::max<size_t>(1, maxLeafEntries)) {}
 
@@ -155,9 +159,6 @@ public:
     }
 
 private:
-    using NodeIndex = uint32_t;
-    static constexpr NodeIndex InvalidNode = std::numeric_limits<NodeIndex>::max();
-
     struct Node
     {
         BBox3D bounds;

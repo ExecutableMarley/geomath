@@ -39,6 +39,10 @@ struct FastQuadTreeNode
 class TransientQuadTree2D : public ISpatialIndex2D
 {
 public:
+    using NodeIndex = size_t;
+	static constexpr NodeIndex InvalidNode = std::numeric_limits<NodeIndex>::max();
+    
+public:
     TransientQuadTree2D(const BBox2D& bounds, size_t maxObjects, size_t maxDepth)
         : _rootBounds(bounds),
           _maxEntries(maxObjects),
