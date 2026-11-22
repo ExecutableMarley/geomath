@@ -28,17 +28,17 @@ public:
 
     real_t volume() const
     {
-        return 0.f;
+        return 0.0;
     }
 
     real_t surfaceArea() const
     {
-        return 0.5f * (m_b - m_a).cross(m_c - m_a).length();
+        return 0.5 * (m_b - m_a).cross(m_c - m_a).length();
     }
 
     Vector3D centroid() const
     {
-        return (m_a + m_b + m_c) / 3.0f;
+        return (m_a + m_b + m_c) / 3.0;
     }
 
     Triangle3D& translate(const Vector3D &translation)

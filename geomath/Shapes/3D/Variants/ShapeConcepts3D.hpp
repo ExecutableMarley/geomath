@@ -15,6 +15,7 @@
 namespace Arns::geomath
 {
 
+class Matrix3x3;
 class Ray3D;
 class Segment3D;
 class BBox3D;
@@ -29,9 +30,9 @@ concept Translatable3D = requires(T& t, const Vector3D& translation) {
 };
 
 template <typename T>
-concept Rotatable3D = requires(T& t, Radians xAngle, Radians yAngle, Radians zAngle, const Vector3D& point) {
-    { t.rotate(xAngle, yAngle, zAngle) } -> std::same_as<T&>;
-    { t.rotate(xAngle, yAngle, zAngle, point) } -> std::same_as<T&>;
+concept Rotatable3D = requires(T& t, const Matrix3x3& rotationMatrix, const Vector3D& point) {
+    { t.rotate(rotationMatrix) } -> std::same_as<T&>;
+    { t.rotateAround(rotationMatrix, point) } -> std::same_as<T&>;
 };
 
 template <typename T>
@@ -51,6 +52,11 @@ concept Transformable3D = Translatable3D<T> && Rotatable3D<T> && Scalable3D<T>;
 template <typename T>
 concept PointContainable3D = requires(const T& t, const Vector3D& point) {
     { t.contains(point) } -> std::same_as<bool>;
+};
+
+template <typename T>
+concept Bounded3D = requires(const T& t) {
+    { t.boundingBox() } -> std::convertible_to<BBox3D>;
 };
 
 }

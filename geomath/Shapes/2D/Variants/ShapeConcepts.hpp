@@ -56,6 +56,11 @@ concept PointContainable2D = requires(const T& t, const Vector2D& point) {
 };
 
 template <typename T>
+concept Bounded2D = requires(const T& t) {
+    { t.boundingBox() } -> std::convertible_to<BBox2D>;
+};
+
+template <typename T>
 concept Shape2D = requires(T& t, const T& ct, const Vector2D& p) {
     { ct.contains(p) } -> std::same_as<bool>;
     { t.translate(p) } -> std::same_as<T&>;

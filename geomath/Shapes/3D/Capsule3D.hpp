@@ -7,10 +7,11 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector3D.hpp"
+#include "Algebra/Matrices/Matrix3x3.hpp"
 #include "BBox3D.hpp"
 #include "Variants/EShapeType3D.hpp"
 #include "Variants/ShapeConcepts3D.hpp"
-#include "Algorithms3D/Algorithms3D.hpp"
+#include "Algorithms3D/Distance3D.hpp"
 
 namespace Arns
 {
@@ -36,17 +37,17 @@ public:
 
     real_t volume() const 
     {
-        return PI * m_radius * m_radius * (4.0f / 3.0f * m_radius + (m_endPoint - m_startPoint).length());
+        return PI * m_radius * m_radius * (4.0 / 3.0 * m_radius + (m_endPoint - m_startPoint).length());
     }
 
     real_t surfaceArea() const 
     {
-        return 2.0f * PI * m_radius * (2.0f * m_radius + (m_endPoint - m_startPoint).length());
+        return 2.0 * PI * m_radius * (2.0 * m_radius + (m_endPoint - m_startPoint).length());
     }
 
     Vector3D centroid() const 
     {
-        return (m_startPoint + m_endPoint) * 0.5f;
+        return (m_startPoint + m_endPoint) * 0.5;
     }
 
     Capsule3D& translate(const Vector3D &translation) 
@@ -65,34 +66,22 @@ public:
         return *this;
     }
 
-    Capsule3D& rotate(Radians xAngle, Radians yAngle, Radians zAngle)
+    Capsule3D& rotateAround(const Matrix3x3 &rotationMatrix, const Vector3D &point)
     {
-        Vector3D centroid = this->centroid();
-        m_startPoint = m_startPoint.rotateAround(xAngle, yAngle, zAngle, centroid);
-        m_endPoint   = m_endPoint.rotateAround(xAngle, yAngle, zAngle, centroid);
+        m_startPoint = rotationMatrix * (m_startPoint - point) + point;
+        m_endPoint   = rotationMatrix * (m_endPoint - point) + point;
         return *this;
     }
 
-    /*
-    Capsule& rotate(real_t angle, const Vector3D &axis)
+    Capsule3D& rotate(const Matrix3x3 &rotationMatrix)
     {
-        m_startPoint = m_startPoint.rotate(angle, axis);
-        m_endPoint   = m_endPoint.rotate(angle, axis);
-        return *this;
-    }*/
-
-    /*
-    bool contains(const Vector3D &point) const 
-    {
-        return false;
-    }*/
-
+        return rotateAround(rotationMatrix, Vector3D(0, 0, 0));
+    }
     
     bool contains(const Vector3D &point) const 
     {
         return detail::distancePointToSegment(m_startPoint, m_endPoint, point) < m_radius;
     }
-    
 
     BBox3D boundingBox() const 
     {
@@ -104,9 +93,9 @@ public:
 
 static_assert(Translatable3D<Capsule3D>);
 static_assert(UniformlyScalable3D<Capsule3D>);
-//static_assert(Rotatable3D<Capsule3D>);
-//static_assert(Transformable3D<Capsule3D>);
+static_assert(Rotatable3D<Capsule3D>);
 static_assert(PointContainable3D<Capsule3D>);
+static_assert(Bounded3D<Capsule3D>);
 
 } // namespace Math
 

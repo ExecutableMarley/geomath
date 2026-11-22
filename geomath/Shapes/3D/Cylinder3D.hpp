@@ -7,6 +7,7 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector3D.hpp"
+#include "Algebra/Matrices/Matrix3x3.hpp"
 #include "BBox3D.hpp"
 #include "Variants/EShapeType3D.hpp"
 #include "Variants/ShapeConcepts3D.hpp"
@@ -40,12 +41,12 @@ public:
 
     real_t surfaceArea() const
     {
-        return 2.0f * PI * m_radius * (m_endPoint - m_startPoint).length() + 2.0f * PI * m_radius * m_radius;
+        return 2.0 * PI * m_radius * (m_endPoint - m_startPoint).length() + 2.0 * PI * m_radius * m_radius;
     }
 
     Vector3D centroid() const
     {
-        return (m_startPoint + m_endPoint) * 0.5f;
+        return (m_startPoint + m_endPoint) * 0.5;
     }
 
     bool contains(const Vector3D &point) const
@@ -55,7 +56,7 @@ public:
         real_t t = (point - m_startPoint).dot(delta) / (delta).lengthSquared();
 
         Vector3D closestPoint = m_startPoint + delta * t;
-        if (t >= 0.0f && t <= 1.0f && (point - closestPoint).lengthSquared() <= m_radius * m_radius)
+        if (t >= 0.0 && t <= 1.0 && (point - closestPoint).lengthSquared() <= m_radius * m_radius)
         {
             return true;
         }
@@ -78,6 +79,18 @@ public:
         return *this;
     }
 
+    Cylinder3D& rotateAround(const Matrix3x3 &rotationMatrix, const Vector3D &point)
+    {
+        m_startPoint = rotationMatrix * (m_startPoint - point) + point;
+        m_endPoint   = rotationMatrix * (m_endPoint - point) + point;
+        return *this;
+    }
+
+    Cylinder3D& rotate(const Matrix3x3 &rotationMatrix)
+    {
+        return this->rotateAround(rotationMatrix, this->centroid());
+    }
+
     BBox3D boundingBox() const
     {
         const Vector3D min = Vector3D::min(m_startPoint, m_endPoint) - Vector3D(m_radius, m_radius, m_radius);
@@ -88,9 +101,10 @@ public:
 
 static_assert(Translatable3D<Cylinder3D>);
 static_assert(UniformlyScalable3D<Cylinder3D>);
-//static_assert(Rotatable3D<Cylinder3D>);
+static_assert(Rotatable3D<Cylinder3D>);
 //static_assert(Transformable3D<Cylinder3D>);
 static_assert(PointContainable3D<Cylinder3D>);
+static_assert(Bounded3D<Cylinder3D>);
 
 } // namespace Math
 

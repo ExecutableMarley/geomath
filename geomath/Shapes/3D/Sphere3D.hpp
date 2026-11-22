@@ -7,6 +7,7 @@
 
 #include "CommonMath.hpp"
 #include "Geometry/Vector3D.hpp"
+#include "Algebra/Matrices/Matrix3x3.hpp"
 #include "BBox3D.hpp"
 #include "Variants/EShapeType3D.hpp"
 #include "Variants/ShapeConcepts3D.hpp"
@@ -34,12 +35,12 @@ public:
 
     real_t volume() const 
     {
-        return 4.0f / 3.0f * PI * m_radius * m_radius * m_radius;
+        return 4.0 / 3.0 * PI * m_radius * m_radius * m_radius;
     }
 
     real_t surfaceArea() const 
     {
-        return 4.0f * PI * m_radius * m_radius;
+        return 4.0 * PI * m_radius * m_radius;
     }
 
     Vector3D centroid() const 
@@ -69,14 +70,14 @@ public:
         return *this;
     }
 
-    Sphere3D& rotate(Radians xAngle, Radians yAngle, Radians zAngle)
+    Sphere3D& rotateAround(const Matrix3x3 &rotationMatrix, const Vector3D &point)
     {
+        m_center = rotationMatrix * (m_center - point) + point;
         return *this;
     }
-    
-    Sphere3D& rotate(Radians xAngle, Radians yAngle, Radians zAngle, const Vector3D& point)
+
+    Sphere3D& rotate(const Matrix3x3 &rotationMatrix)
     {
-        m_center = m_center.rotateAround(xAngle, yAngle, zAngle, point);
         return *this;
     }
 
@@ -96,6 +97,7 @@ static_assert(UniformlyScalable3D<Sphere3D>);
 static_assert(Rotatable3D<Sphere3D>);
 //static_assert(Transformable3D<Sphere3D>);
 static_assert(PointContainable3D<Sphere3D>);
+static_assert(Bounded3D<Sphere3D>);
 
 } // namespace Math
 

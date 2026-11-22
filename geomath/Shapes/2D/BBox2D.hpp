@@ -227,6 +227,11 @@ public:
         return m_min.x <= rectangle.m_max.x && m_max.x >= rectangle.m_min.x && m_min.y <= rectangle.m_max.y && m_max.y >= rectangle.m_min.y;
     }
 
+    BBox2D boundingBox() const
+    {
+        return *this;
+    }
+
     // --- Comparison Operators ---
 
     bool operator==(const BBox2D& other) const
@@ -310,6 +315,7 @@ public:
 static_assert(Translatable2D<BBox2D>);
 static_assert(Scalable2D<BBox2D>);
 static_assert(PointContainable2D<BBox2D>);
+static_assert(Bounded2D<BBox2D>);
 
 } // namespace geomath
 

@@ -47,7 +47,6 @@
 // 2D
 
 //Lightweight algorithms & queries
-#include "Shapes/2D/Algorithms2D/Algorithms2D.hpp"
 #include "Shapes/2D/Algorithms2D/Containment2D.hpp"
 #include "Shapes/2D/Algorithms2D/Intersection2D.hpp"
 #include "Shapes/2D/Algorithms2D/Distance2D.hpp"
@@ -75,12 +74,12 @@
 #include "Shapes/2D/Structures/Spatial/TransientQuadTree2D.hpp"
 
 // 3D
-#include "Shapes/3D/Algorithms3D/Algorithms3D.hpp"
+#include "Shapes/3D/Algorithms3D/Intersection3D.hpp"
+#include "Shapes/3D/Algorithms3D/Distance3D.hpp"
 
 #include "Shapes/3D/Ray3D.hpp"
 #include "Shapes/3D/Line3D.hpp"
 #include "Shapes/3D/BBox3D.hpp"
-#include "Shapes/3D/IShape3D.hpp"
 #include "Shapes/3D/Sphere3D.hpp"
 #include "Shapes/3D/Cylinder3D.hpp"
 #include "Shapes/3D/Capsule3D.hpp"
